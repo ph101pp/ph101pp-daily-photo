@@ -104,4 +104,27 @@ library DateTime {
             (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
         }
     }
+
+    function isValidDate(uint256 year, uint256 month, uint256 day) internal pure returns (bool valid) {
+        if (year >= 1970 && month > 0 && month <= 12) {
+            uint256 daysInMonth = _getDaysInMonth(year, month);
+            if (day > 0 && day <= daysInMonth) {
+                valid = true;
+            }
+        }
+    }
+
+    function _getDaysInMonth(uint256 year, uint256 month) internal pure returns (uint256 daysInMonth) {
+      if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+          daysInMonth = 31;
+      } else if (month != 2) {
+          daysInMonth = 30;
+      } else {
+          daysInMonth = _isLeapYear(year) ? 29 : 28;
+      }
+    }
+
+    function _isLeapYear(uint256 year) internal pure returns (bool leapYear) {
+      leapYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+    }
 }

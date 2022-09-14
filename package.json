@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "test": "npx hardhat test",
     "fast-test": "TS_NODE_TYPE_CHECK=false npx hardhat test"
   },
   "devDependencies": {

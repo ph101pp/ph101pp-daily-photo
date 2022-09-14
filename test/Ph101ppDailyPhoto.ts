@@ -1,124 +1,245 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-import { expect } from "chai";
+import { expect, assert } from "chai";
 import { ethers } from "hardhat";
+import { Ph101ppDailyPhotos } from "../typechain-types";
 
-describe("Lock", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
-  async function deployOneYearLockFixture() {
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const ONE_GWEI = 1_000_000_000;
+describe.only("Ph101ppDailyPhotos", function () {
 
-    const lockedAmount = ONE_GWEI;
-    const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS;
+  async function deployFixture() {
+    const mutableUri = "mutable.uri/";
+    const immutableUri = "immutable.uri/";
+    // Contracts are deplodyed using the first signer/account by default
+    const [owner, account1, account2] = await ethers.getSigners();
 
-    // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await ethers.getSigners();
+    const PDP = await ethers.getContractFactory("Ph101ppDailyPhotos");
+    const pdp = await PDP.deploy(immutableUri, mutableUri);
 
-    const Lock = await ethers.getContractFactory("Lock");
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+    const DateTime = await ethers.getContractFactory("DateTimeTestContract");
+    const dateTime = await DateTime.deploy();
 
-    return { lock, unlockTime, lockedAmount, owner, otherAccount };
+
+    return {pdp, dateTime, owner, account1, account2, mutableUri, immutableUri};
   }
 
-  describe("Deployment", function () {
-    it("Should set the right unlockTime", async function () {
-      const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.unlockTime()).to.equal(unlockTime);
+  describe("URI storing / updating", function () {
+    it("Should set the correct mutableUri and immutableUri during deploy", async function () {
+      const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
+      expect(await pdp.mutableUri()).to.equal(mutableUri);
+      const uriHistory = await pdp.uriHistory();
+      expect(uriHistory).to.be.lengthOf(1);
+      expect(uriHistory[0]).to.equal(immutableUri);
     });
 
-    it("Should set the right owner", async function () {
-      const { lock, owner } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.owner()).to.equal(owner.address);
+    it("Should correcly update mutableUri via setMutableURI()", async function () {
+      const mutableUri2 = "2.mutable.uri";
+      const { pdp, mutableUri } = await loadFixture(deployFixture);
+      expect(await pdp.mutableUri()).to.equal(mutableUri);
+      await pdp.setMutableURI(mutableUri2);
+      expect(await pdp.mutableUri()).to.equal(mutableUri2);
     });
-
-    it("Should receive and store the funds to lock", async function () {
-      const { lock, lockedAmount } = await loadFixture(
-        deployOneYearLockFixture
-      );
-
-      expect(await ethers.provider.getBalance(lock.address)).to.equal(
-        lockedAmount
-      );
-    });
-
-    it("Should fail if the unlockTime is not in the future", async function () {
-      // We don't use the fixture here because we want a different deployment
-      const latestTime = await time.latest();
-      const Lock = await ethers.getContractFactory("Lock");
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-        "Unlock time should be in the future"
-      );
+    
+    it("Should correcly append immutableUri via setURI()", async function () {
+      const immutableUri2 = "2.immutable.uri";
+      const { pdp, immutableUri } = await loadFixture(deployFixture);
+      await pdp.setURI(immutableUri2);
+      const uriHistory = await pdp.uriHistory();
+      expect(uriHistory).to.be.lengthOf(2);
+      expect(uriHistory[0]).to.equal(immutableUri);
+      expect(uriHistory[1]).to.equal(immutableUri2);
     });
   });
 
-  describe("Withdrawals", function () {
-    describe("Validations", function () {
-      it("Should revert with the right error if called too soon", async function () {
-        const { lock } = await loadFixture(deployOneYearLockFixture);
+  describe("tokenID <> date conversion", function(){
+    type TokenIdTest = {
+      tokenID: number,
+      date: string,
+    }
 
-        await expect(lock.withdraw()).to.be.revertedWith(
-          "You can't withdraw yet"
-        );
-      });
+    const tokenIDTests: TokenIdTest[] = [
+      {
+        tokenID: 1,
+        date: "20220901"
+      },
+      {
+        tokenID: 20,
+        date: "20220920"
+      },
+      {
+        tokenID: 524,
+        date: "20240206"
+      },
+      {
+        tokenID: 5824,
+        date: "20380811"
+      },
+      {
+        tokenID: 15824,
+        date: "20651227"
+      },
+      {
+        tokenID: 99999,
+        date: "22960614"
+      }
+    ]
 
-      it("Should revert with the right error if called from another account", async function () {
-        const { lock, unlockTime, otherAccount } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    async function testDate2TokenID(pdp: Ph101ppDailyPhotos, test:TokenIdTest) {
+      const dateString = await pdp.tokenIdToDate(test.tokenID);
 
-        // We can increase the time in Hardhat Network
-        await time.increaseTo(unlockTime);
+      const year = parseInt(test.date.slice(0,4));
+      const month = parseInt(test.date.slice(4,6));
+      const day = parseInt(test.date.slice(6,8));
+      const tokenId = await pdp.tokenIdFromDate(year, month, day);
+            
+      expect(dateString).to.equal(test.date);
+      assert(tokenId.eq(test.tokenID), `${tokenId.toString()} === ${test.tokenID}`)
+    }
 
-        // We use lock.connect() to send a transaction from another account
-        await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
-          "You aren't the owner"
-        );
-      });
+    it("should correcty convert date string <> token ID", async function () {
+      const { pdp } = await loadFixture(deployFixture);
 
-      it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
-        const { lock, unlockTime } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        // Transactions are sent using the first signer by default
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw()).not.to.be.reverted;
-      });
+      for(const i in tokenIDTests) {
+        await testDate2TokenID(pdp, tokenIDTests[i]);
+      }
     });
 
-    describe("Events", function () {
-      it("Should emit an event on withdrawals", async function () {
-        const { lock, unlockTime, lockedAmount } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw())
-          .to.emit(lock, "Withdrawal")
-          .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
-      });
+    it("should fail to translate tokenID:0 (claims) to date", async function () {
+      const { pdp } = await loadFixture(deployFixture);
+      await expect(
+        pdp.tokenIdToDate(0)
+      ).to.be.revertedWith('No date associated with claims!');
     });
 
-    describe("Transfers", function () {
-      it("Should transfer the funds to the owner", async function () {
-        const { lock, unlockTime, lockedAmount, owner } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    it("should fail to translate date before Sept 1, 2022 to tokenId", async function () {
+      const { pdp } = await loadFixture(deployFixture);
+      await expect(
+        pdp.tokenIdFromDate(2022,8,1)
+      ).to.be.revertedWith('Project started September 1, 2022!');
+    });
 
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw()).to.changeEtherBalances(
-          [owner, lock],
-          [lockedAmount, -lockedAmount]
-        );
-      });
+    it("should fail to translate date if invalid date (incl leap years)", async function () {
+      const { pdp } = await loadFixture(deployFixture);
+      await expect(
+        pdp.tokenIdFromDate(5138,13,17)
+      ).to.be.revertedWith('Invalid date!');
+      await expect(
+        pdp.tokenIdFromDate(2023,2,29)
+      ).to.be.revertedWith('Invalid date!');
+      await expect(
+        pdp.tokenIdFromDate(2025,2,29)
+      ).to.be.revertedWith('Invalid date!');
+      assert(
+        await pdp.tokenIdFromDate(2024,2,29),
+      "20240229 should be valid date");
     });
   });
+
+  describe("URI() for tokenIDs", function(){
+
+    it("should return correct url for tokenId:1 ", async function () {
+      const tokenId = 1;
+      const year = 2022;
+      const month = 9;
+      const day = 1;
+      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
+
+      const { pdp, immutableUri } = await loadFixture(deployFixture);
+
+      const uri = await pdp.uri(tokenId);
+      const uriForDate = await pdp.uriForDate(year, month, day);
+      
+      expect(uri).to.equal(immutableUri+tokenDate+".json");
+      expect(uri).to.equal(uriForDate);
+    });
+
+    it("should return correct url for tokenId:0 (CLAIM) ", async function () {
+      const tokenId = 0;
+      const { pdp, immutableUri } = await loadFixture(deployFixture);
+      expect(await pdp.uri(tokenId)).to.equal(immutableUri+"CLAIM.json");
+    });
+
+    it("should return correct url for yesterdays tokenId ", async function () {
+      const { pdp, immutableUri } = await loadFixture(deployFixture);
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth()+1;
+      const day = now.getDate()-1;
+
+      const tokenId = await pdp.tokenIdFromDate(year, month, day);
+      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
+
+      const uri = await pdp.uri(tokenId);
+      const uriForDate = await pdp.uriForDate(year, month, day);
+      
+      expect(uri).to.equal(immutableUri+tokenDate+".json");
+      expect(uri).to.equal(uriForDate);
+    });
+    
+    it("should return correct url for todays tokenId ", async function () {
+      const { pdp, mutableUri } = await loadFixture(deployFixture);
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth()+1;
+      const day = now.getDate();
+
+      const tokenId = await pdp.tokenIdFromDate(year, month, day);
+      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
+
+      const uri = await pdp.uri(tokenId);
+      const uriForDate = await pdp.uriForDate(year, month, day);
+      
+      expect(uri).to.equal(mutableUri+tokenDate+".json");
+      expect(uri).to.equal(uriForDate);
+    });
+
+    it("should return correct url for tomorrows tokenId ", async function () {
+      const { pdp, immutableUri } = await loadFixture(deployFixture);
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth()+1;
+      const day = now.getDate()+1;
+
+      const tokenId = await pdp.tokenIdFromDate(year, month, day);
+
+      const uri = await pdp.uri(tokenId);
+      const uriForDate = await pdp.uriForDate(year, month, day);
+      
+      expect(uri).to.equal(immutableUri+"FUTURE.json");
+      expect(uri).to.equal(uriForDate);
+
+    });
+
+    it("should return correct url for a minted token before and after immutableURI was updated", async function () {
+      const { pdp, mutableUri } = await loadFixture(deployFixture);
+      const newImmutableUri = "2.immutable.uri/";
+
+      time.increase(60*60*24*7);
+      
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth()+1;
+      const day = now.getDate()+3;
+      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
+
+      const tokenId = await pdp.tokenIdFromDate(year, month, day);
+
+      const uri = await pdp.uri(tokenId);
+      const uriForDate = await pdp.uriForDate(year, month, day);
+      
+      expect(uri).to.equal(mutableUri+tokenDate+".json");
+      expect(uri).to.equal(uriForDate);
+
+      await pdp.setURI(newImmutableUri);
+
+      const uri2 = await pdp.uri(tokenId);
+      const uriForDate2 = await pdp.uriForDate(year, month, day);
+      
+      expect(uri2).to.equal(newImmutableUri+tokenDate+".json");
+      expect(uri2).to.equal(uriForDate2);
+
+    });
+
+  });
+
 });
+
