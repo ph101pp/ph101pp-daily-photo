@@ -1,8 +1,10 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 import { Ph101ppDailyPhotos } from "../typechain-types";
+
+const SECONDS_PER_DAY = 24 * 60 * 60;
+const nowTimestamp = Math.ceil(Date.now()/1000)+SECONDS_PER_DAY*3;
 
 describe.only("Ph101ppDailyPhotos", function () {
 
@@ -11,15 +13,13 @@ describe.only("Ph101ppDailyPhotos", function () {
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
     const [owner, account1, account2] = await ethers.getSigners();
-
+    
+    await time.increaseTo(nowTimestamp);
+    
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhotos");
     const pdp = await PDP.deploy(immutableUri, mutableUri);
 
-    const DateTime = await ethers.getContractFactory("DateTimeTestContract");
-    const dateTime = await DateTime.deploy();
-
-
-    return {pdp, dateTime, owner, account1, account2, mutableUri, immutableUri};
+    return {pdp, owner, account1, account2, mutableUri, immutableUri};
   }
 
   describe("URI storing / updating", function () {
@@ -160,10 +160,10 @@ describe.only("Ph101ppDailyPhotos", function () {
 
     it("should return correct url for yesterdays tokenId ", async function () {
       const { pdp, immutableUri } = await loadFixture(deployFixture);
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth()+1;
-      const day = now.getDate()-1;
+      const now = new Date(nowTimestamp*1000);
+      const year = now.getUTCFullYear();
+      const month = now.getUTCMonth()+1;
+      const day = now.getUTCDate()-1;
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
@@ -177,10 +177,10 @@ describe.only("Ph101ppDailyPhotos", function () {
     
     it("should return correct url for todays tokenId ", async function () {
       const { pdp, mutableUri } = await loadFixture(deployFixture);
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth()+1;
-      const day = now.getDate();
+      const now = new Date(nowTimestamp*1000);
+      const year = now.getUTCFullYear();
+      const month = now.getUTCMonth()+1;
+      const day = now.getUTCDate();
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
@@ -194,10 +194,10 @@ describe.only("Ph101ppDailyPhotos", function () {
 
     it("should return correct url for tomorrows tokenId ", async function () {
       const { pdp, immutableUri } = await loadFixture(deployFixture);
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth()+1;
-      const day = now.getDate()+1;
+      const now = new Date(nowTimestamp*1000);
+      const year = now.getUTCFullYear();
+      const month = now.getUTCMonth()+1;
+      const day = now.getUTCDate()+1;
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
 
@@ -215,10 +215,10 @@ describe.only("Ph101ppDailyPhotos", function () {
 
       time.increase(60*60*24*7);
       
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth()+1;
-      const day = now.getDate()+3;
+      const now = new Date(nowTimestamp*1000);
+      const year = now.getUTCFullYear();
+      const month = now.getUTCMonth()+1;
+      const day = now.getUTCDate()+3;
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);

@@ -7,6 +7,9 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./DateTime.sol";
 
+// import "hardhat/console.sol";
+
+
 contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
     // bytes32 public constant PHOTO_MINTER = keccak256("PHOTO_MINTER");
     uint256 public constant START_DATE = 1661990400; // Sept 1, 2022
@@ -49,7 +52,6 @@ contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
         } else {
             uint256 tokenTimestamp = _timestampFromTokenId(tokenId);
             uint256 todayToken = _timestampToTokenId(block.timestamp);
-
             if (block.timestamp < tokenTimestamp) {
                 // ... in future -> return default.
                 tokenDate = FUTURE_TOKEN;

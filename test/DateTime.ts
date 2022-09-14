@@ -72,15 +72,6 @@ describe.only("DateTime", function () {
     return {dateTime};
   }
 
-  it("Should correctly parse current date", async function () {
-    const { dateTime } = await loadFixture(deployFixture);
-    const now = await dateTime._nowDate();
-    
-    expect(now.year.toNumber()).to.equal((new Date()).getFullYear());
-    expect(now.month.toNumber()).to.equal((new Date()).getMonth()+1);
-    expect(now.day.toNumber()).to.equal((new Date()).getDate());
-  });
-
   it("Should correcly parse date test cases ", async function () {
     const { dateTime } = await loadFixture(deployFixture);
     for(const i in testCases) {
