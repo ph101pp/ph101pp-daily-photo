@@ -17,9 +17,11 @@ contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
     string private constant CLAIM_TOKEN = "CLAIM";
     uint256 private constant CLAIM_TOKEN_ID = 0;
 
-    string[] private _uris;
+    string private _uri;
     string private _mutableUri;
     uint256 private _lastUriUpdate;
+
+    event UriSet(string newURI, address sender);
 
     constructor(string memory newUri, string memory newMutableUri) ERC1155("") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -28,10 +30,10 @@ contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
     }
 
     function setURI(string memory newUri) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _uri = newUri;
         _lastUriUpdate = block.timestamp;
-        _uris.push(newUri);
+        emit UriSet(newUri, msg.sender);
     }
-
     function setMutableURI(string memory newMutableUri)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -40,7 +42,6 @@ contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
     }
 
     function uri(uint256 tokenId) public view override returns (string memory) {
-        string memory latestURI = _uris[_uris.length - 1];
         string memory tokenDate;
         string memory currentUri;
 
@@ -48,14 +49,14 @@ contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
         if (tokenId == CLAIM_TOKEN_ID) {
             // ... is claim -> return claim
             tokenDate = CLAIM_TOKEN;
-            currentUri = latestURI;
+            currentUri = _uri;
         } else {
             uint256 tokenTimestamp = _timestampFromTokenId(tokenId);
             uint256 todayToken = _timestampToTokenId(block.timestamp);
             if (block.timestamp < tokenTimestamp) {
                 // ... in future -> return default.
                 tokenDate = FUTURE_TOKEN;
-                currentUri = latestURI;
+                currentUri = _uri;
             } else if (tokenId == todayToken) {
                 // ... is today -> return mutable uri
                 tokenDate = _timestampToDate(tokenTimestamp);
@@ -67,7 +68,7 @@ contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
                 // ... and ...
                 if (_lastUriUpdate > tokenTimestamp) {
                     // ... uri updated since token -> immutable uri
-                    currentUri = latestURI;
+                    currentUri = _uri;
                 } else {
                     // ... uri not yet updated since token -> mutable uri
                     currentUri = _mutableUri;
@@ -78,21 +79,12 @@ contract Ph101ppDailyPhotos is ERC1155, AccessControl, ERC1155Supply {
         return string.concat(currentUri, tokenDate, ".json");
     }
 
-    function uriForDate(
-        uint256 year,
-        uint256 month,
-        uint256 day
-    ) public view returns (string memory) {
-        uint256 tokenID = tokenIdFromDate(year, month, day);
-        return uri(tokenID);
-    }
-
-    function uriHistory() public view returns (string[] memory) {
-        return _uris;
-    }
-
-    function mutableUri() public view returns (string memory) {
+    function mutableBaseUri() public view returns (string memory) {
         return _mutableUri;
+    }
+    
+    function baseUri() public view returns (string memory) {
+        return _uri;
     }
 
     function tokenIdToDate(uint256 tokenId)

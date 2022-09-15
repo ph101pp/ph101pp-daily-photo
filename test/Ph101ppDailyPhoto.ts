@@ -6,7 +6,7 @@ import { Ph101ppDailyPhotos } from "../typechain-types";
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const nowTimestamp = Math.ceil(Date.now()/1000)+SECONDS_PER_DAY*3;
 
-describe.only("Ph101ppDailyPhotos", function () {
+describe("Ph101ppDailyPhotos", function () {
 
   async function deployFixture() {
     const mutableUri = "mutable.uri/";
@@ -25,28 +25,29 @@ describe.only("Ph101ppDailyPhotos", function () {
   describe("URI storing / updating", function () {
     it("Should set the correct mutableUri and immutableUri during deploy", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      expect(await pdp.mutableUri()).to.equal(mutableUri);
-      const uriHistory = await pdp.uriHistory();
-      expect(uriHistory).to.be.lengthOf(1);
-      expect(uriHistory[0]).to.equal(immutableUri);
+      expect(await pdp.mutableBaseUri()).to.equal(mutableUri);
+      expect(await pdp.baseUri()).to.equal(immutableUri);
     });
 
     it("Should correcly update mutableUri via setMutableURI()", async function () {
       const mutableUri2 = "2.mutable.uri";
       const { pdp, mutableUri } = await loadFixture(deployFixture);
-      expect(await pdp.mutableUri()).to.equal(mutableUri);
+      expect(await pdp.mutableBaseUri()).to.equal(mutableUri);
       await pdp.setMutableURI(mutableUri2);
-      expect(await pdp.mutableUri()).to.equal(mutableUri2);
+      expect(await pdp.mutableBaseUri()).to.equal(mutableUri2);
     });
     
-    it("Should correcly append immutableUri via setURI()", async function () {
+    it("Should correcly update immutableUri via setURI() and fire event", async function () {
       const immutableUri2 = "2.immutable.uri";
-      const { pdp, immutableUri } = await loadFixture(deployFixture);
-      await pdp.setURI(immutableUri2);
-      const uriHistory = await pdp.uriHistory();
-      expect(uriHistory).to.be.lengthOf(2);
-      expect(uriHistory[0]).to.equal(immutableUri);
-      expect(uriHistory[1]).to.equal(immutableUri2);
+      const { pdp, immutableUri, owner } = await loadFixture(deployFixture);
+      expect(await pdp.baseUri()).to.equal(immutableUri);
+      const tx = await pdp.setURI(immutableUri2);
+      const receipt = await tx.wait();
+      expect(await pdp.baseUri()).to.equal(immutableUri2);
+      const uriSetEvents = receipt.events?.filter((x) => {return x.event == "UriSet"});
+      assert(uriSetEvents?.length === 1);
+      expect(uriSetEvents[0].args?.newURI).to.equal(immutableUri2);
+      expect(uriSetEvents[0].args?.sender).to.equal(owner.address);
     });
   });
 
@@ -145,11 +146,7 @@ describe.only("Ph101ppDailyPhotos", function () {
 
       const { pdp, immutableUri } = await loadFixture(deployFixture);
 
-      const uri = await pdp.uri(tokenId);
-      const uriForDate = await pdp.uriForDate(year, month, day);
-      
-      expect(uri).to.equal(immutableUri+tokenDate+".json");
-      expect(uri).to.equal(uriForDate);
+      expect(await pdp.uri(tokenId)).to.equal(immutableUri+tokenDate+".json");
     });
 
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
@@ -168,11 +165,7 @@ describe.only("Ph101ppDailyPhotos", function () {
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
 
-      const uri = await pdp.uri(tokenId);
-      const uriForDate = await pdp.uriForDate(year, month, day);
-      
-      expect(uri).to.equal(immutableUri+tokenDate+".json");
-      expect(uri).to.equal(uriForDate);
+      expect(await pdp.uri(tokenId)).to.equal(immutableUri+tokenDate+".json");
     });
     
     it("should return correct url for todays tokenId ", async function () {
@@ -185,11 +178,7 @@ describe.only("Ph101ppDailyPhotos", function () {
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
 
-      const uri = await pdp.uri(tokenId);
-      const uriForDate = await pdp.uriForDate(year, month, day);
-      
-      expect(uri).to.equal(mutableUri+tokenDate+".json");
-      expect(uri).to.equal(uriForDate);
+      expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
     });
 
     it("should return correct url for tomorrows tokenId ", async function () {
@@ -201,12 +190,7 @@ describe.only("Ph101ppDailyPhotos", function () {
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
 
-      const uri = await pdp.uri(tokenId);
-      const uriForDate = await pdp.uriForDate(year, month, day);
-      
-      expect(uri).to.equal(immutableUri+"FUTURE.json");
-      expect(uri).to.equal(uriForDate);
-
+      expect(await pdp.uri(tokenId)).to.equal(immutableUri+"FUTURE.json");
     });
 
     it("should return correct url for a minted token before and after immutableURI was updated", async function () {
@@ -222,23 +206,34 @@ describe.only("Ph101ppDailyPhotos", function () {
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
-
-      const uri = await pdp.uri(tokenId);
-      const uriForDate = await pdp.uriForDate(year, month, day);
       
-      expect(uri).to.equal(mutableUri+tokenDate+".json");
-      expect(uri).to.equal(uriForDate);
+      expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
 
       await pdp.setURI(newImmutableUri);
 
-      const uri2 = await pdp.uri(tokenId);
-      const uriForDate2 = await pdp.uriForDate(year, month, day);
-      
-      expect(uri2).to.equal(newImmutableUri+tokenDate+".json");
-      expect(uri2).to.equal(uriForDate2);
+      expect(await pdp.uri(tokenId)).to.equal(newImmutableUri+tokenDate+".json");
 
     });
 
+  });
+
+  describe.skip("Gas consumption over time", function(){
+
+    it("should not increase gas when called multiple times: setMutableURI ", async function () {
+      const { pdp, mutableUri } = await loadFixture(deployFixture);
+
+      for(let i=0; i<1000; i++) {
+        await pdp.setMutableURI(mutableUri+i);
+      }
+    });
+
+    it("should not increase gas when called multiple times: setURI ", async function () {
+      const { pdp, immutableUri } = await loadFixture(deployFixture);
+
+      for(let i=0; i<1000; i++) {
+        await pdp.setURI(immutableUri+i);
+      }
+    });
   });
 
 });
