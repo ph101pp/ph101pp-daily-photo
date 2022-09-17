@@ -242,10 +242,10 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         uint256[] memory amounts,
         bytes memory data
     ) internal virtual override {
-        // initialize balances if minted via _mintBatchDynamic
-
+        // initialize balances if minted via _mintRange
         for (uint256 i = 0; i < ids.length; ++i) {
-            _maybeInitializeBalance(ids[i]);
+            _maybeInitializeBalance(from, ids[i]);
+            _maybeInitializeBalance(to, ids[i]);
         }
 
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
@@ -276,19 +276,10 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     /**
      * @dev Writes dynamic initial Balance to state if uninitialized.
      */
-    function _maybeInitializeBalance(uint256 id) private {
+    function _maybeInitializeBalance(address account, uint256 id) private {
         // Pre initialization
         if (_balancesInitialized[id] == false) {
-            address[] memory addresses = initialHolders(id);
-            uint256 totalSupplySum = 0;
-            for (uint i = 0; i < addresses.length; i++) {
-                address account = addresses[i];
-                uint256 balance = initialBalanceOf(account, id);
-
-                totalSupplySum += balance;
-                _balances[id][account] = balance;
-            }
-            _totalSupply[id] = totalSupplySum;
+            _balances[id][account] = initialBalanceOf(account, id);
             _balancesInitialized[id] = true;
         }
 
