@@ -15,7 +15,10 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         "Invalid input, use getMintRangeInput() to generate valid input params.";
 
     // Mapping from token ID to balancesInitialzed flag
-    mapping(uint256 => bool) private _balancesInitialized;
+    mapping(uint256 => mapping(address => bool)) private _balancesInitialized;
+
+    // Mapping to keep track of tokens that are minted via ERC1155._mint() or  ERC1155._mintBatch()
+    mapping(uint256 => bool) private _standardMint;
 
     // Track initial holders across tokenID ranges;
     address[][] private _initialHolders;
@@ -90,43 +93,16 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     }
 
     /**
-     * @dev See {ERC1155-_mint}.
-     *
-     * Requirements:
-     * - token must be preminted with dynamic supply via mintRange.
-     */
-    function _mint(
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal virtual override {
-        require(id <= _lastConsecutiveTokenId);
-        super._mint(to, id, amount, data);
-    }
-
-    /**
-     * @dev See {ERC1155-_mintBatch}.
-     *
-     * Requirements
-     * - token must be preminted with dynamic supply via mintRange.
-     */
-    function _mintBatch(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual override {
-        for (uint256 i = 0; i < ids.length; ++i) {
-            require(ids[i] <= _lastConsecutiveTokenId);
-        }
-        super._mintBatch(to, ids, amounts, data);
-    }
-
-    /**
      * @dev Returns true if tokenId was minted.
      */
     function exists(uint256 tokenId) public view returns (bool) {
+        return _inRange(tokenId) || _standardMint[tokenId] == true;
+    }
+
+    /**
+     * @dev Returns true if token is in existing id range.
+     */
+    function _inRange(uint256 tokenId) private view returns (bool) {
         return tokenId <= _lastConsecutiveTokenId;
     }
 
@@ -145,16 +121,17 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         );
 
         // Pre initialization
-        if (_balancesInitialized[id] == false) {
-            if (exists(id)) {
-                address[] memory addresses = initialHolders(id);
-                for (uint i = 0; i < addresses.length; i++) {
-                    if (account == addresses[i]) {
-                        return initialBalanceOf(account, id);
-                    }
+        if (
+            _inRange(id) &&
+            !_balancesInitialized[id][account] &&
+            !_standardMint[id]
+        ) {
+            address[] memory addresses = initialHolders(id);
+            for (uint i = 0; i < addresses.length; i++) {
+                if (account == addresses[i]) {
+                    return initialBalanceOf(account, id);
                 }
             }
-            return 0;
         }
 
         // Post initialization
@@ -188,8 +165,8 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         returns (uint256)
     {
         // Pre initialization
-        if (exists(tokenId) && _balancesInitialized[tokenId] == false) {
-            uint256 totalSupplySum = 0;
+        if (_inRange(tokenId) && !_standardMint[tokenId]) {
+            uint256 totalSupplySum = _totalSupply[tokenId];
             address[] memory initialHolderAddresses = initialHolders(tokenId);
             for (uint i = 0; i < initialHolderAddresses.length; i++) {
                 totalSupplySum += initialBalanceOf(
@@ -243,7 +220,11 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         bytes memory data
     ) internal virtual override {
         // initialize balances if minted via _mintRange
+        // or set _standardMint flag if minted via _mint||_mintBatch
         for (uint256 i = 0; i < ids.length; ++i) {
+            if (from == address(0) && !exists(ids[i])) {
+                _standardMint[ids[i]] = true;
+            }
             _maybeInitializeBalance(from, ids[i]);
             _maybeInitializeBalance(to, ids[i]);
         }
@@ -278,11 +259,20 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
      */
     function _maybeInitializeBalance(address account, uint256 id) private {
         // Pre initialization
-        if (_balancesInitialized[id] == false) {
-            _balances[id][account] = initialBalanceOf(account, id);
-            _balancesInitialized[id] = true;
+        if (
+            _inRange(id) &&
+            !_balancesInitialized[id][account] &&
+            !_standardMint[id]
+        ) {
+            _balancesInitialized[id][account] = true;
+            address[] memory addresses = initialHolders(id);
+            for (uint i = 0; i < addresses.length; i++) {
+                if (account == addresses[i]) {
+                    _balances[id][account] = initialBalanceOf(account, id);
+                    return;
+                }
+            }
         }
-
         // Post initialization
         // no-op
     }
