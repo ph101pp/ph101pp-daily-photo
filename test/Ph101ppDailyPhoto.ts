@@ -12,14 +12,17 @@ describe("Ph101ppDailyPhotos", function () {
     const mutableUri = "mutable.uri/";
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
-    const [owner, account1, account2] = await ethers.getSigners();
+    const [owner, treasury, vault] = await ethers.getSigners();
+    const latest = await time.latest();
     
-    await time.increaseTo(nowTimestamp);
-    
-    const PDP = await ethers.getContractFactory("Ph101ppDailyPhotos");
-    const pdp = await PDP.deploy(immutableUri, mutableUri);
+    if(latest !== nowTimestamp) {
+      await time.increaseTo(nowTimestamp);
+    }
 
-    return {pdp, owner, account1, account2, mutableUri, immutableUri};
+    const PDP = await ethers.getContractFactory("Ph101ppDailyPhotos");
+    const pdp = await PDP.deploy(immutableUri, mutableUri, treasury.address, vault.address);
+
+    return {pdp, owner, treasury, vault, mutableUri, immutableUri};
   }
 
   describe("URI storing / updating", function () {
@@ -215,6 +218,33 @@ describe("Ph101ppDailyPhotos", function () {
 
     });
 
+  });
+
+  describe("Mint Photos", function(){
+    it("should mint 1 photo vault wallet ", async function () {
+      const { pdp, vault, treasury } = await loadFixture(deployFixture);
+      const photos = 2000;
+      const [ids, amounts] = await pdp.getMintRangeInput(photos);
+      
+      const tx = await pdp.mintPhotos(ids, amounts);
+      const addresses = [];
+      for(let i = 0; i<photos; i++) {
+        addresses[i] = treasury.address;
+      }
+
+      const receipt = await tx.wait();
+      // const balances = await pdp.balanceOfBatch(addresses, ids);
+
+      console.log(receipt);
+    });
+  })
+
+  describe("Claim tokens", function(){
+    it("should mint 10 claim tokens to treasury wallet ", async function () {
+      const { pdp, treasury, vault } = await loadFixture(deployFixture);
+      expect(await pdp.balanceOf(treasury.address, 0)).to.equal(10);
+      expect(await pdp.balanceOf(vault.address, 0)).to.equal(0);
+    });
   });
 
   describe.skip("Gas consumption over time", function(){
