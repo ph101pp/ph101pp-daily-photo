@@ -48,10 +48,11 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
 		setURI(newUri);
 		setMutableURI(newMutableUri);
 		(
+			address[] memory claimAddresses,
 			uint256[] memory claimIds,
 			uint256[][] memory claimAmounts
 		) = getMintRangeInput(1);
-		_mintRange(claimIds, claimAmounts);
+		_mintRange(claimAddresses, claimIds, claimAmounts);
 	}
 
 	function initialBalanceOf(address, uint256 tokenId) 
@@ -208,8 +209,10 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
 	) public onlyRole(PHOTO_MINTER_ROLE) {
 		_maxSupplyRange.push(ids[0]);
 		_maxSupplies.push(maxSupply);
+		
+		address[] memory addresses = initialHolders();
 
-		_mintRange(ids, amounts);
+		_mintRange(addresses, ids, amounts);
 	}
 
 	// The following functions are overrides required by Solidity.

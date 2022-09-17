@@ -53,30 +53,37 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     /**
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
-    function _mintRange(uint256[] memory ids, uint256[][] memory amounts)
-        internal
-        virtual
-    {
-        address[] memory addresses = initialHolders(ids[0]);
+    function _safeMintRange(
+        address[] memory addresses,
+        uint256[] memory ids,
+        uint256[][] memory amounts
+    ) internal virtual {
+        address[] memory currentInitialHolders = initialHolders();
+        uint256 firstId = zeroMinted ? _lastConsecutiveTokenId + 1 : 0;
+        uint256 lastId = firstId + ids.length - 1;
+
         require(
-            ids[0] == _lastConsecutiveTokenId + 1 ||
-                (zeroMinted == false && ids[0] == _lastConsecutiveTokenId),
-            ERROR_INVALID_INPUT_MINT_RANGE
-        );
-        require(
-            ids[ids.length - 1] == _lastConsecutiveTokenId + ids.length ||
-                (zeroMinted == false &&
-                    ids[ids.length - 1] ==
-                    _lastConsecutiveTokenId + ids.length - 1),
-            ERROR_INVALID_INPUT_MINT_RANGE
-        );
-        require(
-            addresses.length == amounts.length &&
-                ids.length == amounts[0].length &&
-                ids.length == amounts[addresses.length - 1].length,
+            ids[0] == firstId && ids[ids.length - 1] == lastId,
             ERROR_INVALID_INPUT_MINT_RANGE
         );
 
+        for (uint i = 0; i < addresses.length; i++) {
+            require(
+                addresses[i] == currentInitialHolders[i],
+                "Provided addresses do not match current initialHolders"
+            );
+        }
+        _mintRange(addresses, ids, amounts);
+    }
+
+    /**
+     * @dev Lazy-mint a range of new tokenIds to initial holders
+     */
+    function _mintRange(
+        address[] memory addresses,
+        uint256[] memory ids,
+        uint256[][] memory amounts
+    ) internal virtual {
         _lastConsecutiveTokenId = ids[ids.length - 1];
 
         if (zeroMinted == false) {
@@ -194,7 +201,11 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     function getMintRangeInput(uint256 numberOfTokens)
         public
         view
-        returns (uint256[] memory, uint256[][] memory)
+        returns (
+            address[] memory,
+            uint256[] memory,
+            uint256[][] memory
+        )
     {
         uint256 firstId = zeroMinted ? _lastConsecutiveTokenId + 1 : 0;
         address[] memory addresses = initialHolders(firstId);
@@ -212,7 +223,7 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
             }
         }
 
-        return (ids, amounts);
+        return (addresses, ids, amounts);
     }
 
     /**

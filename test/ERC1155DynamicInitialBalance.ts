@@ -28,8 +28,12 @@ describe.only("ERC1155DynamicInitialBalances", function () {
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      const [ids, amounts] = await c.getMintRangeInput(newTokens);
+      const [addresses, ids, amounts] = await c.getMintRangeInput(newTokens);
 
+      expect(addresses.length).to.equal(initialHolders.length);
+      for (let i = 0; i < addresses.length; i++) {
+        expect(addresses[i]).to.equal(initialHolders[i]);
+      }
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
         expect(ids[i].toNumber()).to.equal(i);
@@ -47,8 +51,12 @@ describe.only("ERC1155DynamicInitialBalances", function () {
       await c.setInitialHolders(initialHolders);
       const input = await c.getMintRangeInput(newTokens);
       await c.mintRange(...input);
-      const [ids2, amounts2] = await c.getMintRangeInput(newTokens);
+      const [addresses2, ids2, amounts2] = await c.getMintRangeInput(newTokens);
 
+      expect(addresses2.length).to.equal(initialHolders.length);
+      for (let i = 0; i < addresses2.length; i++) {
+        expect(addresses2[i]).to.equal(initialHolders[i]);
+      }
       expect(ids2.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
         expect(ids2[i].toNumber()).to.equal(i + newTokens);
@@ -66,8 +74,8 @@ describe.only("ERC1155DynamicInitialBalances", function () {
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      const [ids, amounts] = await c.getMintRangeInput(newTokens);
-      const tx = await c.mintRange(ids, amounts);
+      const [addresses, ids, amounts] = await c.getMintRangeInput(newTokens);
+      const tx = await c.mintRange(addresses, ids, amounts);
       const receipt = await tx.wait();
 
       expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(initialHolders.length);
@@ -151,15 +159,15 @@ describe.only("ERC1155DynamicInitialBalances", function () {
       expect(await c.balanceOf(account5.address, 1)).to.equal(0)
       expect(await c.balanceOf(account5.address, 2)).to.equal(0)
 
-      // await c.connect(account1).safeBatchTransferFrom(account1.address, account5.address, [0, 1, 2], [1,1,1], []);
+      await c.connect(account1).safeBatchTransferFrom(account1.address, account5.address, [0, 1, 2], [1,1,1], []);
 
-      // expect(await c.balanceOf(account1.address, 0)).to.equal(9998)
-      // expect(await c.balanceOf(account1.address, 1)).to.equal(1)
-      // expect(await c.balanceOf(account1.address, 2)).to.equal(2)      
+      expect(await c.balanceOf(account1.address, 0)).to.equal(9998)
+      expect(await c.balanceOf(account1.address, 1)).to.equal(1)
+      expect(await c.balanceOf(account1.address, 2)).to.equal(2)      
       
-      // expect(await c.balanceOf(account5.address, 0)).to.equal(1)
-      // expect(await c.balanceOf(account5.address, 1)).to.equal(1)
-      // expect(await c.balanceOf(account5.address, 2)).to.equal(1)
+      expect(await c.balanceOf(account5.address, 0)).to.equal(1)
+      expect(await c.balanceOf(account5.address, 1)).to.equal(1)
+      expect(await c.balanceOf(account5.address, 2)).to.equal(1)
     });
   });
 
@@ -167,6 +175,9 @@ describe.only("ERC1155DynamicInitialBalances", function () {
   });
 
   describe("mint(Batch)", function () {
+  });
+
+  describe("initialHolders", function () {
   });
 
 });
