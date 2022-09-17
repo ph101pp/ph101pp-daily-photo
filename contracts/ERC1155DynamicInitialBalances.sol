@@ -13,6 +13,8 @@ import "hardhat/console.sol";
 abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     string private constant ERROR_INVALID_INPUT_MINT_RANGE =
         "Invalid input, use getMintRangeInput() to generate valid input params.";
+    string private constant ERROR_NO_INITIAL_HOLDERS =
+        "No initial holders set. Use _setInitialHolders()";
 
     // Mapping from token ID to balancesInitialzed flag
     mapping(uint256 => mapping(address => bool)) private _balancesInitialized;
@@ -147,12 +149,17 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         virtual
         returns (address[] memory)
     {
-        require(
-            _initialHolders.length > 0,
-            "No initial holders set. Use _setInitialHolders()"
-        );
+        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
         uint index = _findInRange(_initialHoldersRange, tokenId);
         return _initialHolders[index];
+    }
+
+    /**
+     * @dev Return current initial holders
+     */
+    function initialHolders() public view virtual returns (address[] memory) {
+        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
+        return _initialHolders[_initialHolders.length - 1];
     }
 
     /**
