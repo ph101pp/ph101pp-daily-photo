@@ -75,7 +75,6 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
 		return 0;
 	}
 
-
 	function setURI(string memory newUri) public onlyRole(DEFAULT_ADMIN_ROLE) {
 		_uri = newUri;
 		_lastUriUpdate = block.timestamp;
@@ -209,10 +208,10 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
 	) public onlyRole(PHOTO_MINTER_ROLE) {
 		_maxSupplyRange.push(ids[0]);
 		_maxSupplies.push(maxSupply);
-		
+
 		address[] memory addresses = initialHolders();
 
-		_mintRange(addresses, ids, amounts);
+		_safeMintRange(addresses, ids, amounts);
 	}
 
 	// The following functions are overrides required by Solidity.
