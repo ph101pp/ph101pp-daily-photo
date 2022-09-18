@@ -53,33 +53,6 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     /**
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
-    function _safeMintRange(
-        address[] memory addresses,
-        uint256[] memory ids,
-        uint256[][] memory amounts
-    ) internal virtual {
-        address[] memory currentInitialHolders = initialHolders();
-        uint256 firstId = _zeroMinted ? _lastRangeTokenId + 1 : 0;
-        uint256 lastId = firstId + ids.length - 1;
-
-        require(
-            ids[0] == firstId && ids[ids.length - 1] == lastId,
-            ERROR_INVALID_INPUT_MINT_RANGE
-        );
-
-        for (uint i = 0; i < addresses.length; i++) {
-            require(
-                addresses[i] == currentInitialHolders[i],
-                "Provided addresses do not match current initialHolders"
-            );
-        }
-
-        _mintRange(addresses, ids, amounts);
-    }
-
-    /**
-     * @dev Lazy-mint a range of new tokenIds to initial holders
-     */
     function _mintRange(
         address[] memory addresses,
         uint256[] memory ids,
@@ -198,7 +171,7 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     }
 
     /**
-     * @dev Convenience method to generate mintRange inputs
+     * @dev Convenience method to generate mintRange inputs for x new tokens.
      */
     function getMintRangeInput(uint256 numberOfTokens)
         public
@@ -214,16 +187,23 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         uint256[] memory ids = new uint256[](numberOfTokens);
         uint256[][] memory amounts = new uint256[][](addresses.length);
 
-        for (uint a = 0; a < addresses.length; a++) {
-            amounts[a] = new uint256[](ids.length);
-        }
-        for (uint i = 0; i < numberOfTokens; i++) {
-            ids[i] = firstId + i;
+        uint newTokens = 0;
+        for (uint i = 0; newTokens < numberOfTokens; i++) {
+            uint newId = firstId + i;
+            if(_manualMint[newId]) {
+                continue;
+            }
+            ids[i] = newId;
+            newTokens++;
+
             for (uint b = 0; b < addresses.length; b++) {
+                if(i == 0) {
+                    amounts[b] = new uint256[](numberOfTokens);
+                }
                 amounts[b][i] = initialBalanceOf(addresses[b], ids[i]);
             }
         }
-        
+
         return (addresses, ids, amounts);
     }
 
