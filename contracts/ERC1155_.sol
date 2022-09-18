@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import "hardhat/console.sol";
 
 /**
  * @dev Implementation of the basic standard multi-token.
@@ -23,7 +22,7 @@ contract ERC1155_ is Context, ERC165, IERC1155, IERC1155MetadataURI {
 
     // Mapping from token ID to account balances
 /////////////////////////////////////////////////////////////////////////
-//  ONLY DIFFERENCE BETWEEN ERC1155 and ERC1155_ (private -> internal)
+//  ONLY DIFFERENCE BETWEEN ERC1155 and ERC1155_ (private => internal)
 /////////////////////////////////////////////////////////////////////////
 //  mapping(uint256 => mapping(address => uint256)) private _balances;
 /////////////////////////////////////////////////////////////////////////

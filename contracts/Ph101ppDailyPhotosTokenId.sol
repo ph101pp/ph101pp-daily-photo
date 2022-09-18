@@ -29,7 +29,7 @@ library Ph101ppDailyPhotosTokenId {
         uint256 tokenTimestamp = DateTime.timestampFromDate(year, month, day);
         require(
             tokenTimestamp >= START_DATE,
-            "Project started September 1, 2022!"
+            "Invalid date! Project started September 1, 2022!"
         );
         return _timestampToTokenId(tokenTimestamp);
     }

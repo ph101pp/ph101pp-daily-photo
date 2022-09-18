@@ -66,7 +66,7 @@ contract ERC1155DynamicInitialBalancesTestContract is
       address from,
       uint256[] memory ids,
       uint256[] memory amounts
-  ) internal virtual {
+  ) public virtual {
     _burnBatch(from, ids, amounts);
   }
 }

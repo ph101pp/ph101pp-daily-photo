@@ -4,7 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
@@ -12,7 +12,7 @@ import "./ERC1155_.sol";
  */
 abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     string private constant ERROR_INVALID_INPUT_MINT_RANGE =
-        "Invalid input, use getMintRangeInput() to generate valid input params.";
+        "Invalid input. Use getMintRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
         "No initial holders set. Use _setInitialHolders()";
 
@@ -23,7 +23,7 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     mapping(uint256 => bool) private _manualMint;
 
     // Mapping from token ID to totalSupply
-    mapping(uint256 => uint256) private _totalSupply;
+    mapping(uint256 => int256) private _totalSupply;
 
     // Track initial holders across tokenID ranges;
     address[][] private _initialHolders;
@@ -48,6 +48,20 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     function _setInitialHolders(address[] memory addresses) internal virtual {
         _initialHoldersRange.push(_zeroMinted ? _lastRangeTokenId + 1 : 0);
         _initialHolders.push(addresses);
+    }
+
+    /**
+     * @dev Lazy-mint a range of new tokenIds to initial holders
+     */
+    function _safeMintRange(
+        address[] memory addresses,
+        uint256[] memory ids,
+        uint256[][] memory amounts
+    ) internal virtual {
+        for(uint i=0; i<ids.length; i++) {
+            require(!exists(ids[i]), "Error: Range can't include an existing tokenId!");
+        }
+        _mintRange(addresses, ids, amounts);
     }
 
     /**
@@ -80,13 +94,6 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
      */
     function exists(uint256 tokenId) public view virtual returns (bool) {
         return _inRange(tokenId) || _manualMint[tokenId] == true;
-    }
-
-    /**
-     * @dev Returns true if token is in existing id range.
-     */
-    function _inRange(uint256 tokenId) private view returns (bool) {
-        return tokenId <= _lastRangeTokenId;
     }
 
     /**
@@ -155,7 +162,7 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     {
         // Pre initialization
         if (_inRange(tokenId) && !_manualMint[tokenId]) {
-            uint256 totalSupplySum = _totalSupply[tokenId];
+            uint256 totalSupplySum = 0;
             address[] memory initialHolderAddresses = initialHolders(tokenId);
             for (uint i = 0; i < initialHolderAddresses.length; i++) {
                 totalSupplySum += initialBalanceOf(
@@ -163,11 +170,11 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
                     tokenId
                 );
             }
-            return totalSupplySum;
+            return uint256(int256(totalSupplySum)+_totalSupply[tokenId]);
         }
 
         // manually minted
-        return _totalSupply[tokenId];
+        return uint256(_totalSupply[tokenId]);
     }
 
     /**
@@ -187,21 +194,20 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         uint256[] memory ids = new uint256[](numberOfTokens);
         uint256[][] memory amounts = new uint256[][](addresses.length);
 
-        uint newTokens = 0;
-        for (uint i = 0; newTokens < numberOfTokens; i++) {
-            uint newId = firstId + i;
+        uint256 newIndex = 0;
+        for (uint256 i = 0; newIndex < numberOfTokens; i++) {
+            uint256 newId = firstId + i;
             if(_manualMint[newId]) {
                 continue;
             }
-            ids[i] = newId;
-            newTokens++;
-
-            for (uint b = 0; b < addresses.length; b++) {
-                if(i == 0) {
+            ids[newIndex] = newId;
+            for (uint256 b = 0; b < addresses.length; b++) {
+                if(newIndex == 0) {
                     amounts[b] = new uint256[](numberOfTokens);
                 }
-                amounts[b][i] = initialBalanceOf(addresses[b], ids[i]);
+                amounts[b][newIndex] = initialBalanceOf(addresses[b], newId);
             }
+            newIndex += 1;
         }
 
         return (addresses, ids, amounts);
@@ -219,31 +225,24 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         bytes memory data
     ) internal virtual override {
         for (uint256 i = 0; i < ids.length; ++i) {
+            uint256 id = ids[i];
+
             // when minting
             if (from == address(0)) {
                 // set _manualMint flag if minted via _mint||_mintBatch
-                if (!exists(ids[i])) {
-                    _manualMint[ids[i]] = true;
+                if (!exists(id)) {
+                    _manualMint[id] = true;
                 }
                 // track supply
-                _totalSupply[ids[i]] += amounts[i];
+                _totalSupply[id] += int256(amounts[i]);
             }
-            // when burning
+            // track supply when burning
             if (to == address(0)) {
-                uint256 id = ids[i];
-                uint256 amount = amounts[i];
-                uint256 supply = _totalSupply[id];
-                require(
-                    supply >= amount,
-                    "ERC1155: burn amount exceeds totalSupply"
-                );
-                unchecked {
-                    _totalSupply[id] = supply - amount;
-                }
+                _totalSupply[id] -= int256(amounts[i]);
             }
             // initialize balances if minted via _mintRange
-            _maybeInitializeBalance(from, ids[i]);
-            _maybeInitializeBalance(to, ids[i]);
+            _maybeInitializeBalance(from, id);
+            _maybeInitializeBalance(to, id);
         }
 
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
@@ -270,6 +269,13 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         }
         // Post initialization
         // no-op
+    }
+
+    /**
+     * @dev Returns true if token is in existing id range.
+     */
+    function _inRange(uint256 tokenId) private view returns (bool) {
+        return _zeroMinted && tokenId <= _lastRangeTokenId;
     }
 
     /**

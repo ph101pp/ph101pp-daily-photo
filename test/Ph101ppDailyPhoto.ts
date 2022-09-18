@@ -136,7 +136,7 @@ describe("Ph101ppDailyPhotos", function () {
       const { pdp } = await loadFixture(deployFixture);
       await expect(
         pdp.tokenIdFromDate(2022,8,1)
-      ).to.be.revertedWith('Project started September 1, 2022!');
+      ).to.be.revertedWith('Invalid date! Project started September 1, 2022!');
     });
 
     it("should fail to translate date if invalid date (incl leap years)", async function () {
