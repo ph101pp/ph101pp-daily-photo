@@ -35,14 +35,13 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
 
         setURI(newUri);
         setMutableURI(newMutableUri);
-
-				_setInitialHolders(initialHolders);
+        _setInitialHolders(initialHolders);
         (
             address[] memory claimAddresses,
             uint256[] memory claimIds,
             uint256[][] memory claimAmounts
         ) = getMintRangeInput(1);
-        // _mintRange(claimAddresses, claimIds, claimAmounts);
+        _mintRange(claimAddresses, claimIds, claimAmounts);
     }
 
     function initialBalanceOf(address, uint256 tokenId)
@@ -89,16 +88,12 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         } else {
             uint256 tokenTimestamp = Ph101ppDailyPhotosTokenId
                 ._timestampFromTokenId(tokenId);
-            uint256 todayToken = Ph101ppDailyPhotosTokenId._timestampToTokenId(
-                block.timestamp
-            );
 
             if (block.timestamp < tokenTimestamp) {
                 // ... in future -> return default.
                 tokenDate = FUTURE_TOKEN;
                 currentUri = _uri;
             } else {
-                // ... not in future  ...
                 (
                     uint256 year,
                     uint256 month,
@@ -113,10 +108,7 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
                     Strings.toString(day)
                 );
 
-                if (tokenId == todayToken) {
-                    // ... is today -> return mutable uri
-                    currentUri = _mutableUri;
-                } else if (_lastUriUpdate > tokenTimestamp) {
+								if (_lastUriUpdate > tokenTimestamp) {
                     // ... uri updated since token -> immutable uri
                     currentUri = _uri;
                 } else {
@@ -172,8 +164,8 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
     ) public onlyRole(PHOTO_MINTER_ROLE) {
         _maxSupplyRange.push(ids[0]);
         _maxSupplies.push(maxSupply);
-				
-        _safeMintRange(addresses, ids, amounts);
+
+        _mintRange(addresses, ids, amounts);
     }
 
     // The following functions are overrides required by Solidity.

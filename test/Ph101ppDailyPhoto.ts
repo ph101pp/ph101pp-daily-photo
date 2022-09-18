@@ -189,19 +189,6 @@ describe("Ph101ppDailyPhotos", function () {
       expect(await pdp.uri(tokenId)).to.equal(immutableUri+tokenDate+".json");
     });
     
-    it("should return correct url for todays tokenId ", async function () {
-      const { pdp, mutableUri } = await loadFixture(deployFixture);
-      const now = new Date(nowTimestamp*1000);
-      const year = now.getUTCFullYear();
-      const month = now.getUTCMonth()+1;
-      const day = now.getUTCDate();
-
-      const tokenId = await pdp.tokenIdFromDate(year, month, day);
-      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
-
-      expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
-    });
-
     it("should return correct url for tomorrows tokenId ", async function () {
       const { pdp, immutableUri } = await loadFixture(deployFixture);
       const now = new Date(nowTimestamp*1000);
