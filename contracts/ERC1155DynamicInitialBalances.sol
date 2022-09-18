@@ -4,7 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
@@ -219,12 +219,11 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         }
         for (uint i = 0; i < numberOfTokens; i++) {
             ids[i] = firstId + i;
-
             for (uint b = 0; b < addresses.length; b++) {
                 amounts[b][i] = initialBalanceOf(addresses[b], ids[i]);
             }
         }
-
+        
         return (addresses, ids, amounts);
     }
 

@@ -30,7 +30,6 @@ library DateTime {
     uint256 constant SECONDS_PER_DAY = 1 days;
     int256 constant OFFSET19700101 = 2440588;
 
-
     // ------------------------------------------------------------------------
     // Calculate the number of days from 1970/01/01 to year/month/day using
     // the date conversion algorithm from
