@@ -9,6 +9,7 @@ import "./Ph101ppDailyPhotosTokenId.sol";
 // import "hardhat/console.sol";
 
 contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
+    bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
     string private constant FUTURE_TOKEN = "FUTURE";
@@ -32,6 +33,7 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(CLAIM_MINTER_ROLE, msg.sender);
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
+        _grantRole(URI_UPDATER_ROLE, msg.sender);
 
         setURI(newUri);
         setMutableURI(newMutableUri);
@@ -63,7 +65,7 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         return 0;
     }
 
-    function setURI(string memory newUri) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setURI(string memory newUri) public onlyRole(URI_UPDATER_ROLE) {
         _uri = newUri;
         _lastUriUpdate = block.timestamp;
         emit UriSet(newUri, msg.sender);
@@ -71,7 +73,7 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
 
     function setMutableURI(string memory newMutableUri)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(URI_UPDATER_ROLE)
     {
         _mutableUri = newMutableUri;
     }
