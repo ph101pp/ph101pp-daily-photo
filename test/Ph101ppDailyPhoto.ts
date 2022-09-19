@@ -26,7 +26,7 @@ describe("Ph101ppDailyPhotos", function () {
         Ph101ppDailyPhotosTokenId: pdpTokenId.address,
       },
     });
-    const pdp = await PDP.deploy(immutableUri, mutableUri, [treasury.address, vault.address]);
+    const pdp = await PDP.deploy(immutableUri, mutableUri, treasury.address, vault.address);
 
     return {pdp, owner, treasury, vault, mutableUri, immutableUri};
   }

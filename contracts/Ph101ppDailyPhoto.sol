@@ -14,7 +14,10 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
     string private constant FUTURE_TOKEN = "FUTURE";
     string private constant CLAIM_TOKEN = "CLAIM";
-    uint256 private constant CLAIM_TOKEN_ID = 0;
+    uint256 private constant CLAIM_TOKEN_ID = 0;    
+		
+		uint256 private constant TREASURY_ID = 0;
+		uint256 private constant VAULT_ID = 1;
 
     string private _uri;
     string private _mutableUri;
@@ -28,7 +31,8 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
     constructor(
         string memory newUri,
         string memory newMutableUri,
-        address[] memory initialHolders
+        address treasuryAddress,
+        address vaultAddress
     ) ERC1155_("") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(CLAIM_MINTER_ROLE, msg.sender);
@@ -37,7 +41,7 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
 
         setURI(newUri);
         setMutableURI(newMutableUri);
-        _setInitialHolders(initialHolders);
+        setAddresses(treasuryAddress, vaultAddress);
         (
             address[] memory claimAddresses,
             uint256[] memory claimIds,
@@ -45,25 +49,36 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         ) = getMintRangeInput(1);
         _mintRange(claimAddresses, claimIds, claimAmounts);
     }
-
-    function initialBalanceOf(address, uint256 tokenId)
+		
+    function initialBalanceOf(address account, uint256 tokenId)
         public
         view
         override
         returns (uint256)
     {
-        // uint256[] memory initialBalances = new uint256[](1);
-        // uint maxSupplyIndex = _findInRange(_maxSupplyRange, tokenId);
+				address[] memory addresses = initialHolders(tokenId);
 
-        // if (tokenId == 0) {
-        //     initialBalances[0] = 10;
-        //     // initialBalances[VAULT_ADDRESS_ID] = 0;
-        // } else {
-        //     initialBalances[0] = _maxSupplies[maxSupplyIndex];
-        //     // initialBalances[VAULT_ADDRESS_ID] = 1;
-        // }
+				if(account == addresses[TREASURY_ID]) {
+					uint256 supplyIndex = _findInRange(_maxSupplyRange, tokenId);
+					uint256 maxSupply =_maxSupplies[supplyIndex];
+					uint256 supply = uint256(keccak256(abi.encode(account, tokenId, maxSupply))) % (maxSupply+1);
+
+					return supply; 
+				}
+
+				if(account == addresses[VAULT_ID]) {
+					return 1;
+				}
+				
         return 0;
     }
+
+		function setAddresses(address treasury, address vault) public onlyRole(DEFAULT_ADMIN_ROLE) {
+				address[] memory addresses = new address[](2);
+				addresses[0] = treasury;
+				addresses[1] = vault;
+				_setInitialHolders(addresses);
+		}
 
     function setURI(string memory newUri) public onlyRole(URI_UPDATER_ROLE) {
         _uri = newUri;

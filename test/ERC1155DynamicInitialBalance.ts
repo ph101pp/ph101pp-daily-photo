@@ -2,7 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 
-describe.only("ERC1155DynamicInitialBalances", function () {
+describe("ERC1155DynamicInitialBalances", function () {
 
   async function deployFixture() {
     // Contracts are deplodyed using the first signer/account by default
