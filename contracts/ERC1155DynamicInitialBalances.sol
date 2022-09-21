@@ -58,8 +58,11 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         uint256[] memory ids,
         uint256[][] memory amounts
     ) internal virtual {
-        for(uint i=0; i<ids.length; i++) {
-            require(!exists(ids[i]), "Error: Range can't include an existing tokenId!");
+        for (uint i = 0; i < ids.length; i++) {
+            require(
+                !exists(ids[i]),
+                "Error: Range can't include an existing tokenId!"
+            );
         }
         _mintRange(addresses, ids, amounts);
     }
@@ -170,7 +173,7 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
                     tokenId
                 );
             }
-            return uint256(int256(totalSupplySum)+_totalSupply[tokenId]);
+            return uint256(int256(totalSupplySum) + _totalSupply[tokenId]);
         }
 
         // manually minted
@@ -197,12 +200,12 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         uint256 newIndex = 0;
         for (uint256 i = 0; newIndex < numberOfTokens; i++) {
             uint256 newId = firstId + i;
-            if(_manualMint[newId]) {
+            if (_manualMint[newId]) {
                 continue;
             }
             ids[newIndex] = newId;
             for (uint256 b = 0; b < addresses.length; b++) {
-                if(newIndex == 0) {
+                if (newIndex == 0) {
                     amounts[b] = new uint256[](numberOfTokens);
                 }
                 amounts[b][newIndex] = initialBalanceOf(addresses[b], newId);

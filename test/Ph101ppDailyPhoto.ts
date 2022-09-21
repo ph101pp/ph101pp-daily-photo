@@ -12,7 +12,7 @@ describe("Ph101ppDailyPhotos", function () {
     const mutableUri = "mutable.uri/";
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
-    const [owner, treasury, vault] = await ethers.getSigners();
+    const [owner, treasury, vault, account1, account2] = await ethers.getSigners();
     const latest = await time.latest();
     
     if(latest < nowTimestamp) {
@@ -28,7 +28,7 @@ describe("Ph101ppDailyPhotos", function () {
     });
     const pdp = await PDP.deploy(immutableUri, mutableUri, treasury.address, vault.address);
 
-    return {pdp, owner, treasury, vault, mutableUri, immutableUri};
+    return {pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2};
   }
 
   describe("URI storing / updating", function () {
@@ -225,26 +225,83 @@ describe("Ph101ppDailyPhotos", function () {
 
   });
 
-  describe.skip("Mint Photos", function(){
-    it("should mint 1 photo vault wallet ", async function () {
+  describe("Mint Photos", function(){
+    it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { pdp, vault, treasury } = await loadFixture(deployFixture);
-      const photos = 2000;
+      const photos = 1000;
+      const maxSupply = 5;
       const [addresses, ids, amounts] = await pdp.getMintRangeInput(photos);
       
-      const tx = await pdp.mintPhotos(addresses, ids, amounts);
+      const vaultAddresses = [];
+      const treasuryAddresses = [];
+      for(let i = 0; i<photos; i++){
+        vaultAddresses.push(vault.address);
+        treasuryAddresses.push(treasury.address);
+      }
 
-      const receipt = await tx.wait();
-      // const balances = await pdp.balanceOfBatch(addresses, ids);
+      await pdp.mintPhotos(addresses, ids, amounts, maxSupply);
 
-      console.log(receipt);
+      const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
+      const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+
+      const balanceDistribution: {[key:number] : number} = {};
+      
+      for(let i = 0; i<photos; i++){
+        expect(vaultBalances[i]).to.equal(1);
+        balanceDistribution[treasuryBalances[i].toNumber()] = balanceDistribution[treasuryBalances[i].toNumber()]??0;
+        balanceDistribution[treasuryBalances[i].toNumber()]++;
+      }
+      expect(balanceDistribution[0]).to.equal(undefined);
+      for(let i = 1; i<maxSupply; i++) {
+        expect(balanceDistribution[i]).to.be.gt(0.8*photos/maxSupply);
+      }
     });
   })
 
-  describe.skip("Claim tokens", function(){
+  describe("Claim tokens", function(){
     it("should mint 10 claim tokens to treasury wallet ", async function () {
       const { pdp, treasury, vault } = await loadFixture(deployFixture);
       expect(await pdp.balanceOf(treasury.address, 0)).to.equal(10);
       expect(await pdp.balanceOf(vault.address, 0)).to.equal(0);
+    });
+
+    it("should mint claim tokens to any wallet ", async function () {
+      const { pdp, treasury, account1 } = await loadFixture(deployFixture);
+
+      await pdp.mintClaims(account1.address, 2);
+      
+      expect(await pdp.totalSupply(0)).to.equal(12);
+      expect(await pdp.balanceOf(treasury.address, 0)).to.equal(10);
+      expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
+
+    });
+
+    it("should claim mint from treasury and burn claim when redeemClaim is called", async function () {
+
+      const { pdp, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
+      
+      const input1 = await pdp.getMintRangeInput(5);
+      await pdp.mintPhotos(...input1, 1);
+
+      const newTreasury = account2.address
+      await pdp.setAddresses(newTreasury, vault.address);
+
+      const input2 = await pdp.getMintRangeInput(5);
+      await pdp.mintPhotos(...input2, 1);
+
+      await pdp.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
+      
+      expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
+
+      await pdp.connect(account1).redeemClaims([2], [1]);
+      await pdp.connect(account1).redeemClaims([8], [1]);
+
+      expect(await pdp.balanceOf(account1.address, 0)).to.equal(0);
+      expect(await pdp.balanceOf(account1.address, 2)).to.equal(1);
+      expect(await pdp.balanceOf(account1.address, 8)).to.equal(1);
+
+      expect(await pdp.balanceOf(treasury.address, 2)).to.equal(0);
+      expect(await pdp.balanceOf(newTreasury, 8)).to.equal(0);
     });
   });
 

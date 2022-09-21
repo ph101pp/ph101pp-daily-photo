@@ -14,10 +14,10 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
     string private constant FUTURE_TOKEN = "FUTURE";
     string private constant CLAIM_TOKEN = "CLAIM";
-    uint256 private constant CLAIM_TOKEN_ID = 0;    
-		
-		uint256 private constant TREASURY_ID = 0;
-		uint256 private constant VAULT_ID = 1;
+    uint256 private constant CLAIM_TOKEN_ID = 0;
+
+    uint256 private constant TREASURY_ID = 0;
+    uint256 private constant VAULT_ID = 1;
 
     string private _uri;
     string private _mutableUri;
@@ -42,43 +42,45 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         setURI(newUri);
         setMutableURI(newMutableUri);
         setAddresses(treasuryAddress, vaultAddress);
-        (
-            address[] memory claimAddresses,
-            uint256[] memory claimIds,
-            uint256[][] memory claimAmounts
-        ) = getMintRangeInput(1);
-        _mintRange(claimAddresses, claimIds, claimAmounts);
+        _mint(treasuryAddress, 0, 10, "");
     }
-		
+
     function initialBalanceOf(address account, uint256 tokenId)
         public
         view
         override
         returns (uint256)
     {
-				address[] memory addresses = initialHolders(tokenId);
+        address[] memory addresses = initialHolders(tokenId);
+        if (account == addresses[TREASURY_ID]) {
+            if (_maxSupplyRange.length <= 0) {
+                return 0;
+            }
+            uint256 supplyIndex = _findInRange(_maxSupplyRange, tokenId);
+            uint256 maxSupply = _maxSupplies[supplyIndex];
+            uint256 supply = (uint256(
+                keccak256(abi.encode(account, tokenId, maxSupply))
+            ) % maxSupply) + 1;
 
-				if(account == addresses[TREASURY_ID]) {
-					uint256 supplyIndex = _findInRange(_maxSupplyRange, tokenId);
-					uint256 maxSupply =_maxSupplies[supplyIndex];
-					uint256 supply = uint256(keccak256(abi.encode(account, tokenId, maxSupply))) % (maxSupply+1);
+            return supply;
+        }
 
-					return supply; 
-				}
+        if (account == addresses[VAULT_ID]) {
+            return 1;
+        }
 
-				if(account == addresses[VAULT_ID]) {
-					return 1;
-				}
-				
         return 0;
     }
 
-		function setAddresses(address treasury, address vault) public onlyRole(DEFAULT_ADMIN_ROLE) {
-				address[] memory addresses = new address[](2);
-				addresses[0] = treasury;
-				addresses[1] = vault;
-				_setInitialHolders(addresses);
-		}
+    function setAddresses(address treasury, address vault)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        address[] memory addresses = new address[](2);
+        addresses[0] = treasury;
+        addresses[1] = vault;
+        _setInitialHolders(addresses);
+    }
 
     function setURI(string memory newUri) public onlyRole(URI_UPDATER_ROLE) {
         _uri = newUri;
@@ -125,7 +127,7 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
                     Strings.toString(day)
                 );
 
-								if (_lastUriUpdate > tokenTimestamp) {
+                if (_lastUriUpdate > tokenTimestamp) {
                     // ... uri updated since token -> immutable uri
                     currentUri = _uri;
                 } else {
@@ -166,7 +168,19 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         return Ph101ppDailyPhotosTokenId.tokenIdFromDate(year, month, day);
     }
 
-    function mintClaim(address to, uint256 amount)
+    function redeemClaims(uint256[] memory tokenIds, uint256[] memory amounts)
+        public
+    {
+        uint256 claimsRequired = 0;
+        for(uint i=0; i<amounts.length; i++) {
+            claimsRequired += amounts[i];
+        }
+        _burn(msg.sender, 0, claimsRequired);
+        address[] memory initialHolders = initialHolders(tokenIds[0]);
+        _safeBatchTransferFrom(initialHolders[TREASURY_ID], msg.sender, tokenIds, amounts, "");
+    }
+
+    function mintClaims(address to, uint256 amount)
         public
         onlyRole(CLAIM_MINTER_ROLE)
     {
