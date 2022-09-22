@@ -188,15 +188,14 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
     }
 
     function mintPhotos(
-        address[] memory addresses,
         uint256[] memory ids,
         uint256[][] memory amounts,
         uint256 maxSupply
     ) public onlyRole(PHOTO_MINTER_ROLE) {
         _maxSupplyRange.push(ids[0]);
         _maxSupplies.push(maxSupply);
-
-        _mintRange(addresses, ids, amounts);
+        
+        _mintRange(ids, amounts);
     }
 
     // The following functions are overrides required by Solidity.

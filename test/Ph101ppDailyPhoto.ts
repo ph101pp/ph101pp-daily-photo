@@ -230,7 +230,7 @@ describe("Ph101ppDailyPhotos", function () {
       const { pdp, vault, treasury } = await loadFixture(deployFixture);
       const photos = 1000;
       const maxSupply = 5;
-      const [addresses, ids, amounts] = await pdp.getMintRangeInput(photos);
+      const [ids, amounts] = await pdp.getMintRangeInput(photos);
       
       const vaultAddresses = [];
       const treasuryAddresses = [];
@@ -239,7 +239,7 @@ describe("Ph101ppDailyPhotos", function () {
         treasuryAddresses.push(treasury.address);
       }
 
-      await pdp.mintPhotos(addresses, ids, amounts, maxSupply);
+      await pdp.mintPhotos(ids, amounts, maxSupply);
 
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);

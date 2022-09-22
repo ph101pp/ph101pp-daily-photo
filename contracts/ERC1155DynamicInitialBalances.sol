@@ -54,7 +54,6 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
     function _safeMintRange(
-        address[] memory addresses,
         uint256[] memory ids,
         uint256[][] memory amounts
     ) internal virtual {
@@ -64,17 +63,17 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
                 "Error: Range can't include an existing tokenId!"
             );
         }
-        _mintRange(addresses, ids, amounts);
+        _mintRange(ids, amounts);
     }
 
     /**
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
     function _mintRange(
-        address[] memory addresses,
         uint256[] memory ids,
         uint256[][] memory amounts
     ) internal virtual {
+        address[] memory addresses = initialHolders();
         _lastRangeTokenId = ids[ids.length - 1];
 
         if (_zeroMinted == false) {
@@ -187,13 +186,12 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         public
         view
         returns (
-            address[] memory,
             uint256[] memory,
             uint256[][] memory
         )
     {
         uint256 firstId = _zeroMinted ? _lastRangeTokenId + 1 : 0;
-        address[] memory addresses = initialHolders(firstId);
+        address[] memory addresses = initialHolders();
         uint256[] memory ids = new uint256[](numberOfTokens);
         uint256[][] memory amounts = new uint256[][](addresses.length);
 
@@ -213,7 +211,7 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
             newIndex += 1;
         }
 
-        return (addresses, ids, amounts);
+        return (ids, amounts);
     }
 
     /**
