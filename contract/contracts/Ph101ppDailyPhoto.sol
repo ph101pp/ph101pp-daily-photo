@@ -4,11 +4,16 @@ pragma solidity ^0.8.12;
 import "./ERC1155DynamicInitialBalances.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./Ph101ppDailyPhotosTokenId.sol";
 
 // import "hardhat/console.sol";
 
-contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
+contract Ph101ppDailyPhotos is
+    ERC1155DynamicInitialBalances,
+    ERC2981,
+    AccessControl
+{
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
@@ -42,6 +47,7 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         setURI(newUri);
         setMutableURI(newMutableUri);
         setAddresses(treasuryAddress, vaultAddress);
+        setDefaultRoyalty(msg.sender, 500);
         _mint(treasuryAddress, 0, 10, "");
     }
 
@@ -172,12 +178,18 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
         public
     {
         uint256 claimsRequired = 0;
-        for(uint i=0; i<amounts.length; i++) {
+        for (uint i = 0; i < amounts.length; i++) {
             claimsRequired += amounts[i];
         }
         _burn(msg.sender, 0, claimsRequired);
         address[] memory initialHolders = initialHolders(tokenIds[0]);
-        _safeBatchTransferFrom(initialHolders[TREASURY_ID], msg.sender, tokenIds, amounts, "");
+        _safeBatchTransferFrom(
+            initialHolders[TREASURY_ID],
+            msg.sender,
+            tokenIds,
+            amounts,
+            ""
+        );
     }
 
     function mintClaims(address to, uint256 amount)
@@ -194,15 +206,37 @@ contract Ph101ppDailyPhotos is ERC1155DynamicInitialBalances, AccessControl {
     ) public onlyRole(PHOTO_MINTER_ROLE) {
         _maxSupplyRange.push(ids[0]);
         _maxSupplies.push(maxSupply);
-        
+
         _mintRange(ids, amounts);
+    }
+
+    function setDefaultRoyalty(address receiver, uint96 feeNumerator)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _setDefaultRoyalty(receiver, feeNumerator);
+    }
+
+    function setTokenRoyalty(
+        uint256 tokenId,
+        address receiver,
+        uint96 feeNumerator
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setTokenRoyalty(tokenId, receiver, feeNumerator);
+    }
+
+    function resetTokenRoyalty(uint256 tokenId)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _resetTokenRoyalty(tokenId);
     }
 
     // The following functions are overrides required by Solidity.
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(AccessControl, ERC1155_)
+        override(AccessControl, ERC1155_, ERC2981)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
