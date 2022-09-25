@@ -1,0 +1,72 @@
+{
+  "name": "September 1, 2022",
+  "created_by": "ph101pp",
+  "external_url": "https://ph101pp.xyz/daily-photo",
+  "description": "Daily photograph taken by ph101pp.",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Philipp Adrian"
+    },
+    {
+      "trait_type": "Place",
+      "value": "Brooklyn"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "Apple iPhone 13 Pro"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Daily Pictures"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "ƒ/2.8 1/60 9mm ISO200"
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "trait_type": "Month",
+      "value": "August"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Hour",
+      "value": "20",
+      "max_value": "23"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Minute",
+      "value": "09",
+      "max_value": "59"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": "2022"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": "16",
+      "max_value": "31"
+    }
+  ],
+  "image_details": {
+    "bytes": 533613,
+    "format": "JPEG",
+    "sha256": "04adcb9a1491c0cc29972bb8e6f6da8953e018bca164bd22874dc86c5854123b",
+    "width": 2358,
+    "height": 1768
+  },
+  "image": "https://arweave.net/vvorXHtnBYFRszjiKRkqtiV_rZrx6BFf-ZNVV7XK5JU",
+  "image_url": "https://arweave.net/vvorXHtnBYFRszjiKRkqtiV_rZrx6BFf-ZNVV7XK5JU"
+}

@@ -1,18 +1,26 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const mutableUri = "https://arweave.net/1a-HDKflsjG2_b3jAuMYTrQyB13BNarkz0WZdCEBj0E/";
+  const immutableUri = "https://arweave.net/1a-HDKflsjG2_b3jAuMYTrQyB13BNarkz0WZdCEBj0E/";
+  const treasury = "0x7E00FE5a6AAc417167A1a506550255CAfB5196a6";
+  const vault = "0x1347aeA833D7a54456EAa76f45b66a9d91d0afb2";
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const PDPTokenId = await ethers.getContractFactory("Ph101ppDailyPhotosTokenId");
+  const pdpTokenId = await PDPTokenId.deploy();
+  await pdpTokenId.deployed();
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  console.log(`deployed: Ph101ppDailyPhotosTokenId`, pdpTokenId.address);
 
-  await lock.deployed();
+  const PDP = await ethers.getContractFactory("Ph101ppDailyPhotos", {
+    libraries: {
+      Ph101ppDailyPhotosTokenId: pdpTokenId.address,
+    },
+  });
+  const pdp = await PDP.deploy(immutableUri, mutableUri, treasury, vault);
+  await pdp.deployed();
+  console.log(`deployed: Ph101ppDailyPhotos`, pdp.address);
 
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -2,12 +2,15 @@
   "scripts": {
     "test": "npx hardhat test",
     "test-gas": "REPORT_GAS=true npx hardhat test",
-    "test-fast": "TS_NODE_TYPE_CHECK=false npx hardhat test"
+    "test-fast": "TS_NODE_TYPE_CHECK=false npx hardhat test",
+    "deploy-test": "npx hardhat run scripts/deploy.ts",
+    "deploy-goerli": "npx hardhat run scripts/deploy.ts --network goerli"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
     "@openzeppelin/contracts": "^4.7.3",
     "hardhat": "^2.11.1",
-    "hardhat-gas-reporter": "^1.0.9"
+    "hardhat-gas-reporter": "^1.0.9",
+    "dotenv": "^16.0.2"
   }
 }
