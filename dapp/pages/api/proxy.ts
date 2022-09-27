@@ -8,23 +8,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const token = await getToken({req});
-
-  const octokit = new Octokit({
-    auth: token?.access_token
-  })
-
+  const octokit = new Octokit();
   const gist = await octokit.request(`GET /gists/${process.env.GIST_ID}`, {
     gist_id: process.env.GIST_ID
   });
-
-  await octokit.request(`PATCH /gists/${process.env.GIST_ID}`, {
-    gist_id: process.env.GIST_ID,
-    files: {
-      'immutableBaseUrl': {
-        content: req.query.gist
-      }
-    }
-  });
-    
+  console.log(gist.data.files['immutableBaseUrl'].content);
 }
