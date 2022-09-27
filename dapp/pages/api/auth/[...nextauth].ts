@@ -36,6 +36,10 @@ export const authOptions: NextAuthOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
+      authorization: {
+        url: "https://github.com/login/oauth/authorize",
+        params: { scope: "read:user user:email gist" },
+      },
     }),
     // GoogleProvider({
     //   clientId: process.env.GOOGLE_ID,
@@ -55,8 +59,11 @@ export const authOptions: NextAuthOptions = {
     colorScheme: "light",
   },
   callbacks: {
-    async jwt({ token }) {
-      token.userRole = "admin"
+    async jwt({token, account}) {
+      token.userRole = "admin";
+      if(account) {
+        token.access_token = account?.access_token
+      }
       return token
     },
   },
