@@ -18,12 +18,14 @@
     "Lluis Agusti <hi@llu.lu>"
   ],
   "dependencies": {
+    "exif-js": "^2.3.0",
     "next": "latest",
     "next-auth": "latest",
     "nodemailer": "^6",
     "octokit": "^2.0.7",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-images-uploading": "^3.1.7"
   },
   "devDependencies": {
     "@types/node": "^17",
