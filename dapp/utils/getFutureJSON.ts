@@ -4,7 +4,7 @@ const months = [ "January", "February", "March", "April", "May", "June",
 
 const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-export default function getFutureJSON(dateString: string): string {
+export default function getFutureJSON(dateString: string): object {
   const year = parseInt(dateString.slice(0,4));
   const month = parseInt(dateString.slice(4,6))-1;
   const day = parseInt(dateString.slice(6,8));
@@ -51,5 +51,5 @@ export default function getFutureJSON(dateString: string): string {
     "image_url": "https://arweave.net/xbJD03bT9-5XGHIrFp6TfCsu_6zXBNUiRffS2IVifU4"
     };
 
-  return JSON.stringify(metadata)
+  return metadata;
 }

@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const token = await getToken({req});
-  console.log(process.env.LATEST_MANIFEST_URI)
+  // console.log(process.env.LATEST_MANIFEST_URI)
   const octokit = new Octokit({
     auth: token?.access_token
   });
@@ -32,5 +32,5 @@ export default async function handler(
     "method": "post"
   });
 
-  return res.status(200).end("ok");
+  return res.status(200).end(process.env.LATEST_MANIFEST_URI);
 }
