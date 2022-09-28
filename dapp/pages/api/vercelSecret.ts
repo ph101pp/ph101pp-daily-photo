@@ -1,15 +1,21 @@
 // This is an example of to protect an API route
 import { getToken } from "next-auth/jwt"
-import { Octokit } from "octokit"
+import { Octokit } from "@octokit/rest"
+import { Base64 } from "js-base64";
 
-import type { NextApiRequest, NextApiResponse } from "next"
+import type { NextApiRequest, NextApiResponse } from "next";
+import genUpdateLatestManifestUri from "../../utils/genUpdateLatestManifestUri";
+
+const owner = "greenish";
+const repo = "ph101pp-daily-photo";
+const path = "LATEST_MANIFEST_URI.txt";
+
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const token = await getToken({req});
-  // console.log(process.env.LATEST_MANIFEST_URI)
   const octokit = new Octokit({
     auth: token?.access_token
   });
@@ -19,18 +25,5 @@ export default async function handler(
 
   const arweaveURL = gist.data.files['latestManifestUri.txt'].content;
 
-  const name = "LATEST_MANIFEST_URI"
-
-  await fetch(`https://api.vercel.com/v2/secrets/${name}`, {
-    "body": JSON.stringify({
-      "name": name,
-      "value": arweaveURL
-    }),
-    "headers": {
-      "Authorization": `Bearer ${process.env.VERCEL_TOKEN}`
-    },
-    "method": "post"
-  });
-
-  return res.status(200).end(process.env.LATEST_MANIFEST_URI);
+  await genUpdateLatestManifestUri(octokit, arweaveURL);
 }
