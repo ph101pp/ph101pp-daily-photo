@@ -22,10 +22,10 @@ export default async function handler(
   const name = "LATEST_MANIFEST_URI"
 
   await fetch(`https://api.vercel.com/v2/secrets/${name}`, {
-    "body": {
+    "body": JSON.stringify({
       "name": name,
       "value": arweaveURL
-    },
+    }),
     "headers": {
       "Authorization": `Bearer ${process.env.VERCEL_TOKEN}`
     },
