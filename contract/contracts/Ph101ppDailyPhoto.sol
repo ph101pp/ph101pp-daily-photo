@@ -5,7 +5,7 @@ import "./ERC1155DynamicInitialBalances.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "./Ph101ppDailyPhotosTokenId.sol";
+import "./Ph101ppDailyPhotoTokenId.sol";
 
 // import "hardhat/console.sol";
 
@@ -105,42 +105,35 @@ contract Ph101ppDailyPhotos is
     function uri(uint256 tokenId) public view override returns (string memory) {
         string memory tokenDate;
         string memory currentUri;
-
         // token...
         if (tokenId == CLAIM_TOKEN_ID) {
             // ... is claim -> return claim
             tokenDate = CLAIM_TOKEN;
             currentUri = _uri;
         } else {
-            uint256 tokenTimestamp = Ph101ppDailyPhotosTokenId
+            uint256 tokenTimestamp = Ph101ppDailyPhotoTokenId
                 ._timestampFromTokenId(tokenId);
 
-            if (block.timestamp < tokenTimestamp) {
-                // ... in future -> return default.
-                tokenDate = FUTURE_TOKEN;
+            (
+                uint256 year,
+                uint256 month,
+                uint256 day
+            ) = Ph101ppDailyPhotoTokenId._timestampToDate(tokenTimestamp);
+
+            tokenDate = string.concat(
+                Strings.toString(year),
+                month <= 9 ? "0" : "",
+                Strings.toString(month),
+                day <= 9 ? "0" : "",
+                Strings.toString(day)
+            );
+
+            if (_lastUriUpdate > tokenTimestamp) {
+                // ... uri updated since token -> immutable uri
                 currentUri = _uri;
             } else {
-                (
-                    uint256 year,
-                    uint256 month,
-                    uint256 day
-                ) = Ph101ppDailyPhotosTokenId._timestampToDate(tokenTimestamp);
-
-                tokenDate = string.concat(
-                    Strings.toString(year),
-                    month <= 9 ? "0" : "",
-                    Strings.toString(month),
-                    day <= 9 ? "0" : "",
-                    Strings.toString(day)
-                );
-
-                if (_lastUriUpdate > tokenTimestamp) {
-                    // ... uri updated since token -> immutable uri
-                    currentUri = _uri;
-                } else {
-                    // ... uri not yet updated since token -> mutable uri
-                    currentUri = _mutableUri;
-                }
+                // ... uri not yet updated since token -> mutable uri
+                currentUri = _mutableUri;
             }
         }
 
@@ -164,7 +157,7 @@ contract Ph101ppDailyPhotos is
             uint256 day
         )
     {
-        return Ph101ppDailyPhotosTokenId.tokenIdToDate(tokenId);
+        return Ph101ppDailyPhotoTokenId.tokenIdToDate(tokenId);
     }
 
     function tokenIdFromDate(
@@ -172,7 +165,7 @@ contract Ph101ppDailyPhotos is
         uint256 month,
         uint256 day
     ) public pure returns (uint256 tokenId) {
-        return Ph101ppDailyPhotosTokenId.tokenIdFromDate(year, month, day);
+        return Ph101ppDailyPhotoTokenId.tokenIdFromDate(year, month, day);
     }
 
     function redeemClaims(uint256[] memory tokenIds, uint256[] memory amounts)

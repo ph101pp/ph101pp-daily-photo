@@ -18,12 +18,12 @@ describe("Ph101ppDailyPhotos", function () {
     if(latest < nowTimestamp) {
       await time.increaseTo(nowTimestamp);
     }
-    const PDPTokenId = await ethers.getContractFactory("Ph101ppDailyPhotosTokenId");
+    const PDPTokenId = await ethers.getContractFactory("Ph101ppDailyPhotoTokenId");
     const pdpTokenId = await PDPTokenId.deploy();
 
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhotos", {
       libraries: {
-        Ph101ppDailyPhotosTokenId: pdpTokenId.address,
+        Ph101ppDailyPhotoTokenId: pdpTokenId.address,
       },
     });
     const pdp = await PDP.deploy(immutableUri, mutableUri, treasury.address, vault.address);
@@ -178,10 +178,10 @@ describe("Ph101ppDailyPhotos", function () {
 
     it("should return correct url for yesterdays tokenId ", async function () {
       const { pdp, immutableUri } = await loadFixture(deployFixture);
-      const now = new Date(nowTimestamp*1000);
+      const now = new Date((nowTimestamp-SECONDS_PER_DAY)*1000);
       const year = now.getUTCFullYear();
-      const month = now.getUTCMonth()+1;
-      const day = now.getUTCDate()-1;
+      const month = now.getUTCMonth()+1; // month+1 because returned as 0-11
+      const day = now.getUTCDate();
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
@@ -189,16 +189,17 @@ describe("Ph101ppDailyPhotos", function () {
       expect(await pdp.uri(tokenId)).to.equal(immutableUri+tokenDate+".json");
     });
     
-    it("should return correct url for tomorrows tokenId ", async function () {
-      const { pdp, immutableUri } = await loadFixture(deployFixture);
-      const now = new Date(nowTimestamp*1000);
+    it("should return correct url for future tokenId ", async function () {
+      const { pdp, mutableUri } = await loadFixture(deployFixture);
+      const now = new Date((nowTimestamp+SECONDS_PER_DAY)*1000);
       const year = now.getUTCFullYear();
-      const month = now.getUTCMonth()+1;
-      const day = now.getUTCDate()+1;
+      const month = now.getUTCMonth()+1; // month+1 because returned as 0-11
+      const day = now.getUTCDate();
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);
+      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
 
-      expect(await pdp.uri(tokenId)).to.equal(immutableUri+"FUTURE.json");
+      expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
     });
 
     it("should return correct url for a minted token before and after immutableURI was updated", async function () {
@@ -207,10 +208,10 @@ describe("Ph101ppDailyPhotos", function () {
 
       time.increase(60*60*24*7);
       
-      const now = new Date(nowTimestamp*1000);
+      const now = new Date((nowTimestamp+SECONDS_PER_DAY*3)*1000);
       const year = now.getUTCFullYear();
-      const month = now.getUTCMonth()+1;
-      const day = now.getUTCDate()+3;
+      const month = now.getUTCMonth()+1; // month+1 because returned as 0-11
+      const day = now.getUTCDate();
       const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
 
       const tokenId = await pdp.tokenIdFromDate(year, month, day);

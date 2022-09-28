@@ -3,7 +3,7 @@ pragma solidity ^0.8.12;
 
 import "./DateTime.sol";
 
-library Ph101ppDailyPhotosTokenId {
+library Ph101ppDailyPhotoTokenId {
     uint256 public constant START_DATE = 1661990400; // Sept 1, 2022
 
     function tokenIdToDate(uint256 tokenId)
