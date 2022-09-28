@@ -4,7 +4,8 @@ import { Octokit } from "@octokit/rest"
 import { Base64 } from "js-base64";
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import genUpdateLatestManifestUri from "../../utils/genUpdateLatestManifestUri";
+import genUpdateLatestManifestUri from "../../utils/genUpdateGithubFile";
+import genUpdateGithubFile from "../../utils/genUpdateGithubFile";
 
 const owner = "greenish";
 const repo = "ph101pp-daily-photo";
@@ -25,5 +26,5 @@ export default async function handler(
 
   const arweaveURL = gist.data.files['latestManifestUri.txt'].content;
 
-  await genUpdateLatestManifestUri(octokit, arweaveURL);
+  await genUpdateGithubFile(octokit, "LATEST_MANIFEST_URI.txt", arweaveURL, "Update LATEST_MANIFEST_URI");
 }
