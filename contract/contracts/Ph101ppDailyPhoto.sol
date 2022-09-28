@@ -34,7 +34,6 @@ contract Ph101ppDailyPhotos is
     event UriSet(string newURI, address sender);
 
     constructor(
-        string memory newUri,
         string memory newMutableUri,
         address treasuryAddress,
         address vaultAddress
@@ -44,7 +43,6 @@ contract Ph101ppDailyPhotos is
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
 
-        setURI(newUri);
         setMutableURI(newMutableUri);
         setAddresses(treasuryAddress, vaultAddress);
         setDefaultRoyalty(msg.sender, 500);
@@ -88,12 +86,21 @@ contract Ph101ppDailyPhotos is
         addresses[1] = vault;
         _setInitialHolders(addresses);
     }
-
+    
     function setURI(string memory newUri) public onlyRole(URI_UPDATER_ROLE) {
+       setURI(newUri, block.timestamp);
+    }
+    
+    function setURI(string memory newUri, uint256 timestamp ) public onlyRole(URI_UPDATER_ROLE) {
+        require(
+            timestamp > _lastUriUpdate, 
+            "Error: URI update date must be larger than previous one."
+        );
         _uri = newUri;
-        _lastUriUpdate = block.timestamp;
+        _lastUriUpdate = timestamp;
         emit UriSet(newUri, msg.sender);
     }
+
 
     function setMutableURI(string memory newMutableUri)
         public
@@ -128,7 +135,7 @@ contract Ph101ppDailyPhotos is
                 Strings.toString(day)
             );
 
-            if (_lastUriUpdate > tokenTimestamp) {
+            if (exists(tokenId) && _lastUriUpdate > tokenTimestamp) {
                 // ... uri updated since token -> immutable uri
                 currentUri = _uri;
             } else {
