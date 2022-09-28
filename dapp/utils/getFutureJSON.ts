@@ -29,11 +29,16 @@ export default function getFutureJSON(dateString: string): object {
       },
       {
         "trait_type": "Weekday",
-        "value": formattedDate
+        "value": weekday
       },
       {
-        "trait_type": "Month",
+        "trait_type": "Month Name",
         "value": months[month]
+      },
+      {
+        "display_type": "number",
+        "trait_type": "Month",
+        "value": month+1
       },
       {
         "display_type": "number",
@@ -44,7 +49,6 @@ export default function getFutureJSON(dateString: string): object {
         "display_type": "number",
         "trait_type": "Day",
         "value": day,
-        "max_value": "31"
       }
     ],
     "image": "https://arweave.net/xbJD03bT9-5XGHIrFp6TfCsu_6zXBNUiRffS2IVifU4",
