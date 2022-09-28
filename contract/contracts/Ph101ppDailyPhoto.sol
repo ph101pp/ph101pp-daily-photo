@@ -26,7 +26,7 @@ contract Ph101ppDailyPhotos is
 
     string private _uri;
     string private _mutableUri;
-    uint256 private _lastUriUpdate;
+    uint256 private _uriValidUptoTokenId;
 
     uint256[] private _maxSupplies;
     uint256[] private _maxSupplyRange;
@@ -87,17 +87,13 @@ contract Ph101ppDailyPhotos is
         _setInitialHolders(addresses);
     }
     
-    function setURI(string memory newUri) public onlyRole(URI_UPDATER_ROLE) {
-       setURI(newUri, block.timestamp);
-    }
-    
-    function setURI(string memory newUri, uint256 timestamp ) public onlyRole(URI_UPDATER_ROLE) {
+    function setURI(string memory newUri, uint256 validUptoTokenId ) public onlyRole(URI_UPDATER_ROLE) {
         require(
-            timestamp > _lastUriUpdate, 
-            "Error: URI update date must be larger than previous one."
+            validUptoTokenId > _uriValidUptoTokenId, 
+            "Error: URI must be valid for more tokenIds than previous URI."
         );
         _uri = newUri;
-        _lastUriUpdate = timestamp;
+        _uriValidUptoTokenId = validUptoTokenId;
         emit UriSet(newUri, msg.sender);
     }
 
@@ -118,14 +114,12 @@ contract Ph101ppDailyPhotos is
             tokenDate = CLAIM_TOKEN;
             currentUri = _uri;
         } else {
-            uint256 tokenTimestamp = Ph101ppDailyPhotoTokenId
-                ._timestampFromTokenId(tokenId);
-
             (
                 uint256 year,
                 uint256 month,
                 uint256 day
-            ) = Ph101ppDailyPhotoTokenId._timestampToDate(tokenTimestamp);
+            ) = Ph101ppDailyPhotoTokenId
+                .tokenIdToDate(tokenId);
 
             tokenDate = string.concat(
                 Strings.toString(year),
@@ -135,7 +129,7 @@ contract Ph101ppDailyPhotos is
                 Strings.toString(day)
             );
 
-            if (exists(tokenId) && _lastUriUpdate > tokenTimestamp) {
+            if (exists(tokenId) && _uriValidUptoTokenId >= tokenId) {
                 // ... uri updated since token -> immutable uri
                 currentUri = _uri;
             } else {

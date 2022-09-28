@@ -33,9 +33,9 @@ describe("Ph101ppDailyPhotos", function () {
 
   describe("URI storing / updating", function () {
     it("Should set the correct mutableUri and immutableUri during deploy", async function () {
-      const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
+      const { pdp, mutableUri } = await loadFixture(deployFixture);
       expect(await pdp.mutableBaseUri()).to.equal(mutableUri);
-      expect(await pdp.baseUri()).to.equal(immutableUri);
+      expect(await pdp.baseUri()).to.equal("");
     });
 
     it("Should correcly update mutableUri via setMutableURI()", async function () {
@@ -48,22 +48,9 @@ describe("Ph101ppDailyPhotos", function () {
     
     it("Should correcly update immutableUri via setURI() and fire event", async function () {
       const immutableUri2 = "2.immutable.uri";
-      const { pdp, immutableUri, owner } = await loadFixture(deployFixture);
-      expect(await pdp.baseUri()).to.equal(immutableUri);
-      const tx = await pdp["setURI(string)"](immutableUri2);
-      const receipt = await tx.wait();
-      expect(await pdp.baseUri()).to.equal(immutableUri2);
-      const uriSetEvents = receipt.events?.filter((x) => {return x.event == "UriSet"});
-      assert(uriSetEvents?.length === 1);
-      expect(uriSetEvents[0].args?.newURI).to.equal(immutableUri2);
-      expect(uriSetEvents[0].args?.sender).to.equal(owner.address);
-    });
-
-    it("Should be possible ", async function () {
-      const immutableUri2 = "2.immutable.uri";
-      const { pdp, immutableUri, owner } = await loadFixture(deployFixture);
-      expect(await pdp.baseUri()).to.equal(immutableUri);
-      const tx = await pdp['setURI(string)'](immutableUri2);
+      const { pdp, owner } = await loadFixture(deployFixture);
+      expect(await pdp.baseUri()).to.equal("");
+      const tx = await pdp.setURI(immutableUri2, 100);
       const receipt = await tx.wait();
       expect(await pdp.baseUri()).to.equal(immutableUri2);
       const uriSetEvents = receipt.events?.filter((x) => {return x.event == "UriSet"});
@@ -237,7 +224,7 @@ describe("Ph101ppDailyPhotos", function () {
       
       expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
 
-      await pdp["setURI(string)"](newImmutableUri);
+      await pdp.setURI(newImmutableUri);
 
       expect(await pdp.uri(tokenId)).to.equal(newImmutableUri+tokenDate+".json");
 
@@ -339,7 +326,7 @@ describe("Ph101ppDailyPhotos", function () {
       const { pdp, immutableUri } = await loadFixture(deployFixture);
 
       for(let i=0; i<1000; i++) {
-        await pdp["setURI(string)"](immutableUri+i);
+        await pdp.setURI(immutableUri+i);
       }
     });
   });
