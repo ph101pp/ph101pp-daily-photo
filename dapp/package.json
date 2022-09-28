@@ -18,6 +18,7 @@
     "Lluis Agusti <hi@llu.lu>"
   ],
   "dependencies": {
+    "arweave": "^1.11.6",
     "exif-js": "^2.3.0",
     "next": "latest",
     "next-auth": "latest",
