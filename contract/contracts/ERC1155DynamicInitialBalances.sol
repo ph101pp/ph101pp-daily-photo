@@ -14,8 +14,6 @@ import "./ERC1155_.sol";
 abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
-    string private constant ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT =
-        "Invalid input. Use verifyUpdateInitialHoldersRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
         "No initial holders set. Use _setInitialHolders()";
 
@@ -51,155 +49,6 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     function _setInitialHolders(address[] memory addresses) internal virtual {
         _initialHoldersRange.push(_zeroMinted ? _lastRangeTokenId + 1 : 0);
         _initialHolders.push(addresses);
-    }
-
-    struct UpdateInitialHoldersRangeInput {
-        address[] fromAddresses;
-        address[] toAddresses;
-        uint256[][] ids;
-        uint256[][] amounts;
-        address[][] newInitialHolders;
-        uint256[] newInitialHoldersRange;
-    } 
-
-    function verifyUpdateInitialHoldersRangeInput(
-        uint256 from,
-        uint256 to,
-        address[] memory newInitialHolders,
-        UpdateInitialHoldersRangeInput memory input
-    )
-        public
-        view
-        virtual
-        returns (
-            UpdateInitialHoldersRangeInput memory,
-            bytes32
-        )
-    {
-        uint256 fromIndex = _findInRange(_initialHoldersRange, from);
-        uint256 toIndex = _findInRange(_initialHoldersRange, to);
-        uint256 skip = toIndex - fromIndex;
-        uint256 newRangeIndex = 0;
-        bool rangeSet = false;
-        for (uint i = 0; i < _initialHoldersRange.length; i++) {
-            uint256 current = _initialHoldersRange[i];
-
-            if (current < from || current > to) {
-                require(
-                    input.newInitialHoldersRange[newRangeIndex] ==
-                        _initialHoldersRange[i]
-                );
-                require(
-                    input.newInitialHolders[newRangeIndex][0] == _initialHolders[i][0]
-                );
-                newRangeIndex++;
-            } else if (current >= from && current <= to) {
-                require(input.newInitialHoldersRange[newRangeIndex] == from);
-                require(input.newInitialHolders[newRangeIndex][0] == newInitialHolders[0]);
-                require(input.newInitialHoldersRange[newRangeIndex + 1] == to);
-                require(
-                    input.newInitialHolders[newRangeIndex + 1][0] ==
-                        _initialHolders[toIndex][0]
-                );
-                rangeSet = true;
-                newRangeIndex += 2;
-                i += skip - 1;
-            }
-        }
-        if (!rangeSet) {
-            require(
-                input.newInitialHoldersRange[input.newInitialHoldersRange.length - 2] ==
-                    from
-            );
-            require(
-                input.newInitialHolders[input.newInitialHoldersRange.length - 2][0] ==
-                    newInitialHolders[0]
-            );
-            require(
-                input.newInitialHoldersRange[input.newInitialHoldersRange.length - 1] == to
-            );
-            require(
-                input.newInitialHolders[input.newInitialHoldersRange.length - 1][0] ==
-                    _initialHolders[toIndex][0]
-            );
-        }
-
-        require(input.fromAddresses.length == input.toAddresses.length);
-        require(input.fromAddresses.length == input.ids.length);
-        require(input.fromAddresses.length == input.amounts.length);
-
-        uint256[] memory indexes = new uint256[](input.fromAddresses.length);
-
-        for (uint256 tokenId = from; tokenId <= to; tokenId++) {
-            bool tokenFound = false;
-            require(initialHolders(tokenId).length == newInitialHolders.length);
-
-            for (uint256 p = 0; p < input.fromAddresses.length; p++) {
-                if (input.ids[p][indexes[p]] == tokenId) {
-                    require(
-                        balanceOf(input.fromAddresses[p], tokenId) ==
-                            input.amounts[p][indexes[p]]
-                    );
-                    indexes[p]++;
-                    tokenFound = true;
-                }
-            }
-            if (!tokenFound) {
-                require(_manualMint[tokenId]);
-            }
-        }
-        return (
-            input,
-            keccak256(
-                abi.encode(
-                    input.fromAddresses,
-                    input.toAddresses,
-                    input.ids,
-                    input.amounts,
-                    input.newInitialHolders,
-                    input.newInitialHoldersRange,
-                    _initialHolders,
-                    _initialHoldersRange,
-                    _lastRangeTokenId
-                )
-            )
-        );
-    }
-
-    /**
-     * @dev Update initial holders for a range of ids.
-     */
-    function _updateInitialHoldersRange(
-        UpdateInitialHoldersRangeInput memory input,
-        bytes32 inputCheckSum
-    ) internal virtual {
-        bytes32 checkSum = keccak256(
-            abi.encode(
-                input.fromAddresses,
-                input.toAddresses,
-                input.ids,
-                input.amounts,
-                input.newInitialHolders,
-                input.newInitialHoldersRange,
-                _initialHolders,
-                _initialHoldersRange,
-                _lastRangeTokenId
-            )
-        );
-        require(inputCheckSum == checkSum, ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT);
-
-        _initialHolders = input.newInitialHolders;
-        _initialHoldersRange = input.newInitialHoldersRange;
-
-        for (uint i = 0; i < input.toAddresses.length; i++) {
-            emit TransferBatch(
-                msg.sender,
-                input.fromAddresses[i],
-                input.toAddresses[i],
-                input.ids[i],
-                input.amounts[i]
-            );
-        }
     }
 
     /**
@@ -335,9 +184,9 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         )
     {
         uint256 firstId = _zeroMinted ? _lastRangeTokenId + 1 : 0;
-        address[] memory addresses = initialHolders();
+        address[] memory holders = initialHolders();
         uint256[] memory ids = new uint256[](numberOfTokens);
-        uint256[][] memory amounts = new uint256[][](addresses.length);
+        uint256[][] memory amounts = new uint256[][](holders.length);
 
         uint256 newIndex = 0;
         for (uint256 i = 0; newIndex < numberOfTokens; i++) {
@@ -346,16 +195,16 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
                 continue;
             }
             ids[newIndex] = newId;
-            for (uint256 b = 0; b < addresses.length; b++) {
+            for (uint256 b = 0; b < holders.length; b++) {
                 if (newIndex == 0) {
                     amounts[b] = new uint256[](numberOfTokens);
                 }
-                amounts[b][newIndex] = initialBalanceOf(addresses[b], newId);
+                amounts[b][newIndex] = initialBalanceOf(holders[b], newId);
             }
             newIndex += 1;
         }
         bytes32 checkSum = keccak256(
-            abi.encode(ids, amounts, addresses, _lastRangeTokenId, _zeroMinted)
+            abi.encode(ids, amounts, holders, _lastRangeTokenId, _zeroMinted)
         );
 
         return (ids, amounts, checkSum);
