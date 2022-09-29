@@ -9,7 +9,7 @@ const nowTimestamp = Math.ceil(Date.now()/1000)+SECONDS_PER_DAY*3;
 describe("Ph101ppDailyPhotos", function () {
 
   async function deployFixture() {
-    const mutableUri = "mutable.uri/";
+    const mutableUri = "mutable_.uri/";
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
     const [owner, treasury, vault, account1, account2] = await ethers.getSigners();
@@ -156,7 +156,7 @@ describe("Ph101ppDailyPhotos", function () {
     });
   });
 
-  describe("URI() for tokenIDs", function(){
+  describe.only("URI() for tokenIDs", function(){
 
     it("should return correct url for unminted tokenId:1 ", async function () {
       const tokenId = 1;
@@ -173,63 +173,43 @@ describe("Ph101ppDailyPhotos", function () {
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
       const tokenId = 0;
       const { pdp, immutableUri } = await loadFixture(deployFixture);
+      expect(await pdp.uri(tokenId)).to.equal("CLAIM.json");
+      await pdp.setURI(immutableUri, 1);
       expect(await pdp.uri(tokenId)).to.equal(immutableUri+"CLAIM.json");
     });
 
-    it("should return correct url for yesterdays minted tokenId ", async function () {
-      const { pdp, immutableUri } = await loadFixture(deployFixture);
-      const inputs = await pdp.getMintRangeInput(100);
-      await pdp.mintPhotos(...inputs, 5);
-      const now = new Date((nowTimestamp-SECONDS_PER_DAY)*1000);
-      const year = now.getUTCFullYear();
-      const month = now.getUTCMonth()+1; // month+1 because returned as 0-11
-      const day = now.getUTCDate();
+    it("should return mutable url for all unminted nfts ", async function () {
+      const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
+      await pdp.setURI(immutableUri, 100);
 
-      const tokenId = await pdp.tokenIdFromDate(year, month, day);
-      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
-
-      expect(await pdp.uri(tokenId)).to.equal(immutableUri+tokenDate+".json");
-    });
-    
-    it("should return correct url for future tokenId ", async function () {
-      const { pdp, mutableUri } = await loadFixture(deployFixture);
-      const inputs = await pdp.getMintRangeInput(100);
-      await pdp.mintPhotos(...inputs, 5);
-      const now = new Date((nowTimestamp+SECONDS_PER_DAY)*1000);
-      const year = now.getUTCFullYear();
-      const month = now.getUTCMonth()+1; // month+1 because returned as 0-11
-      const day = now.getUTCDate();
-
-      const tokenId = await pdp.tokenIdFromDate(year, month, day);
-      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
-
-      expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
+      for(let i=1; i<100; i++) {
+        expect(await pdp.uri(i)).to.include(mutableUri);
+      }
     });
 
-    it("should return correct url for a minted token before and after immutableURI was updated", async function () {
-      const { pdp, mutableUri } = await loadFixture(deployFixture);
-      const inputs = await pdp.getMintRangeInput(100);
+    it("should return immutable url for all minted nfts ", async function () {
+      const { pdp, mutableUri,immutableUri } = await loadFixture(deployFixture);
+      await pdp.setURI(immutableUri, 100);
+      const inputs = await pdp.getMintRangeInput(50);
       await pdp.mintPhotos(...inputs, 5);
-      const newImmutableUri = "2.immutable.uri/";
 
-      time.increase(60*60*24*7);
-      
-      const now = new Date((nowTimestamp+SECONDS_PER_DAY*3)*1000);
-      const year = now.getUTCFullYear();
-      const month = now.getUTCMonth()+1; // month+1 because returned as 0-11
-      const day = now.getUTCDate();
-      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
-
-      const tokenId = await pdp.tokenIdFromDate(year, month, day);
-      
-      expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
-
-      await pdp.setURI(newImmutableUri);
-
-      expect(await pdp.uri(tokenId)).to.equal(newImmutableUri+tokenDate+".json");
-
+      for(let i=1; i<100; i++) {
+        if(i>50) expect(await pdp.uri(i)).to.include(mutableUri);
+        else expect(await pdp.uri(i)).to.include(immutableUri);
+      }
     });
 
+    it("should return mutable url for minted nfts after _uriValidUptoTokenId", async function () {
+      const { pdp, mutableUri,immutableUri } = await loadFixture(deployFixture);
+      await pdp.setURI(immutableUri, 10);
+      const inputs = await pdp.getMintRangeInput(50);
+      await pdp.mintPhotos(...inputs, 5);
+
+      for(let i=1; i<50; i++) {
+        if(i>10) expect(await pdp.uri(i)).to.include(mutableUri);
+        else expect(await pdp.uri(i)).to.include(immutableUri);
+      }
+    });
   });
 
   describe("Mint Photos", function(){
@@ -326,7 +306,7 @@ describe("Ph101ppDailyPhotos", function () {
       const { pdp, immutableUri } = await loadFixture(deployFixture);
 
       for(let i=0; i<1000; i++) {
-        await pdp.setURI(immutableUri+i);
+        await pdp.setURI(immutableUri+i, i);
       }
     });
   });
