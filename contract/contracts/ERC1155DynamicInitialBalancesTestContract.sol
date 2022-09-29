@@ -30,9 +30,10 @@ contract ERC1155DynamicInitialBalancesTestContract is
 
   function mintRange(
     uint256[] memory ids,
-    uint256[][] memory amounts
+    uint256[][] memory amounts,
+    bytes32 checkSum
   ) public virtual {
-    _mintRange(ids, amounts);
+    _mintRange(ids, amounts, checkSum);
   }
  
   function mint(

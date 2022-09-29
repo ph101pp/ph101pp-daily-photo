@@ -68,7 +68,7 @@ describe("ERC1155DynamicInitialBalances", function () {
       await c.mintBatch(account1.address, [0, 1, 2, 3, 4, 5], [1, 1, 1, 1, 1, 1], []);
       await c.mint(account1.address, 8, 8, []);
 
-      const [ids, amounts] = await c.getMintRangeInput(newTokens);
+      const [ids, amounts, checkSum] = await c.getMintRangeInput(newTokens);
 
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < 6; i++) {
@@ -76,7 +76,7 @@ describe("ERC1155DynamicInitialBalances", function () {
       }
       expect(ids).to.not.include(8);
 
-      await c.mintRange(ids, amounts);
+      await c.mintRange(ids, amounts, checkSum);
       await c.mintBatch(account1.address, [15, 17], [1, 1], []);
 
       const [ids2] = await c.getMintRangeInput(newTokens);

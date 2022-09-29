@@ -53,27 +53,16 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     /**
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
-    function _safeMintRange(
-        uint256[] memory ids,
-        uint256[][] memory amounts
-    ) internal virtual {
-        for (uint i = 0; i < ids.length; i++) {
-            require(
-                !exists(ids[i]),
-                "Error: Range can't include an existing tokenId!"
-            );
-        }
-        _mintRange(ids, amounts);
-    }
-
-    /**
-     * @dev Lazy-mint a range of new tokenIds to initial holders
-     */
     function _mintRange(
         uint256[] memory ids,
-        uint256[][] memory amounts
+        uint256[][] memory amounts,
+        bytes32 inputCheckSum
     ) internal virtual {
         address[] memory addresses = initialHolders();
+
+        bytes32 checkSum = keccak256(abi.encode(ids, amounts, addresses, _lastRangeTokenId));
+        require(inputCheckSum == checkSum, ERROR_INVALID_INPUT_MINT_RANGE);
+
         _lastRangeTokenId = ids[ids.length - 1];
 
         if (_zeroMinted == false) {
@@ -187,7 +176,8 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         view
         returns (
             uint256[] memory,
-            uint256[][] memory
+            uint256[][] memory,
+            bytes32
         )
     {
         uint256 firstId = _zeroMinted ? _lastRangeTokenId + 1 : 0;
@@ -210,8 +200,9 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
             }
             newIndex += 1;
         }
-
-        return (ids, amounts);
+        bytes32 checkSum = keccak256(abi.encode(ids, amounts, addresses, _lastRangeTokenId));
+        
+        return (ids, amounts, checkSum);
     }
 
     /**
@@ -255,6 +246,7 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     function _maybeInitializeBalance(address account, uint256 id) private {
         // Pre initialization
         if (
+            account != address(0) &&
             _inRange(id) &&
             !_balancesInitialized[id][account] &&
             !_manualMint[id]

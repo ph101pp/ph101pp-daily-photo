@@ -197,12 +197,13 @@ contract Ph101ppDailyPhotos is
     function mintPhotos(
         uint256[] memory ids,
         uint256[][] memory amounts,
+        bytes32 checkSum,
         uint256 maxSupply
     ) public onlyRole(PHOTO_MINTER_ROLE) {
         _maxSupplyRange.push(ids[0]);
         _maxSupplies.push(maxSupply);
 
-        _mintRange(ids, amounts);
+        _mintRange(ids, amounts, checkSum);
     }
 
     function setDefaultRoyalty(address receiver, uint96 feeNumerator)
