@@ -153,6 +153,30 @@ describe("ERC1155MintRange", function () {
       expect(balances2n[7].toNumber()).to.equal((19 % 10) + 1);
     });
 
+    it("should be possible to increase supply of dynamically minted tokens (_mintRange) via _mint|_mintBatch", async function () {
+      const newTokens = 5;
+      const { c, account1} = await loadFixture(deployFixture);
+      const initialHolders = [account1.address];
+      await c.setInitialHolders(initialHolders);
+      const inputs = await c.getMintRangeInput(newTokens);
+      await c.mintRange(...inputs);
+
+      const balances1 = await c.balanceOfBatch([account1.address, account1.address,account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
+      for (let i = 0; i < initialHolders.length; i++) {
+        expect(balances1[i].toNumber()).to.equal((i+1 % 10) + 1);
+      }
+
+      await c.mint(account1.address, 1, 5, []);
+      await c.mintBatch(account1.address, [2,3,4,5], [5,5,5,5], []);
+
+      const balances2 = await c.balanceOfBatch([account1.address, account1.address,account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
+      for (let i = 0; i < initialHolders.length; i++) {
+        const balance = (i+1 % 10) + 1 + 5;
+        expect(balances2[i].toNumber()).to.equal(balance);
+        expect(await c.totalSupply(i+1)).to.equal(balance);
+      }
+    })
+
   });
 
   describe("safeTransfer(Batch)", function () {
