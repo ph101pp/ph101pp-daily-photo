@@ -24,14 +24,14 @@ contract Ph101ppDailyPhotos is
     uint256 private constant TREASURY_ID = 0;
     uint256 private constant VAULT_ID = 1;
 
-    string private _uri;
-    string private _mutableUri;
-    uint256 private _uriValidUptoTokenId;
+    string private _permanentUri;
+    string private _proxyUri;
+    uint256 private _permanentUriValidUptoTokenId;
 
     uint256[] private _maxSupplies;
     uint256[] private _maxSupplyRange;
 
-    event UriSet(string newURI, address sender);
+    event PermanentUriSet(string newURI, uint256 validUptoTokenId, address sender);
 
     constructor(
         string memory newMutableUri,
@@ -43,7 +43,7 @@ contract Ph101ppDailyPhotos is
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
 
-        setMutableURI(newMutableUri);
+        setProxyURI(newMutableUri);
         setAddresses(treasuryAddress, vaultAddress);
         setDefaultRoyalty(msg.sender, 500);
         _mint(treasuryAddress, 0, 10, "");
@@ -87,22 +87,22 @@ contract Ph101ppDailyPhotos is
         _setInitialHolders(addresses);
     }
     
-    function setURI(string memory newUri, uint256 validUptoTokenId ) public onlyRole(URI_UPDATER_ROLE) {
+    function setPermanentURI(string memory newUri, uint256 validUptoTokenId ) public onlyRole(URI_UPDATER_ROLE) {
         require(
-            validUptoTokenId > _uriValidUptoTokenId, 
+            validUptoTokenId > _permanentUriValidUptoTokenId, 
             "Error: URI must be valid for more tokenIds than previous URI."
         );
-        _uri = newUri;
-        _uriValidUptoTokenId = validUptoTokenId;
-        emit UriSet(newUri, msg.sender);
+        _permanentUri = newUri;
+        _permanentUriValidUptoTokenId = validUptoTokenId;
+        emit PermanentUriSet(newUri, validUptoTokenId, msg.sender);
     }
 
 
-    function setMutableURI(string memory newMutableUri)
+    function setProxyURI(string memory newProxyUri)
         public
         onlyRole(URI_UPDATER_ROLE)
     {
-        _mutableUri = newMutableUri;
+        _proxyUri = newProxyUri;
     }
 
     function uri(uint256 tokenId) public view override returns (string memory) {
@@ -112,7 +112,7 @@ contract Ph101ppDailyPhotos is
         if (tokenId == CLAIM_TOKEN_ID) {
             // ... is claim -> return claim
             tokenDate = CLAIM_TOKEN;
-            currentUri = _uri;
+            currentUri = _permanentUri;
         } else {
             (
                 uint256 year,
@@ -129,12 +129,12 @@ contract Ph101ppDailyPhotos is
                 Strings.toString(day)
             );
 
-            if (exists(tokenId) && _uriValidUptoTokenId >= tokenId) {
+            if (exists(tokenId) && _permanentUriValidUptoTokenId >= tokenId) {
                 // ... uri updated since token -> immutable uri
-                currentUri = _uri;
+                currentUri = _permanentUri;
             } else {
                 // ... uri not yet updated since token -> mutable uri
-                currentUri = _mutableUri;
+                currentUri = _proxyUri;
             }
         }
 
@@ -142,11 +142,11 @@ contract Ph101ppDailyPhotos is
     }
 
     function mutableBaseUri() public view returns (string memory) {
-        return _mutableUri;
+        return _proxyUri;
     }
 
-    function baseUri() public view returns (string memory) {
-        return _uri;
+    function permanentBaseUri() public view returns (string memory) {
+        return _permanentUri;
     }
 
     function tokenIdToDate(uint256 tokenId)

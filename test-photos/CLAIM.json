@@ -1,16 +1,16 @@
 {
-  "name": "September 1, 2022",
-  "created_by": "ph101pp",
+  "name": "Claim - Daily Photo",
+  "created_by": "Ph101pp",
   "external_url": "https://ph101pp.xyz/daily-photo",
-  "description": "Claim for one Photo from Ph101pp Daily Photo collection",
+  "description": "Good for one Photo from Ph101pp Daily Photo collection.",
   "attributes": [
     {
       "trait_type": "Artist",
-      "value": "ph101pp"
+      "value": "Ph101pp"
     },
     {
       "trait_type": "Collection",
-      "value": "Daily Photo - Claims"
+      "value": "Claim - Daily Photo"
     }
   ],
   "image_details": {

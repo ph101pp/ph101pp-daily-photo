@@ -35,25 +35,25 @@ describe("Ph101ppDailyPhotos", function () {
     it("Should set the correct mutableUri and immutableUri during deploy", async function () {
       const { pdp, mutableUri } = await loadFixture(deployFixture);
       expect(await pdp.mutableBaseUri()).to.equal(mutableUri);
-      expect(await pdp.baseUri()).to.equal("");
+      expect(await pdp.permanentBaseUri()).to.equal("");
     });
 
-    it("Should correcly update mutableUri via setMutableURI()", async function () {
+    it("Should correcly update mutableUri via setProxyURI()", async function () {
       const mutableUri2 = "2.mutable.uri";
       const { pdp, mutableUri } = await loadFixture(deployFixture);
       expect(await pdp.mutableBaseUri()).to.equal(mutableUri);
-      await pdp.setMutableURI(mutableUri2);
+      await pdp.setProxyURI(mutableUri2);
       expect(await pdp.mutableBaseUri()).to.equal(mutableUri2);
     });
     
-    it("Should correcly update immutableUri via setURI() and fire event", async function () {
+    it("Should correcly update immutableUri via setPermanentURI() and fire event", async function () {
       const immutableUri2 = "2.immutable.uri";
       const { pdp, owner } = await loadFixture(deployFixture);
-      expect(await pdp.baseUri()).to.equal("");
-      const tx = await pdp.setURI(immutableUri2, 100);
+      expect(await pdp.permanentBaseUri()).to.equal("");
+      const tx = await pdp.setPermanentURI(immutableUri2, 100);
       const receipt = await tx.wait();
-      expect(await pdp.baseUri()).to.equal(immutableUri2);
-      const uriSetEvents = receipt.events?.filter((x) => {return x.event == "UriSet"});
+      expect(await pdp.permanentBaseUri()).to.equal(immutableUri2);
+      const uriSetEvents = receipt.events?.filter((x) => {return x.event == "PermanentUriSet"});
       assert(uriSetEvents?.length === 1);
       expect(uriSetEvents[0].args?.newURI).to.equal(immutableUri2);
       expect(uriSetEvents[0].args?.sender).to.equal(owner.address);
@@ -156,7 +156,7 @@ describe("Ph101ppDailyPhotos", function () {
     });
   });
 
-  describe.only("URI() for tokenIDs", function(){
+  describe("URI() for tokenIDs", function(){
 
     it("should return correct url for unminted tokenId:1 ", async function () {
       const tokenId = 1;
@@ -174,13 +174,13 @@ describe("Ph101ppDailyPhotos", function () {
       const tokenId = 0;
       const { pdp, immutableUri } = await loadFixture(deployFixture);
       expect(await pdp.uri(tokenId)).to.equal("CLAIM.json");
-      await pdp.setURI(immutableUri, 1);
+      await pdp.setPermanentURI(immutableUri, 1);
       expect(await pdp.uri(tokenId)).to.equal(immutableUri+"CLAIM.json");
     });
 
     it("should return mutable url for all unminted nfts ", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      await pdp.setURI(immutableUri, 100);
+      await pdp.setPermanentURI(immutableUri, 100);
 
       for(let i=1; i<100; i++) {
         expect(await pdp.uri(i)).to.include(mutableUri);
@@ -189,7 +189,7 @@ describe("Ph101ppDailyPhotos", function () {
 
     it("should return immutable url for all minted nfts ", async function () {
       const { pdp, mutableUri,immutableUri } = await loadFixture(deployFixture);
-      await pdp.setURI(immutableUri, 100);
+      await pdp.setPermanentURI(immutableUri, 100);
       const inputs = await pdp.getMintRangeInput(50);
       await pdp.mintPhotos(...inputs, 5);
 
@@ -201,7 +201,7 @@ describe("Ph101ppDailyPhotos", function () {
 
     it("should return mutable url for minted nfts after _uriValidUptoTokenId", async function () {
       const { pdp, mutableUri,immutableUri } = await loadFixture(deployFixture);
-      await pdp.setURI(immutableUri, 10);
+      await pdp.setPermanentURI(immutableUri, 10);
       const inputs = await pdp.getMintRangeInput(50);
       await pdp.mintPhotos(...inputs, 5);
 
@@ -294,19 +294,19 @@ describe("Ph101ppDailyPhotos", function () {
 
   describe.skip("Gas consumption over time", function(){
 
-    it("should not increase gas when called multiple times: setMutableURI ", async function () {
+    it("should not increase gas when called multiple times: setProxyURI ", async function () {
       const { pdp, mutableUri } = await loadFixture(deployFixture);
 
       for(let i=0; i<1000; i++) {
-        await pdp.setMutableURI(mutableUri+i);
+        await pdp.setProxyURI(mutableUri+i);
       }
     });
 
-    it("should not increase gas when called multiple times: setURI ", async function () {
+    it("should not increase gas when called multiple times: setPermanentURI ", async function () {
       const { pdp, immutableUri } = await loadFixture(deployFixture);
 
       for(let i=0; i<1000; i++) {
-        await pdp.setURI(immutableUri+i, i);
+        await pdp.setPermanentURI(immutableUri+i, i);
       }
     });
   });

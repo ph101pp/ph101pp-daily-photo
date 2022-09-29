@@ -15,17 +15,21 @@ export default function getFutureJSON(dateString: string): object {
 
   const metadata = {
     "name": formattedDate,
-    "created_by": "ph101pp",
+    "created_by": "Ph101pp",
     "external_url": `https://ph101pp.xyz/daily-photo/${dateString}`,
-    "description": `This photo will be taken on ${weekday} ${formattedDate}`,
+    "description": `This photo will be taken on ${weekday} ${formattedDate}.`,
     "attributes": [
       {
         "trait_type": "Artist",
-        "value": "Philipp Adrian"
+        "value": "Ph101pp"
       },
       {
         "trait_type": "Collection",
         "value": "Daily Photo"
+      },
+      {
+        "trait_type": "Revealed",
+        "value": false
       },
       {
         "trait_type": "Weekday",
@@ -36,17 +40,14 @@ export default function getFutureJSON(dateString: string): object {
         "value": months[month]
       },
       {
-        "display_type": "number",
         "trait_type": "Month",
         "value": month+1
       },
       {
-        "display_type": "number",
         "trait_type": "Year",
         "value": year
       },
       {
-        "display_type": "number",
         "trait_type": "Day",
         "value": day,
       }
