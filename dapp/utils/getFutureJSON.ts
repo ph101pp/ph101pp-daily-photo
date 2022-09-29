@@ -12,6 +12,7 @@ export default function getFutureJSON(dateString: string): object {
   const date = new Date(year, month, day);
   const formattedDate = `${months[month]} ${day}, ${year}`;
   const weekday = weekdays[date.getUTCDay()]
+  const timestamp = Math.round(date.getTime()/1000);
 
   const metadata = {
     "name": formattedDate,
@@ -22,6 +23,11 @@ export default function getFutureJSON(dateString: string): object {
       {
         "trait_type": "Artist",
         "value": "Ph101pp"
+      },
+      {
+        "display_type": "date", 
+        "trait_type": "Date", 
+        "value": timestamp
       },
       {
         "trait_type": "Collection",
