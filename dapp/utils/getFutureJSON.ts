@@ -46,14 +46,17 @@ export default function getFutureJSON(dateString: string): object {
         "value": months[month]
       },
       {
+        "display_type": "property",
         "trait_type": "Month",
         "value": month+1
       },
       {
+        "display_type": "number",
         "trait_type": "Year",
         "value": year
       },
       {
+        "display_type": "number",
         "trait_type": "Day",
         "value": day,
       }
