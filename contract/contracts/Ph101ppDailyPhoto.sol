@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import "./ERC1155DynamicInitialBalances.sol";
+import "./ERC1155MintRange.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
@@ -10,7 +10,7 @@ import "./Ph101ppDailyPhotoTokenId.sol";
 // import "hardhat/console.sol";
 
 contract Ph101ppDailyPhotos is
-    ERC1155DynamicInitialBalances,
+    ERC1155MintRange,
     ERC2981,
     AccessControl
 {

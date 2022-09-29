@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import "./ERC1155DynamicInitialBalances.sol";
+import "./ERC1155MintRange.sol";
 
-contract ERC1155DynamicInitialBalancesTestContract is
-  ERC1155DynamicInitialBalances
+contract ERC1155MintRangeTestContract is
+  ERC1155MintRange
 {
   constructor() ERC1155_("") {}
 

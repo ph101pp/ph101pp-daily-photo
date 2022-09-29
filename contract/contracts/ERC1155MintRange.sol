@@ -11,7 +11,7 @@ import "./ERC1155_.sol";
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
  * and adds tracking of total supply per id.
  */
-abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
+abstract contract ERC1155MintRange is ERC1155_ {
     string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
