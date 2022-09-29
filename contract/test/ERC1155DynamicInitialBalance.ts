@@ -152,6 +152,7 @@ describe("ERC1155DynamicInitialBalances", function () {
       expect(balances2n[6].toNumber()).to.equal((18 % 10) + 1);
       expect(balances2n[7].toNumber()).to.equal((19 % 10) + 1);
     });
+
   });
 
   describe("safeTransfer(Batch)", function () {

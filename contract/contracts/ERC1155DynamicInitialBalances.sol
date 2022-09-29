@@ -4,6 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
+
 // import "hardhat/console.sol";
 
 /**
@@ -11,26 +12,28 @@ import "./ERC1155_.sol";
  * and adds tracking of total supply per id.
  */
 abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
-    string private constant ERROR_INVALID_INPUT_MINT_RANGE =
+    string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
+    string private constant ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT =
+        "Invalid input. Use verifyUpdateInitialHoldersRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
         "No initial holders set. Use _setInitialHolders()";
 
     // Mapping from token ID to balancesInitialzed flag
-    mapping(uint256 => mapping(address => bool)) private _balancesInitialized;
-
-    // Mapping to keep track of tokens that are minted via ERC1155._mint() or  ERC1155._mintBatch()
-    mapping(uint256 => bool) private _manualMint;
+    mapping(uint256 => mapping(address => bool)) public _balancesInitialized;
 
     // Mapping from token ID to totalSupply
-    mapping(uint256 => int256) private _totalSupply;
+    mapping(uint256 => int256) public _totalSupply;
+
+    // Mapping to keep track of tokens that are minted via ERC1155._mint() or  ERC1155._mintBatch()
+    mapping(uint256 => bool) public _manualMint;
 
     // Track initial holders across tokenID ranges;
-    address[][] private _initialHolders;
-    uint256[] private _initialHoldersRange;
+    address[][] public _initialHolders;
+    uint256[] public _initialHoldersRange;
 
     uint256 public _lastRangeTokenId = 0;
-    bool private _zeroMinted = false;
+    bool public _zeroMinted = false;
 
     /**
      * @dev Implement: Return initial token balance for address.
@@ -50,6 +53,155 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
         _initialHolders.push(addresses);
     }
 
+    struct UpdateInitialHoldersRangeInput {
+        address[] fromAddresses;
+        address[] toAddresses;
+        uint256[][] ids;
+        uint256[][] amounts;
+        address[][] newInitialHolders;
+        uint256[] newInitialHoldersRange;
+    } 
+
+    function verifyUpdateInitialHoldersRangeInput(
+        uint256 from,
+        uint256 to,
+        address[] memory newInitialHolders,
+        UpdateInitialHoldersRangeInput memory input
+    )
+        public
+        view
+        virtual
+        returns (
+            UpdateInitialHoldersRangeInput memory,
+            bytes32
+        )
+    {
+        uint256 fromIndex = _findInRange(_initialHoldersRange, from);
+        uint256 toIndex = _findInRange(_initialHoldersRange, to);
+        uint256 skip = toIndex - fromIndex;
+        uint256 newRangeIndex = 0;
+        bool rangeSet = false;
+        for (uint i = 0; i < _initialHoldersRange.length; i++) {
+            uint256 current = _initialHoldersRange[i];
+
+            if (current < from || current > to) {
+                require(
+                    input.newInitialHoldersRange[newRangeIndex] ==
+                        _initialHoldersRange[i]
+                );
+                require(
+                    input.newInitialHolders[newRangeIndex][0] == _initialHolders[i][0]
+                );
+                newRangeIndex++;
+            } else if (current >= from && current <= to) {
+                require(input.newInitialHoldersRange[newRangeIndex] == from);
+                require(input.newInitialHolders[newRangeIndex][0] == newInitialHolders[0]);
+                require(input.newInitialHoldersRange[newRangeIndex + 1] == to);
+                require(
+                    input.newInitialHolders[newRangeIndex + 1][0] ==
+                        _initialHolders[toIndex][0]
+                );
+                rangeSet = true;
+                newRangeIndex += 2;
+                i += skip - 1;
+            }
+        }
+        if (!rangeSet) {
+            require(
+                input.newInitialHoldersRange[input.newInitialHoldersRange.length - 2] ==
+                    from
+            );
+            require(
+                input.newInitialHolders[input.newInitialHoldersRange.length - 2][0] ==
+                    newInitialHolders[0]
+            );
+            require(
+                input.newInitialHoldersRange[input.newInitialHoldersRange.length - 1] == to
+            );
+            require(
+                input.newInitialHolders[input.newInitialHoldersRange.length - 1][0] ==
+                    _initialHolders[toIndex][0]
+            );
+        }
+
+        require(input.fromAddresses.length == input.toAddresses.length);
+        require(input.fromAddresses.length == input.ids.length);
+        require(input.fromAddresses.length == input.amounts.length);
+
+        uint256[] memory indexes = new uint256[](input.fromAddresses.length);
+
+        for (uint256 tokenId = from; tokenId <= to; tokenId++) {
+            bool tokenFound = false;
+            require(initialHolders(tokenId).length == newInitialHolders.length);
+
+            for (uint256 p = 0; p < input.fromAddresses.length; p++) {
+                if (input.ids[p][indexes[p]] == tokenId) {
+                    require(
+                        balanceOf(input.fromAddresses[p], tokenId) ==
+                            input.amounts[p][indexes[p]]
+                    );
+                    indexes[p]++;
+                    tokenFound = true;
+                }
+            }
+            if (!tokenFound) {
+                require(_manualMint[tokenId]);
+            }
+        }
+        return (
+            input,
+            keccak256(
+                abi.encode(
+                    input.fromAddresses,
+                    input.toAddresses,
+                    input.ids,
+                    input.amounts,
+                    input.newInitialHolders,
+                    input.newInitialHoldersRange,
+                    _initialHolders,
+                    _initialHoldersRange,
+                    _lastRangeTokenId
+                )
+            )
+        );
+    }
+
+    /**
+     * @dev Update initial holders for a range of ids.
+     */
+    function _updateInitialHoldersRange(
+        UpdateInitialHoldersRangeInput memory input,
+        bytes32 inputCheckSum
+    ) internal virtual {
+        bytes32 checkSum = keccak256(
+            abi.encode(
+                input.fromAddresses,
+                input.toAddresses,
+                input.ids,
+                input.amounts,
+                input.newInitialHolders,
+                input.newInitialHoldersRange,
+                _initialHolders,
+                _initialHoldersRange,
+                _lastRangeTokenId
+            )
+        );
+        require(inputCheckSum == checkSum, ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT);
+
+        _initialHolders = input.newInitialHolders;
+        _initialHoldersRange = input.newInitialHoldersRange;
+
+        for (uint i = 0; i < input.toAddresses.length; i++) {
+            emit TransferBatch(
+                msg.sender,
+                input.fromAddresses[i],
+                input.toAddresses[i],
+                input.ids[i],
+                input.amounts[i]
+            );
+        }
+    }
+
     /**
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
@@ -60,8 +212,10 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
     ) internal virtual {
         address[] memory addresses = initialHolders();
 
-        bytes32 checkSum = keccak256(abi.encode(ids, amounts, addresses, _lastRangeTokenId));
-        require(inputCheckSum == checkSum, ERROR_INVALID_INPUT_MINT_RANGE);
+        bytes32 checkSum = keccak256(
+            abi.encode(ids, amounts, addresses, _lastRangeTokenId, _zeroMinted)
+        );
+        require(inputCheckSum == checkSum, ERROR_INVALID_MINT_RANGE_INPUT);
 
         _lastRangeTokenId = ids[ids.length - 1];
 
@@ -200,8 +354,10 @@ abstract contract ERC1155DynamicInitialBalances is ERC1155_ {
             }
             newIndex += 1;
         }
-        bytes32 checkSum = keccak256(abi.encode(ids, amounts, addresses, _lastRangeTokenId));
-        
+        bytes32 checkSum = keccak256(
+            abi.encode(ids, amounts, addresses, _lastRangeTokenId, _zeroMinted)
+        );
+
         return (ids, amounts, checkSum);
     }
 
