@@ -192,6 +192,13 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
+     * @dev Return current initial holders
+     */
+    function initialHoldersRange() public view virtual returns (address[][] memory, uint256[] memory) {
+        return (_initialHolders, _initialHoldersRange);
+    }
+
+    /**
      * @dev Total amount of tokens with a given id.
      */
     function totalSupply(uint256 tokenId)
