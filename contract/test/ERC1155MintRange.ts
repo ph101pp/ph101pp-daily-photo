@@ -2,7 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 import { ERC1155MintRange } from "../typechain-types";
-import getUpdateInitialHoldersRangeInput from "./getUpdateInitialHoldersRangeInput";
+import getUpdateInitialHoldersRangeInput from "../scripts/getUpdateInitialHoldersRangeInput";
 
 describe("ERC1155MintRange", function () {
 
@@ -181,28 +181,95 @@ describe("ERC1155MintRange", function () {
 
   });
 
-  describe("updateInitialHoldersRange", function () {
-    it.only("should correcly update initialHolders of a simple range", async function () {
+  describe.only("updateInitialHoldersRange / getUpdateInitialHolderRangeInput", function () {
+    it("should correcly update initialHolders of a simple range", async function () {
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address];
       await c.setInitialHolders(initialHolders);
-      const inputs = await c.getMintRangeInput(5);
-      await c.mintRange(...inputs);
+      const mintIntput = await c.getMintRangeInput(5);
+      const ids = mintIntput[0];
+      await c.mintRange(...mintIntput);
       const newInitialHolders = [account3.address, account4.address];
-      const input = await getUpdateInitialHoldersRangeInput(c, 0, 5, newInitialHolders);
-      const ids = input[2];
-      const amounts = input[3];
-      console.log(input);
-      const tx = await c.updateInitialHoldersRange(...input);
+      const rangeInput = await getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      const tx = await c.updateInitialHoldersRange(...rangeInput);
+      const receipt = await tx.wait();
+      
+      const fromAddresses = rangeInput[0]
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(fromAddresses.length);
+
+      const balancesAccount1 = await c.balanceOfBatch(ids.map(()=>account1.address), ids);
+      const balancesAccount2 = await c.balanceOfBatch(ids.map(()=>account2.address), ids);
+      const balancesAccount3 = await c.balanceOfBatch(ids.map(()=>account3.address), ids);
+      const balancesAccount4 = await c.balanceOfBatch(ids.map(()=>account4.address), ids);
+
+      for(let i = 0; i < ids.length; i++){
+        if(i===0){
+          expect(balancesAccount1[i]).to.equal(0);
+          expect(balancesAccount2[i]).to.equal(0);
+          expect(balancesAccount3[i]).to.equal(9999);
+          expect(balancesAccount4[i]).to.equal(9999);
+        }
+        else if(i<=3) {
+          expect(balancesAccount1[i]).to.equal(0);
+          expect(balancesAccount2[i]).to.equal(0);
+          expect(balancesAccount3[i]).to.equal(i+1);
+          expect(balancesAccount4[i]).to.equal(i+1);
+        }
+        else {
+          expect(balancesAccount1[i]).to.equal(i+1);
+          expect(balancesAccount2[i]).to.equal(i+1);
+          expect(balancesAccount3[i]).to.equal(0);
+          expect(balancesAccount4[i]).to.equal(0);
+        }
+      }
+    });
+
+    it("should correcly update initialHolders across multiple ranges", async function () {
+      const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const mintIntput = await c.getMintRangeInput(2);
+      await c.mintRange(...mintIntput);
+      await c.setInitialHolders([account2.address]);
+      const mintIntput2 = await c.getMintRangeInput(2);
+      await c.mintRange(...mintIntput2);
+      await c.setInitialHolders([account3.address]);
+      const mintIntput3 = await c.getMintRangeInput(2);
+      await c.mintRange(...mintIntput3);
+
+      const rangeInput = await getUpdateInitialHoldersRangeInput(c, 1, 4, [account4.address]);
+      const tx = await c.updateInitialHoldersRange(...rangeInput);
       const receipt = await tx.wait();
 
-      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(newInitialHolders.length);
+      const empty = new Array(6).fill(0);
 
-      const newAmounts = [
-        await c.balanceOfBatch([account3.address, account3.address, account3.address, account3.address, account3.address], ids[0]),
-        await c.balanceOfBatch([account4.address, account4.address, account4.address, account4.address, account4.address], ids[1])
-      ]
-      expect(newAmounts).to.deep.equal(amounts);
+      const fromAddresses = rangeInput[0];
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(fromAddresses.length);
+
+      const balancesAccount1 = await c.balanceOfBatch(empty.fill(account1.address), empty.map((x,i)=>i));
+      const balancesAccount2 = await c.balanceOfBatch(empty.fill(account2.address), empty.map((x,i)=>i));
+      const balancesAccount3 = await c.balanceOfBatch(empty.fill(account3.address), empty.map((x,i)=>i));
+      const balancesAccount4 = await c.balanceOfBatch(empty.fill(account4.address), empty.map((x,i)=>i));
+
+      for(let i = 0; i < 6; i++){
+        if(i===0){
+          expect(balancesAccount1[i]).to.equal(9999);
+          expect(balancesAccount2[i]).to.equal(0);
+          expect(balancesAccount3[i]).to.equal(0);
+          expect(balancesAccount4[i]).to.equal(0);
+        }
+        else if(i<=4) {
+          expect(balancesAccount1[i]).to.equal(0);
+          expect(balancesAccount2[i]).to.equal(0);
+          expect(balancesAccount3[i]).to.equal(0);
+          expect(balancesAccount4[i]).to.equal(i+1);
+        }
+        else {
+          expect(balancesAccount1[i]).to.equal(0);
+          expect(balancesAccount2[i]).to.equal(0);
+          expect(balancesAccount3[i]).to.equal(i+1);
+          expect(balancesAccount4[i]).to.equal(0);
+        }
+      }
     });
 
 
