@@ -1,6 +1,8 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
+import { ERC1155MintRange } from "../typechain-types";
+import getUpdateInitialHoldersRangeInput from "./getUpdateInitialHoldersRangeInput";
 
 describe("ERC1155MintRange", function () {
 
@@ -155,27 +157,55 @@ describe("ERC1155MintRange", function () {
 
     it("should be possible to increase supply of dynamically minted tokens (_mintRange) via _mint|_mintBatch", async function () {
       const newTokens = 5;
-      const { c, account1} = await loadFixture(deployFixture);
+      const { c, account1 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address];
       await c.setInitialHolders(initialHolders);
       const inputs = await c.getMintRangeInput(newTokens);
       await c.mintRange(...inputs);
 
-      const balances1 = await c.balanceOfBatch([account1.address, account1.address,account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
+      const balances1 = await c.balanceOfBatch([account1.address, account1.address, account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
       for (let i = 0; i < initialHolders.length; i++) {
-        expect(balances1[i].toNumber()).to.equal((i+1 % 10) + 1);
+        expect(balances1[i].toNumber()).to.equal((i + 1 % 10) + 1);
       }
 
       await c.mint(account1.address, 1, 5, []);
-      await c.mintBatch(account1.address, [2,3,4,5], [5,5,5,5], []);
+      await c.mintBatch(account1.address, [2, 3, 4, 5], [5, 5, 5, 5], []);
 
-      const balances2 = await c.balanceOfBatch([account1.address, account1.address,account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
+      const balances2 = await c.balanceOfBatch([account1.address, account1.address, account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
       for (let i = 0; i < initialHolders.length; i++) {
-        const balance = (i+1 % 10) + 1 + 5;
+        const balance = (i + 1 % 10) + 1 + 5;
         expect(balances2[i].toNumber()).to.equal(balance);
-        expect(await c.totalSupply(i+1)).to.equal(balance);
+        expect(await c.totalSupply(i + 1)).to.equal(balance);
       }
     })
+
+  });
+
+  describe("updateInitialHoldersRange", function () {
+    it.only("should correcly update initialHolders of a simple range", async function () {
+      const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address];
+      await c.setInitialHolders(initialHolders);
+      const inputs = await c.getMintRangeInput(5);
+      await c.mintRange(...inputs);
+      const newInitialHolders = [account3.address, account4.address];
+      const input = await getUpdateInitialHoldersRangeInput(c, 0, 5, newInitialHolders);
+      const ids = input[2];
+      const amounts = input[3];
+      console.log(input);
+      const tx = await c.updateInitialHoldersRange(...input);
+      const receipt = await tx.wait();
+
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(newInitialHolders.length);
+
+      const newAmounts = [
+        await c.balanceOfBatch([account3.address, account3.address, account3.address, account3.address, account3.address], ids[0]),
+        await c.balanceOfBatch([account4.address, account4.address, account4.address, account4.address, account4.address], ids[1])
+      ]
+      expect(newAmounts).to.deep.equal(amounts);
+    });
+
+
 
   });
 
@@ -326,7 +356,7 @@ describe("ERC1155MintRange", function () {
       expect(await c.totalSupply(0)).to.equal(9999 * initialHolders.length + 60);
 
       c.mintBatch(account3.address, [1, 2, 3, 4, 5, 6, 7, 8, 9], [3, 3, 3, 3, 3, 3, 3, 3, 3], []);
-      
+
       for (let i = 0; i < newTokens; i++) {
         if (i !== 0) {
           const dynamicSupply = (i % 10) + 1;
@@ -350,8 +380,8 @@ describe("ERC1155MintRange", function () {
 
       expect(await c.totalSupply(0)).to.equal(9999 * initialHolders.length - 60);
 
-      await c.burnBatch(account3.address, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1,1,1,1,1,1,1,1,1]);
-      
+      await c.burnBatch(account3.address, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
       for (let i = 0; i < newTokens; i++) {
         if (i !== 0) {
           const dynamicSupply = (i % 10) + 1;

@@ -16,6 +16,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
         "Invalid input. Use getMintRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
         "No initial holders set. Use _setInitialHolders()";
+    string private constant ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT =
+        "Invalid input. Verify checksum.";
 
     // Mapping from token ID to balancesInitialzed flag
     mapping(uint256 => mapping(address => bool)) public _balancesInitialized;
@@ -52,19 +54,63 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
+     * @dev Update initial holders for a range of ids.
+     */
+    function _updateInitialHoldersRange(
+        address[] memory fromAddresses,
+        address[] memory toAddresses,
+        uint256[][] memory ids,
+        uint256[][] memory amounts,
+        address[][] memory newInitialHolders,
+        uint256[] memory newInitialHoldersRange,
+        bytes32 inputChecksum
+    ) internal virtual {
+        bytes32 checksum = keccak256(
+            abi.encode(
+                fromAddresses,
+                toAddresses,
+                ids,
+                amounts,
+                newInitialHolders,
+                newInitialHoldersRange,
+                _initialHolders,
+                _initialHoldersRange,
+                _lastRangeTokenId
+            )
+        );
+        require(
+            inputChecksum == checksum,
+            ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT
+        );
+
+        _initialHolders = newInitialHolders;
+        _initialHoldersRange = newInitialHoldersRange;
+
+        for (uint i = 0; i < toAddresses.length; i++) {
+            emit TransferBatch(
+                msg.sender,
+                fromAddresses[i],
+                toAddresses[i],
+                ids[i],
+                amounts[i]
+            );
+        }
+    }
+
+    /**
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
     function _mintRange(
         uint256[] memory ids,
         uint256[][] memory amounts,
-        bytes32 inputCheckSum
+        bytes32 inputChecksum
     ) internal virtual {
         address[] memory addresses = initialHolders();
 
-        bytes32 checkSum = keccak256(
+        bytes32 checksum = keccak256(
             abi.encode(ids, amounts, addresses, _lastRangeTokenId, _zeroMinted)
         );
-        require(inputCheckSum == checkSum, ERROR_INVALID_MINT_RANGE_INPUT);
+        require(inputChecksum == checksum, ERROR_INVALID_MINT_RANGE_INPUT);
 
         _lastRangeTokenId = ids[ids.length - 1];
 
@@ -203,11 +249,11 @@ abstract contract ERC1155MintRange is ERC1155_ {
             }
             newIndex += 1;
         }
-        bytes32 checkSum = keccak256(
+        bytes32 checksum = keccak256(
             abi.encode(ids, amounts, holders, _lastRangeTokenId, _zeroMinted)
         );
 
-        return (ids, amounts, checkSum);
+        return (ids, amounts, checksum);
     }
 
     /**
