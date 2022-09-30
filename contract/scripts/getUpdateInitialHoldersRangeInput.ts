@@ -1,5 +1,4 @@
 import { ERC1155MintRangeTestContract } from "../typechain-types";
-import { ethers } from "hardhat";
 
 function findInRange(range: number[], needle: number) {
   for (let i = range.length - 1; i >= 0; i--) {
@@ -24,6 +23,9 @@ export default async function getUpdateInitialHoldersRangeInput(
   number[],
   string
 ]> {
+  if (from < 0 || from > to) {
+    throw Error("Error: from < 0 || from > to");
+  };
   const toAddresses: string[] = [];
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
@@ -31,44 +33,51 @@ export default async function getUpdateInitialHoldersRangeInput(
 
   const too = to == Infinity ? await c._lastRangeTokenId() : to;
 
-  for (let i = from; i <= too; i++) {
-    const currentInitialHolders = await c["initialHolders(uint256)"](i);
-    const balances = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
-    const isManuallyMinted = await c._manualMint(i);
+  const zeroMinted = await c._zeroMinted();
 
-    if (isManuallyMinted) {
-      continue;
-    }
+  if (zeroMinted) {
+    for (let i = from; i <= too; i++) {
+      const currentInitialHolders = await c["initialHolders(uint256)"](i);
+      const balances = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
+      const isManuallyMinted = await c._manualMint(i);
+      if (isManuallyMinted) {
+        continue;
+      }
 
-    for (let a = 0; a < currentInitialHolders.length; a++) {
-      const fromAddress = currentInitialHolders[a];
-      const toAddress = newInitialHolders[a];
-      const balance = balances[a].toNumber();
-      const isBalanceInitialized = await c._balancesInitialized(i, fromAddress)
+      for (let a = 0; a < currentInitialHolders.length; a++) {
+        const fromAddress = currentInitialHolders[a];
+        const toAddress = newInitialHolders[a];
+        const balance = balances[a].toNumber();
+        const isBalanceInitialized = await c._balancesInitialized(i, fromAddress)
 
-      if (!isBalanceInitialized && balance > 0) {
-        let addressIndex = fromAddresses.indexOf(fromAddress);
-        if (addressIndex < 0) {
-          fromAddresses.push(fromAddress);
-          toAddresses.push(toAddress);
-          addressIndex = fromAddresses.length - 1;
+        if (!isBalanceInitialized && balance > 0) {
+          let addressIndex = fromAddresses.indexOf(fromAddress);
+          if (addressIndex < 0) {
+            fromAddresses.push(fromAddress);
+            toAddresses.push(toAddress);
+            addressIndex = fromAddresses.length - 1;
+          }
+          ids[addressIndex] = ids[addressIndex] ?? [];
+          ids[addressIndex].push(i);
+          amounts[addressIndex] = amounts[addressIndex] ?? [];
+          amounts[addressIndex].push(balance);
         }
-        ids[addressIndex] = ids[addressIndex] ?? [];
-        ids[addressIndex].push(i);
-        amounts[addressIndex] = amounts[addressIndex] ?? [];
-        amounts[addressIndex].push(balance);
       }
     }
   }
-
   const newInitialHoldersArray: string[][] = [];
   const newInitialHoldersRange: number[] = [];
 
   const [currentInitialHolders, currentInitialHoldersRangeBig] = await c.initialHoldersRange();
+
+  for(let i=0; i<currentInitialHolders.length; i++) {
+    if(currentInitialHolders[0].length !== newInitialHolders.length) {
+      throw Error("Error: newInitialHolders.length does not match");
+    }
+  }
+
   const currentInitialHoldersRange = currentInitialHoldersRangeBig.map(n => n.toNumber());
-  const fromIndex = findInRange(currentInitialHoldersRange, from);
   const toIndex = findInRange(currentInitialHoldersRange, to);
-  const skip = toIndex - fromIndex;
   let newRangeIndex = 0;
   let rangeSet = false;
 
@@ -81,24 +90,30 @@ export default async function getUpdateInitialHoldersRangeInput(
       newRangeIndex++;
 
     } else if (current >= from && current <= to) {
+      if(rangeSet){
+        continue;
+      }
       newInitialHoldersRange[newRangeIndex] = from;
       newInitialHoldersArray[newRangeIndex] = newInitialHolders;
+      newRangeIndex ++;
       rangeSet = true;
-      if(to === Infinity) {
+
+      if (to === Infinity) {
         break;
       }
-      newInitialHoldersRange[newRangeIndex + 1] = to+1;
-      newInitialHoldersArray[newRangeIndex + 1] = currentInitialHolders[toIndex];
-      newRangeIndex += 2;
-      i += skip;
+      if(!currentInitialHoldersRange.includes(to+1)) {
+        newInitialHoldersRange[newRangeIndex] = to + 1;
+        newInitialHoldersArray[newRangeIndex] = currentInitialHolders[toIndex];
+        newRangeIndex ++;
+      }
     }
   }
   if (!rangeSet) {
-    newInitialHoldersRange[newInitialHoldersRange.length - 2] = from;
-    newInitialHoldersArray[newInitialHoldersRange.length - 2] = newInitialHolders;
+    newInitialHoldersRange.push(from);
+    newInitialHoldersArray.push(newInitialHolders);
     if (to !== Infinity) {
-      newInitialHoldersRange[newInitialHoldersRange.length - 1] = to+1;
-      newInitialHoldersArray[newInitialHoldersRange.length - 1] = currentInitialHolders[toIndex];
+      newInitialHoldersRange.push(to + 1);
+      newInitialHoldersArray.push(currentInitialHolders[toIndex]);
     }
   }
 
