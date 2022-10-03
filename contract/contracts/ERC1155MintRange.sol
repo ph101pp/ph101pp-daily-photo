@@ -266,6 +266,66 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
     }
 
     /**
+     * @dev Verify and hash input updateInitialHolderRangeInput.
+     */
+    function verifyUpdateInitialHolderRangeInput(
+        address[] memory fromAddresses,
+        address[] memory toAddresses,
+        uint256[][] memory ids,
+        uint256[][] memory amounts,
+        address[][] memory newInitialHolders,
+        uint256[] memory newInitialHoldersRange
+    ) public view virtual whenPaused returns (bytes32) {
+        require(fromAddresses.length == toAddresses.length, "fromAddresses.length == toAddresses.length");
+        require(fromAddresses.length == ids.length, "fromAddresses.length == ids.length");
+        require(fromAddresses.length == amounts.length, "fromAddresses.length == amounts.length");
+        require(newInitialHolders.length == newInitialHoldersRange.length, "newInitialHolders.length == newInitialHoldersRange.length");
+
+        for(uint256 j = 1; j < newInitialHoldersRange.length; j++ ) {
+          require(newInitialHoldersRange[j] > newInitialHoldersRange[j-1], "newInitialHoldersRange[j] > newInitialHoldersRange[j-1]");
+        }
+
+        for(uint256 i = 0; i<ids.length; i++) {
+          address from = fromAddresses[i];
+          address to = toAddresses[i];
+          uint256[] memory id = ids[i];
+          uint256[] memory amount = amounts[i];
+          require(id.length == amount.length, "id.length == amount.length");
+
+          for(uint256 k = 0; k<id.length; k++) {
+            uint256 tokenId = id[k];
+            uint256 balance = amount[k];
+
+            require(_manualMint[tokenId] == false);
+            require(_balancesInitialized[tokenId][from] == false);
+            require(_balancesInitialized[tokenId][to] == false);
+            require(balanceOf(from, tokenId) == balance, "balanceOf(from, tokenId) == balance");
+            
+            address[] memory currentInitialHolders = initialHolders(tokenId);
+            require(_includesAddress(currentInitialHolders, from), "_includesAddress(currentInitialHolders, from)");
+            
+            uint256 newInitialHoldersIndex = _findInRange(newInitialHoldersRange, tokenId);
+            address[] memory nextInitialHolders = newInitialHolders[newInitialHoldersIndex];
+            require(_includesAddress(nextInitialHolders, to), "_includesAddress(nextInitialHolders, to)");
+          }
+        }
+
+        return keccak256(
+            abi.encode(
+                fromAddresses,
+                toAddresses,
+                ids,
+                amounts,
+                newInitialHolders,
+                newInitialHoldersRange,
+                _initialHolders,
+                _initialHoldersRange,
+                paused()
+            )
+        );
+    }
+
+    /**
      * @dev See {ERC1155-_beforeTokenTransfer}.
      */
     function _beforeTokenTransfer(
@@ -347,5 +407,21 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
             }
         }
         return 0;
+    }
+
+    /**
+     * @dev Utility to find Address in array of addresses
+     */
+    function _includesAddress(address[] memory array, address value)
+        private
+        pure
+        returns (bool)
+    {
+        for (uint i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                return true;
+            }
+        }
+        return false;
     }
 }

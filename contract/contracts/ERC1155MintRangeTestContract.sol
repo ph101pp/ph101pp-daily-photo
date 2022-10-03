@@ -2,6 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "./ERC1155MintRange.sol";
+import "hardhat/console.sol";
 
 contract ERC1155MintRangeTestContract is ERC1155MintRange {
     constructor() ERC1155_("") {}
@@ -44,31 +45,6 @@ contract ERC1155MintRangeTestContract is ERC1155MintRange {
             newInitialHoldersRange,
             inputChecksum
         );
-    }
-
-    function getChecksum(
-        address[] memory fromAddresses,
-        address[] memory toAddresses,
-        uint256[][] memory ids,
-        uint256[][] memory amounts,
-        address[][] memory newInitialHolders,
-        uint256[] memory newInitialHoldersRange
-    ) public view virtual returns (bytes32) {
-        bytes32 checksum = keccak256(
-            abi.encode(
-                fromAddresses,
-                toAddresses,
-                ids,
-                amounts,
-                newInitialHolders,
-                newInitialHoldersRange,
-                _initialHolders,
-                _initialHoldersRange,
-                _lastRangeTokenId
-            )
-        );
-
-        return checksum;
     }
 
     function mintRange(

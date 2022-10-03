@@ -30,8 +30,9 @@ export default async function getUpdateInitialHoldersRangeInput(
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
   const amounts: number[][] = [];
+  const lastTokenId = await c._lastRangeTokenId();
 
-  const too = to == Infinity ? await c._lastRangeTokenId() : to;
+  const too = to == Infinity ? lastTokenId : to;
 
   const zeroMinted = await c._zeroMinted();
 
@@ -117,7 +118,7 @@ export default async function getUpdateInitialHoldersRangeInput(
     }
   }
 
-  const checksum = await c.getChecksum(
+  const checksum = await c.verifyUpdateInitialHolderRangeInput(
     fromAddresses,
     toAddresses,
     ids,
