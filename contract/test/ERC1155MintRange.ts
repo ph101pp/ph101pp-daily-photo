@@ -2,7 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 import { ERC1155MintRange } from "../typechain-types";
-import getUpdateInitialHoldersRangeInput from "../scripts/getUpdateInitialHoldersRangeInput";
+import _getUpdateInitialHoldersRangeInput from "../scripts/_getUpdateInitialHoldersRangeInput";
 
 describe("ERC1155MintRange", function () {
 
@@ -229,17 +229,17 @@ describe("ERC1155MintRange", function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address, account2.address]);
 
-      await expect(getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])).to.be.rejectedWith("Pausable: not paused");
+      await expect(_getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])).to.be.rejectedWith("Pausable: not paused");
       await c.pause();
-      await getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])
+      await _getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])
       .catch((e) => { expect(true).to.equal(false) });
-      await getUpdateInitialHoldersRangeInput(c, -1, 300, [account1.address, account2.address])
+      await _getUpdateInitialHoldersRangeInput(c, -1, 300, [account1.address, account2.address])
         .then(() => { expect(true).to.equal(false) })
         .catch((e) => { expect(e.message).to.equal("Error: from < 0 || from > to") });
-      await getUpdateInitialHoldersRangeInput(c, 1, 0, [account1.address, account2.address])
+      await _getUpdateInitialHoldersRangeInput(c, 1, 0, [account1.address, account2.address])
         .then(() => { expect(true).to.equal(false) })
         .catch((e) => { expect(e.message).to.equal("Error: from < 0 || from > to") });
-      await getUpdateInitialHoldersRangeInput(c, 0, 1, [account1.address])
+      await _getUpdateInitialHoldersRangeInput(c, 0, 1, [account1.address])
         .then(() => { expect(true).to.equal(false) })
         .catch((e) => { expect(e.message).to.equal("Error: newInitialHolders.length does not match") });
     })
@@ -261,7 +261,7 @@ describe("ERC1155MintRange", function () {
         ] = [[account1.address], [account2.address], [[]], [[]], initialHolders, example.initial]
         const checksum = await c.verifyUpdateInitialHolderRangeInput(...resetInput);
         await c.updateInitialHoldersRange(...resetInput, checksum);
-        const rangeInput = await getUpdateInitialHoldersRangeInput(c, example.input[0], example.input[1], [account2.address]);
+        const rangeInput = await _getUpdateInitialHoldersRangeInput(c, example.input[0], example.input[1], [account2.address]);
         await c.updateInitialHoldersRange(...rangeInput);
         const [, initialHolderRange] = await c.initialHoldersRange();
 
@@ -279,7 +279,7 @@ describe("ERC1155MintRange", function () {
       await c.connect(account1).safeTransferFrom(account1.address, account3.address, 5, 3, []);
       await c.pause();
 
-      const [fromAddresses, toAddresses, ids, amounts] = await getUpdateInitialHoldersRangeInput(c, 0, Infinity, [account4.address]);
+      const [fromAddresses, toAddresses, ids, amounts] = await _getUpdateInitialHoldersRangeInput(c, 0, Infinity, [account4.address]);
 
       expect(fromAddresses.length).to.equal(1);
       expect(toAddresses.length).to.equal(1);
@@ -300,7 +300,7 @@ describe("ERC1155MintRange", function () {
       await c.mintRange(...mintIntput);
       await c.pause();
       const newInitialHolders = [account3.address, account4.address];
-      const rangeInput = await getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
       const tx = await c.updateInitialHoldersRange(...rangeInput);
       const receipt = await tx.wait();
 
@@ -347,7 +347,7 @@ describe("ERC1155MintRange", function () {
       await c.mintRange(...mintIntput3);
       await c.pause();
 
-      const rangeInput = await getUpdateInitialHoldersRangeInput(c, 1, 4, [account4.address]);
+      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 1, 4, [account4.address]);
       const tx = await c.updateInitialHoldersRange(...rangeInput);
       const receipt = await tx.wait();
 
@@ -397,7 +397,7 @@ describe("ERC1155MintRange", function () {
 
       await c.pause();
 
-      const rangeInput = await getUpdateInitialHoldersRangeInput(c, 1, Infinity, [account4.address]);
+      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 1, Infinity, [account4.address]);
       const tx = await c.updateInitialHoldersRange(...rangeInput);
       const receipt = await tx.wait();
 
@@ -611,7 +611,7 @@ describe("ERC1155MintRange", function () {
     });
   });
 
-  describe("pausable (when paused)", function () {
+  describe("Pausable (when paused)", function () {
     it("should fail to mintRange()", async function () {
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       await c.pause();
@@ -638,7 +638,7 @@ describe("ERC1155MintRange", function () {
       await c.pause();
       await expect(c.burn(account1.address, 2, 1)).to.be.rejectedWith("Pausable: paused");
     });
-    
+
     it("should fail to transfer()", async function () {
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       await c.mint(account1.address, 2, 1, []);

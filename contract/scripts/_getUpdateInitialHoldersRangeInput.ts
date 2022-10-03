@@ -9,7 +9,7 @@ function findInRange(range: number[], needle: number) {
   return 0;
 }
 
-export default async function getUpdateInitialHoldersRangeInput(
+export default async function _getUpdateInitialHoldersRangeInput(
   c: ERC1155MintRangeTestContract,
   from: number,
   to: number,
