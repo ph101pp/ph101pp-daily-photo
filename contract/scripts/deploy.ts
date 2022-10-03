@@ -17,7 +17,7 @@ async function main() {
       Ph101ppDailyPhotoTokenId: "0x9AFb855a02A44766dD6859448ecce97493322F01" // pdpTokenId.address,
     },
   });
-  const pdp = await PDP.deploy(mutableUri, treasury, vault);
+  const pdp = await PDP.deploy(mutableUri, immutableUri, treasury, vault);
   await pdp.deployed();
   console.log(`deployed: Ph101ppDailyPhotos`, pdp.address);
 

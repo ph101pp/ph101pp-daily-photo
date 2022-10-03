@@ -26,37 +26,55 @@ describe("Ph101ppDailyPhotos", function () {
         Ph101ppDailyPhotoTokenId: pdpTokenId.address,
       },
     });
-    const pdp = await PDP.deploy(mutableUri, treasury.address, vault.address);
+    const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
 
     return {pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2};
   }
 
   describe("URI storing / updating", function () {
     it("Should set the correct mutableUri and immutableUri during deploy", async function () {
-      const { pdp, mutableUri } = await loadFixture(deployFixture);
-      expect(await pdp.mutableBaseUri()).to.equal(mutableUri);
-      expect(await pdp.permanentBaseUri()).to.equal("");
+      const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
+      expect(await pdp.proxyBaseUri()).to.equal(mutableUri);
+      expect(await pdp.permanentBaseUri()).to.equal(immutableUri);
     });
 
     it("Should correcly update mutableUri via setProxyURI()", async function () {
       const mutableUri2 = "2.mutable.uri";
       const { pdp, mutableUri } = await loadFixture(deployFixture);
-      expect(await pdp.mutableBaseUri()).to.equal(mutableUri);
+      expect(await pdp.proxyBaseUri()).to.equal(mutableUri);
       await pdp.setProxyURI(mutableUri2);
-      expect(await pdp.mutableBaseUri()).to.equal(mutableUri2);
+      expect(await pdp.proxyBaseUri()).to.equal(mutableUri2);
     });
     
-    it("Should correcly update immutableUri via setPermanentURI() and fire event", async function () {
+    it("Should correcly update immutableUri via setPermanentURI() and permanentBaseUriHistory to reflect this.", async function () {
       const immutableUri2 = "2.immutable.uri";
-      const { pdp, owner } = await loadFixture(deployFixture);
-      expect(await pdp.permanentBaseUri()).to.equal("");
-      const tx = await pdp.setPermanentURI(immutableUri2, 100);
-      const receipt = await tx.wait();
+      const immutableUri3 = "3.immutable.uri";
+      const { pdp, immutableUri } = await loadFixture(deployFixture);
+      expect(await pdp.permanentBaseUri()).to.equal(immutableUri);
+      await pdp.setPermanentURI(immutableUri2, 100);
       expect(await pdp.permanentBaseUri()).to.equal(immutableUri2);
-      const uriSetEvents = receipt.events?.filter((x) => {return x.event == "PermanentUriSet"});
-      assert(uriSetEvents?.length === 1);
-      expect(uriSetEvents[0].args?.newURI).to.equal(immutableUri2);
-      expect(uriSetEvents[0].args?.sender).to.equal(owner.address);
+      
+      const history = await pdp.permanentBaseUriHistory();
+      expect(history.length).to.equal(2);
+      expect(history[0]).to.equal(immutableUri);
+      expect(history[1]).to.equal(immutableUri2);
+      
+      await pdp.setPermanentURI(immutableUri3, 101);
+      
+      const histor2 = await pdp.permanentBaseUriHistory();
+      expect(histor2.length).to.equal(3);
+      expect(histor2[0]).to.equal(immutableUri);
+      expect(histor2[1]).to.equal(immutableUri2);
+      expect(histor2[2]).to.equal(immutableUri3);
+    });
+
+    it("Should require new permanentUri via setPermanentURI() to be valid for more tokenIds than the last one.", async function () {
+      const immutableUri2 = "2.immutable.uri";
+      const immutableUri3 = "3.immutable.uri";
+      const { pdp, owner } = await loadFixture(deployFixture);
+      const tx = await pdp.setPermanentURI(immutableUri2, 100);
+      await expect(pdp.setPermanentURI(immutableUri3, 100)).to.be.revertedWith("Error: URI must be valid for more tokenIds than previous URI.");
+      await pdp.setPermanentURI(immutableUri3, 101);
     });
   });
 
@@ -173,8 +191,6 @@ describe("Ph101ppDailyPhotos", function () {
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
       const tokenId = 0;
       const { pdp, immutableUri } = await loadFixture(deployFixture);
-      expect(await pdp.uri(tokenId)).to.equal("CLAIM.json");
-      await pdp.setPermanentURI(immutableUri, 1);
       expect(await pdp.uri(tokenId)).to.equal(immutableUri+"CLAIM.json");
     });
 
@@ -271,7 +287,7 @@ describe("Ph101ppDailyPhotos", function () {
       await pdp.mintPhotos(...input1, 1);
 
       const newTreasury = account2.address
-      await pdp.setAddresses(newTreasury, vault.address);
+      await pdp.setInitialHolders(newTreasury, vault.address);
 
       const input2 = await pdp.getMintRangeInput(5);
       await pdp.mintPhotos(...input2, 1);

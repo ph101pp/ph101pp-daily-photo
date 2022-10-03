@@ -9,11 +9,7 @@ import "./Ph101ppDailyPhotoTokenId.sol";
 
 // import "hardhat/console.sol";
 
-contract Ph101ppDailyPhotos is
-    ERC1155MintRange,
-    ERC2981,
-    AccessControl
-{
+contract Ph101ppDailyPhotos is ERC1155MintRange, ERC2981, AccessControl {
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
@@ -24,17 +20,16 @@ contract Ph101ppDailyPhotos is
     uint256 private constant TREASURY_ID = 0;
     uint256 private constant VAULT_ID = 1;
 
-    string private _permanentUri;
+    string[] private _permanentUris;
     string private _proxyUri;
-    uint256 private _permanentUriValidUptoTokenId;
+    uint256 private _lastPermanentUriValidUptoTokenId;
 
     uint256[] private _maxSupplies;
     uint256[] private _maxSupplyRange;
 
-    event PermanentUriSet(string newURI, uint256 validUptoTokenId, address sender);
-
     constructor(
-        string memory newMutableUri,
+        string memory newProxyUri,
+        string memory newPermanentUri,
         address treasuryAddress,
         address vaultAddress
     ) ERC1155_("") {
@@ -43,8 +38,9 @@ contract Ph101ppDailyPhotos is
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
 
-        setProxyURI(newMutableUri);
-        setAddresses(treasuryAddress, vaultAddress);
+        setProxyURI(newProxyUri);
+        setPermanentURI(newPermanentUri, 0);
+        setInitialHolders(treasuryAddress, vaultAddress);
         setDefaultRoyalty(msg.sender, 500);
         _mint(treasuryAddress, 0, 10, "");
     }
@@ -77,7 +73,7 @@ contract Ph101ppDailyPhotos is
         return 0;
     }
 
-    function setAddresses(address treasury, address vault)
+    function setInitialHolders(address treasury, address vault)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
@@ -86,15 +82,37 @@ contract Ph101ppDailyPhotos is
         addresses[1] = vault;
         _setInitialHolders(addresses);
     }
-    
-    function setPermanentURI(string memory newUri, uint256 validUptoTokenId ) public onlyRole(URI_UPDATER_ROLE) {
+
+    function updateInitialHoldersRange(
+        address[] memory fromAddresses,
+        address[] memory toAddresses,
+        uint256[][] memory ids,
+        uint256[][] memory amounts,
+        address[][] memory newInitialHolders,
+        uint256[] memory newInitialHoldersRange,
+        bytes32 inputChecksum
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _updateInitialHoldersRange(
+            fromAddresses,
+            toAddresses,
+            ids,
+            amounts,
+            newInitialHolders,
+            newInitialHoldersRange,
+            inputChecksum
+        );
+    }
+
+    function setPermanentURI(string memory newUri, uint256 validUptoTokenId)
+        public
+        onlyRole(URI_UPDATER_ROLE)
+    {
         require(
-            validUptoTokenId > _permanentUriValidUptoTokenId, 
+            validUptoTokenId > _lastPermanentUriValidUptoTokenId || _permanentUris.length == 0,
             "Error: URI must be valid for more tokenIds than previous URI."
         );
-        _permanentUri = newUri;
-        _permanentUriValidUptoTokenId = validUptoTokenId;
-        emit PermanentUriSet(newUri, validUptoTokenId, msg.sender);
+        _permanentUris.push(newUri);
+        _lastPermanentUriValidUptoTokenId = validUptoTokenId;
     }
 
     function setProxyURI(string memory newProxyUri)
@@ -111,14 +129,13 @@ contract Ph101ppDailyPhotos is
         if (tokenId == CLAIM_TOKEN_ID) {
             // ... is claim -> return claim
             tokenDate = CLAIM_TOKEN;
-            currentUri = _permanentUri;
+            currentUri = permanentBaseUri();
         } else {
             (
                 uint256 year,
                 uint256 month,
                 uint256 day
-            ) = Ph101ppDailyPhotoTokenId
-                .tokenIdToDate(tokenId);
+            ) = Ph101ppDailyPhotoTokenId.tokenIdToDate(tokenId);
 
             tokenDate = string.concat(
                 Strings.toString(year),
@@ -128,24 +145,30 @@ contract Ph101ppDailyPhotos is
                 Strings.toString(day)
             );
 
-            if (exists(tokenId) && _permanentUriValidUptoTokenId >= tokenId) {
+            if (
+                exists(tokenId) && _lastPermanentUriValidUptoTokenId >= tokenId
+            ) {
                 // ... uri updated since token -> immutable uri
-                currentUri = _permanentUri;
+                currentUri = permanentBaseUri();
             } else {
                 // ... uri not yet updated since token -> mutable uri
-                currentUri = _proxyUri;
+                currentUri = proxyBaseUri();
             }
         }
 
         return string.concat(currentUri, tokenDate, ".json");
     }
 
-    function mutableBaseUri() public view returns (string memory) {
+    function proxyBaseUri() public view returns (string memory) {
         return _proxyUri;
     }
 
     function permanentBaseUri() public view returns (string memory) {
-        return _permanentUri;
+        return _permanentUris[_permanentUris.length - 1];
+    }
+
+    function permanentBaseUriHistory() public view returns (string[] memory) {
+        return _permanentUris;
     }
 
     function tokenIdToDate(uint256 tokenId)
