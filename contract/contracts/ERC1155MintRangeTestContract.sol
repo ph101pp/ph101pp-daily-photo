@@ -79,6 +79,14 @@ contract ERC1155MintRangeTestContract is ERC1155MintRange {
         _mintRange(ids, amounts, checkSum);
     }
 
+    function pause() public {
+        _pause();
+    }
+
+    function unpause() public {
+        _unpause();
+    }
+
     function mint(
         address to,
         uint256 id,

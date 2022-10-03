@@ -4,6 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 // import "hardhat/console.sol";
 
@@ -11,13 +12,13 @@ import "./ERC1155_.sol";
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
  * and adds tracking of total supply per id.
  */
-abstract contract ERC1155MintRange is ERC1155_ {
+abstract contract ERC1155MintRange is ERC1155_, Pausable {
     string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
         "No initial holders set. Use _setInitialHolders()";
-    string private constant ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT =
-        "Invalid input. Verify checksum.";
+    string private constant ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT =
+        "Invalid input. Use _verifyUpdateInitialHolderRangeInput().";
 
     // Mapping from token ID to balancesInitialzed flag
     mapping(uint256 => mapping(address => bool)) public _balancesInitialized;
@@ -64,7 +65,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         address[][] memory newInitialHolders,
         uint256[] memory newInitialHoldersRange,
         bytes32 inputChecksum
-    ) internal virtual {
+    ) internal virtual whenPaused {
         bytes32 checksum = keccak256(
             abi.encode(
                 fromAddresses,
@@ -75,17 +76,18 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 newInitialHoldersRange,
                 _initialHolders,
                 _initialHoldersRange,
-                _lastRangeTokenId
+                paused()
             )
         );
         require(
             inputChecksum == checksum,
-            ERROR_INVALID_INITIAL_HOLDER_RANGE_INPUT
+            ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT
         );
 
         _initialHolders = newInitialHolders;
         _initialHoldersRange = newInitialHoldersRange;
 
+        _unpause();
         for (uint i = 0; i < toAddresses.length; i++) {
             emit TransferBatch(
                 msg.sender,
@@ -95,6 +97,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 amounts[i]
             );
         }
+        _pause();
     }
 
     /**
@@ -104,7 +107,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint256[] memory ids,
         uint256[][] memory amounts,
         bytes32 inputChecksum
-    ) internal virtual {
+    ) internal virtual whenNotPaused {
         address[] memory addresses = initialHolders();
 
         bytes32 checksum = keccak256(
@@ -117,7 +120,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
         if (_zeroMinted == false) {
             _zeroMinted = true;
         }
-
         for (uint i = 0; i < addresses.length; i++) {
             emit TransferBatch(
                 msg.sender,
@@ -273,7 +275,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) internal virtual override {
+    ) internal virtual override whenNotPaused {
         for (uint256 i = 0; i < ids.length; ++i) {
             uint256 id = ids[i];
 
@@ -296,6 +298,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
 
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+
+        require(!paused(), "ERC1155Pausable: token transfer while paused");
     }
 
     /**

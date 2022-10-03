@@ -97,7 +97,6 @@ contract Ph101ppDailyPhotos is
         emit PermanentUriSet(newUri, validUptoTokenId, msg.sender);
     }
 
-
     function setProxyURI(string memory newProxyUri)
         public
         onlyRole(URI_UPDATER_ROLE)
@@ -226,6 +225,14 @@ contract Ph101ppDailyPhotos is
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _resetTokenRoyalty(tokenId);
+    }
+
+    function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _pause();
+    }
+
+    function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _unpause();
     }
 
     // The following functions are overrides required by Solidity.
