@@ -181,7 +181,7 @@ describe("ERC1155MintRange", function () {
 
   });
 
-  describe("updateInitialHoldersRange / getUpdateInitialHolderRangeInput", function () {
+  describe("updateInitialHoldersRange / verifyUpdateInitialHolderRangeInput", function () {
     const exampleRanges = [
       {
         initial: [0, 4, 5],
@@ -232,7 +232,7 @@ describe("ERC1155MintRange", function () {
       await expect(_getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])).to.be.rejectedWith("Pausable: not paused");
       await c.pause();
       await _getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])
-      .catch((e) => { expect(true).to.equal(false) });
+        .catch((e) => { expect(true).to.equal(false) });
       await _getUpdateInitialHoldersRangeInput(c, -1, 300, [account1.address, account2.address])
         .then(() => { expect(true).to.equal(false) })
         .catch((e) => { expect(e.message).to.equal("Error: from < 0 || from > to") });
@@ -299,37 +299,34 @@ describe("ERC1155MintRange", function () {
       const ids = mintIntput[0];
       await c.mintRange(...mintIntput);
       await c.pause();
-      const newInitialHolders = [account3.address, account4.address];
+      const newInitialHolders = [account1.address, account3.address];
       const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
       const tx = await c.updateInitialHoldersRange(...rangeInput);
       const receipt = await tx.wait();
-
-      const fromAddresses = rangeInput[0]
+      const fromAddresses = rangeInput[0];
+      expect(receipt.events?.filter(e => e.event === "Paused").length).to.equal(1);
+      expect(receipt.events?.filter(e => e.event === "Unpaused").length).to.equal(1);
       expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(fromAddresses.length);
 
       const balancesAccount1 = await c.balanceOfBatch(ids.map(() => account1.address), ids);
       const balancesAccount2 = await c.balanceOfBatch(ids.map(() => account2.address), ids);
       const balancesAccount3 = await c.balanceOfBatch(ids.map(() => account3.address), ids);
-      const balancesAccount4 = await c.balanceOfBatch(ids.map(() => account4.address), ids);
 
       for (let i = 0; i < ids.length; i++) {
         if (i === 0) {
-          expect(balancesAccount1[i]).to.equal(0);
+          expect(balancesAccount1[i]).to.equal(9999);
           expect(balancesAccount2[i]).to.equal(0);
           expect(balancesAccount3[i]).to.equal(9999);
-          expect(balancesAccount4[i]).to.equal(9999);
         }
         else if (i <= 3) {
-          expect(balancesAccount1[i]).to.equal(0);
+          expect(balancesAccount1[i]).to.equal(i + 1);
           expect(balancesAccount2[i]).to.equal(0);
           expect(balancesAccount3[i]).to.equal(i + 1);
-          expect(balancesAccount4[i]).to.equal(i + 1);
         }
         else {
           expect(balancesAccount1[i]).to.equal(i + 1);
           expect(balancesAccount2[i]).to.equal(i + 1);
           expect(balancesAccount3[i]).to.equal(0);
-          expect(balancesAccount4[i]).to.equal(0);
         }
       }
     });
@@ -628,13 +625,13 @@ describe("ERC1155MintRange", function () {
     });
 
     it("should fail to mintBatch()", async function () {
-      const { c, account1} = await loadFixture(deployFixture);
+      const { c, account1 } = await loadFixture(deployFixture);
       await c.pause();
       await expect(c.mintBatch(account1.address, [3, 4, 5], [2, 2, 2], [])).to.be.rejectedWith("Pausable: paused");
     });
 
     it("should fail to burn()", async function () {
-      const { c, account1} = await loadFixture(deployFixture);
+      const { c, account1 } = await loadFixture(deployFixture);
       await c.pause();
       await expect(c.burn(account1.address, 2, 1)).to.be.rejectedWith("Pausable: paused");
     });

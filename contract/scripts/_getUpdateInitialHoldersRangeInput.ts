@@ -1,4 +1,4 @@
-import { ERC1155MintRangeTestContract } from "../typechain-types";
+import { ERC1155MintRangeTestContract, Ph101ppDailyPhoto } from "../typechain-types";
 
 function findInRange(range: number[], needle: number) {
   for (let i = range.length - 1; i >= 0; i--) {
@@ -10,7 +10,7 @@ function findInRange(range: number[], needle: number) {
 }
 
 export default async function _getUpdateInitialHoldersRangeInput(
-  c: ERC1155MintRangeTestContract,
+  c: ERC1155MintRangeTestContract | Ph101ppDailyPhoto,
   from: number,
   to: number,
   newInitialHolders: string[]
@@ -39,6 +39,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
   if (zeroMinted) {
     for (let i = from; i <= too; i++) {
       const currentInitialHolders = await c["initialHolders(uint256)"](i);
+
       const balances = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
       const isManuallyMinted = await c._manualMint(i);
       if (isManuallyMinted) {
@@ -48,6 +49,11 @@ export default async function _getUpdateInitialHoldersRangeInput(
       for (let a = 0; a < currentInitialHolders.length; a++) {
         const fromAddress = currentInitialHolders[a];
         const toAddress = newInitialHolders[a];
+
+        if(fromAddress === toAddress) {
+          continue;
+        }
+
         const balance = balances[a].toNumber();
         const isBalanceInitialized = await c._balancesInitialized(i, fromAddress)
 

@@ -1,8 +1,8 @@
 import _getUpdateInitialHoldersRangeInput from "./_getUpdateInitialHoldersRangeInput";
-import { ERC1155MintRangeTestContract } from "../typechain-types";
+import { Ph101ppDailyPhoto } from "../typechain-types";
 
 export default async function getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(
-  c: ERC1155MintRangeTestContract,
+  c: Ph101ppDailyPhoto,
   from: number,
   to: number,
   treasury: string,

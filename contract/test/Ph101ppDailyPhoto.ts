@@ -1,12 +1,13 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
-import { Ph101ppDailyPhotos } from "../typechain-types";
+import getPh101ppDailyPhotoUpdateInitialHoldersRangeInput from "../scripts/getPh101ppDailyPhotoUpdateInitialHoldersRangeInput";
+import { Ph101ppDailyPhoto } from "../typechain-types";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const nowTimestamp = Math.ceil(Date.now()/1000)+SECONDS_PER_DAY*3;
 
-describe("Ph101ppDailyPhotos", function () {
+describe("Ph101ppDailyPhoto", function () {
 
   async function deployFixture() {
     const mutableUri = "mutable_.uri/";
@@ -21,7 +22,7 @@ describe("Ph101ppDailyPhotos", function () {
     const PDPTokenId = await ethers.getContractFactory("Ph101ppDailyPhotoTokenId");
     const pdpTokenId = await PDPTokenId.deploy();
 
-    const PDP = await ethers.getContractFactory("Ph101ppDailyPhotos", {
+    const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
       libraries: {
         Ph101ppDailyPhotoTokenId: pdpTokenId.address,
       },
@@ -125,7 +126,7 @@ describe("Ph101ppDailyPhotos", function () {
       }
     ]
 
-    async function testDate2TokenID(pdp: Ph101ppDailyPhotos, test:TokenIdTest) {
+    async function testDate2TokenID(pdp: Ph101ppDailyPhoto, test:TokenIdTest) {
       const [year, month, day] = await pdp.tokenIdToDate(test.tokenID);
       const tokenId = await pdp.tokenIdFromDate(test.year, test.month, test.day);
           
@@ -235,12 +236,8 @@ describe("Ph101ppDailyPhotos", function () {
       const maxSupply = 5;
       const input = await pdp.getMintRangeInput(photos);
       
-      const vaultAddresses = [];
-      const treasuryAddresses = [];
-      for(let i = 0; i<photos; i++){
-        vaultAddresses.push(vault.address);
-        treasuryAddresses.push(treasury.address);
-      }
+      const vaultAddresses = new Array(photos).fill(vault.address);
+      const treasuryAddresses = new Array(photos).fill(treasury.address);
 
       await pdp.mintPhotos(...input, maxSupply);
       const ids = input[0];
@@ -305,6 +302,119 @@ describe("Ph101ppDailyPhotos", function () {
 
       expect(await pdp.balanceOf(treasury.address, 2)).to.equal(0);
       expect(await pdp.balanceOf(newTreasury, 8)).to.equal(0);
+    });
+  });
+
+  describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function(){
+    it("should correcly update vault address only", async function () {
+      const { pdp, vault, treasury, account1 } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = 5;
+      const input = await pdp.getMintRangeInput(photos);
+      
+      const vaultAddresses = new Array(photos).fill(vault.address);
+      const treasuryAddresses = new Array(photos).fill(treasury.address);
+
+      await pdp.mintPhotos(...input, maxSupply);
+      const ids = input[0];
+      const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
+      const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+
+      for(let i = 0; i<photos; i++){
+        expect(vaultBalances[i]).to.equal(1);
+        expect(treasuryBalances[i]).to.gte(1);
+      }
+
+      await pdp.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, Infinity, treasury.address, account1.address);
+      const tx = await pdp.updateInitialHoldersRange(...updateInitialHoldersInput);
+      const receipt = await tx.wait();
+
+      const newVaultAddresses = new Array(photos).fill(account1.address);
+      const newTreasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+      const newVaultBalances = await pdp.balanceOfBatch(newVaultAddresses, ids);
+      const newOldVaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
+      
+      for(let i = 0; i<photos; i++){
+        expect(newVaultBalances[i]).to.equal(1);
+        expect(newOldVaultBalances[i]).to.equal(0);
+        expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
+      }
+      
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
+      expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
+    });
+
+    it("should correcly update treasury address only", async function () {
+      const { pdp, vault, treasury, account1 } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = 5;
+      const input = await pdp.getMintRangeInput(photos);
+      
+      const vaultAddresses = new Array(photos).fill(vault.address);
+      const treasuryAddresses = new Array(photos).fill(treasury.address);
+
+      await pdp.mintPhotos(...input, maxSupply);
+      const ids = input[0];
+      const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
+      const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+
+      for(let i = 0; i<photos; i++){
+        expect(vaultBalances[i]).to.equal(1);
+        expect(treasuryBalances[i]).to.gte(1);
+      }
+
+      await pdp.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, Infinity, account1.address, vault.address);
+      const tx = await pdp.updateInitialHoldersRange(...updateInitialHoldersInput);
+      const receipt = await tx.wait();
+
+      const newTreasuryAddresses = new Array(photos).fill(account1.address);
+      const newTreasuryBalances = await pdp.balanceOfBatch(newTreasuryAddresses, ids);
+      const newOldTreasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+      const newVaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
+      
+      for(let i = 0; i<photos; i++){
+        expect(newVaultBalances[i]).to.equal(1);
+        expect(newOldTreasuryBalances[i]).to.equal(0);
+        expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
+      }
+      
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
+      expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
+    });
+
+    it("should correcly swap treasury and vault addresses", async function () {
+      const { pdp, vault, treasury } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = 5;
+      const input = await pdp.getMintRangeInput(photos);
+      
+      const vaultAddresses = new Array(photos).fill(vault.address);
+      const treasuryAddresses = new Array(photos).fill(treasury.address);
+
+      await pdp.mintPhotos(...input, maxSupply);
+      const ids = input[0];
+      const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
+      const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+
+      for(let i = 0; i<photos; i++){
+        expect(vaultBalances[i]).to.equal(1);
+        expect(treasuryBalances[i]).to.gte(1);
+      }
+
+      await pdp.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, Infinity, vault.address, treasury.address);
+      
+      await pdp.updateInitialHoldersRange(...updateInitialHoldersInput);
+
+      const newTreasuryBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
+      const newVaultBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+
+      for(let i = 0; i<photos; i++){
+        expect(newVaultBalances[i]).to.equal(vaultBalances[i]);
+        expect(newTreasuryBalances[i]).to.equal(treasuryBalances[i]);
+      }
     });
   });
 
