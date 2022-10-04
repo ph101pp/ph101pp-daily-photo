@@ -28,6 +28,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
 
     // Mapping to keep track of tokens that are minted via ERC1155._mint() or  ERC1155._mintBatch()
     mapping(uint256 => bool) public _manualMint;
+    uint256 public _manualMints = 0;
 
     // Track initial holders across tokenID ranges;
     address[][] public _initialHolders;
@@ -111,7 +112,14 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         address[] memory addresses = initialHolders();
 
         bytes32 checksum = keccak256(
-            abi.encode(ids, amounts, addresses, _lastRangeTokenId, _zeroMinted)
+            abi.encode(
+                ids,
+                amounts,
+                addresses,
+                _lastRangeTokenId,
+                _zeroMinted,
+                _manualMints
+            )
         );
         require(inputChecksum == checksum, ERROR_INVALID_MINT_RANGE_INPUT);
 
@@ -259,7 +267,14 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
             newIndex += 1;
         }
         bytes32 checksum = keccak256(
-            abi.encode(ids, amounts, holders, _lastRangeTokenId, _zeroMinted)
+            abi.encode(
+                ids,
+                amounts,
+                holders,
+                _lastRangeTokenId,
+                _zeroMinted,
+                _manualMints
+            )
         );
 
         return (ids, amounts, checksum);
@@ -344,6 +359,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
                 // set _manualMint flag if minted via _mint||_mintBatch
                 if (!exists(id)) {
                     _manualMint[id] = true;
+                    _manualMints++;
                 }
                 // track supply
                 _totalSupply[id] += int256(amounts[i]);
