@@ -9,7 +9,7 @@ import "./Ph101ppDailyPhotoTokenId.sol";
 
 // import "hardhat/console.sol";
 
-contract Ph101ppDailyPhotos is ERC1155MintRange, ERC2981, AccessControl {
+contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
@@ -60,7 +60,7 @@ contract Ph101ppDailyPhotos is ERC1155MintRange, ERC2981, AccessControl {
             uint256 supplyIndex = _findInRange(_maxSupplyRange, tokenId);
             uint256 maxSupply = _maxSupplies[supplyIndex];
             uint256 supply = (uint256(
-                keccak256(abi.encode(account, tokenId, maxSupply))
+                keccak256(abi.encode(tokenId, maxSupply))
             ) % maxSupply) + 1;
 
             return supply;
