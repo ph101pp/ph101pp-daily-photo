@@ -42,6 +42,23 @@ describe("ERC1155MintRange", function () {
       }
     });
 
+    it("Should return correctly formatted input params for 0 tokens", async function () {
+      const newTokens = 0;
+      const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
+      await c.setInitialHolders(initialHolders);
+      const [ids, amounts] = await c.getMintRangeInput(newTokens);
+
+      expect(ids.length).to.equal(newTokens);
+      for (let i = 0; i < newTokens; i++) {
+        expect(ids[i].toNumber()).to.equal(i);
+      }
+      expect(amounts.length).to.equal(initialHolders.length);
+      for (let i = 0; i < amounts.length; i++) {
+        expect(amounts[i].length).to.equal(newTokens);
+      }
+    });
+
     it("Should return correctly formatted input params with consecutive ids when called after mintRange", async function () {
       const newTokens = 7;
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
