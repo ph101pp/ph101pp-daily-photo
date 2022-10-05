@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 // import "hardhat/console.sol";
 
-contract ERC1155MintRangeTestContract is
+contract ERC1155TestContract is
     ERC1155_,
     Pausable,
     ERC2981,

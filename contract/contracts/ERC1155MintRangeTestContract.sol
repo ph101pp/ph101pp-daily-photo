@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import "./ERC1155MintRange.sol";
+import "./ERC1155MintRangeUpdateable.sol";
 import "hardhat/console.sol";
 
-contract ERC1155MintRangeTestContract is ERC1155MintRange {
+contract ERC1155MintRangeTestContract is ERC1155MintRangeUpdateable {
     constructor() ERC1155_("") {}
 
     function initialBalanceOf(address, uint256 tokenId)

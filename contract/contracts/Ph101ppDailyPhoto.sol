@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import "./ERC1155MintRange.sol";
+import "./ERC1155MintRangeUpdateable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
@@ -9,7 +9,7 @@ import "./DateTime.sol";
 
 // import "hardhat/console.sol";
 
-contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
+contract Ph101ppDailyPhoto is ERC1155MintRangeUpdateable, ERC2981, AccessControl {
     uint256 public constant START_DATE = 1661990400; // Sept 1, 2022
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");

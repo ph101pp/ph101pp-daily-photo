@@ -12,13 +12,11 @@ import "@openzeppelin/contracts/security/Pausable.sol";
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
  * and adds tracking of total supply per id.
  */
-abstract contract ERC1155MintRange is ERC1155_, Pausable {
+abstract contract ERC1155MintRange is ERC1155_ {
     string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
         "No initial holders set. Use _setInitialHolders()";
-    string private constant ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT =
-        "Invalid input. Use _verifyUpdateInitialHolderRangeInput().";
 
     // Mapping from token ID to balancesInitialzed flag
     mapping(uint256 => mapping(address => bool)) public _balancesInitialized;
@@ -36,9 +34,6 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
 
     uint256 public _lastRangeTokenId = 0;
     bool public _zeroMinted = false;
-    
-    // used to check validity of updateInitialHolderRangeInput
-    uint256 private _pauseTimestamp;
 
     /**
      * @dev Implement: Return initial token balance for address.
@@ -53,54 +48,9 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
     /**
      * @dev Set initial holders. mintRange will distribute tokens to these holders
      */
-    function _setInitialHolders(address[] memory addresses) internal virtual whenNotPaused {
+    function _setInitialHolders(address[] memory addresses) internal virtual {
         _initialHoldersRange.push(_zeroMinted ? _lastRangeTokenId + 1 : 0);
         _initialHolders.push(addresses);
-    }
-
-    /**
-     * @dev Update initial holders for a range of ids.
-     */
-    function _updateInitialHoldersRange(
-        address[] memory fromAddresses,
-        address[] memory toAddresses,
-        uint256[][] memory ids,
-        uint256[][] memory amounts,
-        address[][] memory newInitialHolders,
-        uint256[] memory newInitialHoldersRange,
-        bytes32 inputChecksum
-    ) internal virtual whenPaused {
-        bytes32 checksum = keccak256(
-            abi.encode(
-                fromAddresses,
-                toAddresses,
-                ids,
-                amounts,
-                newInitialHolders,
-                newInitialHoldersRange,
-                _pauseTimestamp,
-                paused()
-            )
-        );
-        require(
-            inputChecksum == checksum,
-            ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT
-        );
-
-        _initialHolders = newInitialHolders;
-        _initialHoldersRange = newInitialHoldersRange;
-
-        _unpause();
-        for (uint i = 0; i < toAddresses.length; i++) {
-            emit TransferBatch(
-                msg.sender,
-                fromAddresses[i],
-                toAddresses[i],
-                ids[i],
-                amounts[i]
-            );
-        }
-        _pause();
     }
 
     /**
@@ -110,7 +60,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         uint256[] memory ids,
         uint256[][] memory amounts,
         bytes32 inputChecksum
-    ) internal virtual whenNotPaused {
+    ) internal virtual {
         address[] memory addresses = initialHolders();
 
         bytes32 checksum = keccak256(
@@ -141,10 +91,6 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         }
     }
 
-    function _pause() internal virtual override {
-        _pauseTimestamp = block.timestamp;
-        super._pause();
-    }
     /**
      * @dev Returns true if tokenId was minted.
      */
@@ -205,18 +151,6 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
     function initialHolders() public view virtual returns (address[] memory) {
         require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
         return _initialHolders[_initialHolders.length - 1];
-    }
-
-    /**
-     * @dev Return current initial holders
-     */
-    function initialHoldersRange()
-        public
-        view
-        virtual
-        returns (address[][] memory, uint256[] memory)
-    {
-        return (_initialHolders, _initialHoldersRange);
     }
 
     /**
@@ -291,77 +225,6 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         return (ids, amounts, checksum);
     }
 
-    /**
-     * @dev Verify and hash input updateInitialHolderRangeInput.
-     */
-    function verifyUpdateInitialHolderRangeInput(
-        address[] memory fromAddresses,
-        address[] memory toAddresses,
-        uint256[][] memory ids,
-        uint256[][] memory amounts,
-        address[][] memory newInitialHolders,
-        uint256[] memory newInitialHoldersRange
-    ) public view virtual whenPaused returns (bytes32) {
-        require(fromAddresses.length == toAddresses.length, "E:01");
-        require(fromAddresses.length == ids.length, "E:02");
-        require(fromAddresses.length == amounts.length, "E:03");
-        require(newInitialHolders.length == newInitialHoldersRange.length, "E:04");
-        require(newInitialHoldersRange[0] == 0, "E:05");
-
-        for (uint256 j = 1; j < newInitialHoldersRange.length; j++) {
-            require(
-                newInitialHoldersRange[j] > newInitialHoldersRange[j - 1],
-                "E:06"
-            );
-        }
-
-        for (uint256 i = 0; i < ids.length; i++) {
-            address from = fromAddresses[i];
-            address to = toAddresses[i];
-            uint256[] memory id = ids[i];
-            uint256[] memory amount = amounts[i];
-            require(id.length == amount.length, "E:07");
-
-            for (uint256 k = 0; k < id.length; k++) {
-                uint256 tokenId = id[k];
-                uint256 balance = amount[k];
-
-                require(exists(tokenId) == true, "E:11");
-                require(_manualMint[tokenId] == false, "E:12");
-                require(_balancesInitialized[tokenId][from] == false, "E:13");
-                require(_balancesInitialized[tokenId][to] == false, "E:14");
-                require(balanceOf(from, tokenId) >= balance, "E:08");
-
-                address[] memory currentInitialHolders = initialHolders(
-                    tokenId
-                );
-                require(_includesAddress(currentInitialHolders, from), "E:09");
-
-                uint256 newInitialHoldersIndex = _findInRange(
-                    newInitialHoldersRange,
-                    tokenId
-                );
-                address[] memory nextInitialHolders = newInitialHolders[
-                    newInitialHoldersIndex
-                ];
-                require(_includesAddress(nextInitialHolders, to), "E:10");
-            }
-        }
-
-        return
-            keccak256(
-                abi.encode(
-                    fromAddresses,
-                    toAddresses,
-                    ids,
-                    amounts,
-                    newInitialHolders,
-                    newInitialHoldersRange,
-                    _pauseTimestamp,
-                    paused()
-                )
-            );
-    }
 
     /**
      * @dev See {ERC1155-_beforeTokenTransfer}.
@@ -373,7 +236,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         uint256[] memory ids,
         uint256[] memory amounts,
         bytes memory data
-    ) internal virtual override whenNotPaused {
+    ) internal virtual override {
         for (uint256 i = 0; i < ids.length; ++i) {
             uint256 id = ids[i];
 
@@ -397,8 +260,6 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         }
 
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
-
-        require(!paused(), "ERC1155Pausable: token transfer while paused");
     }
 
     /**
@@ -448,19 +309,4 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         return 0;
     }
 
-    /**
-     * @dev Utility to find Address in array of addresses
-     */
-    function _includesAddress(address[] memory array, address value)
-        private
-        pure
-        returns (bool)
-    {
-        for (uint i = 0; i < array.length; i++) {
-            if (array[i] == value) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
