@@ -42,7 +42,7 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
         setPermanentURI(newPermanentUri, 0);
         setInitialHolders(treasuryAddress, vaultAddress);
         setDefaultRoyalty(msg.sender, 500);
-        _mint(treasuryAddress, 0, 10, "");
+        mintClaims(treasuryAddress, 10);
     }
 
     function initialBalanceOf(address account, uint256 tokenId)
@@ -198,7 +198,7 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
         for (uint i = 0; i < amounts.length; i++) {
             claimsRequired += amounts[i];
         }
-        _burn(msg.sender, 0, claimsRequired);
+        _burn(msg.sender, CLAIM_TOKEN_ID, claimsRequired);
         address[] memory initialHolders = initialHolders(tokenIds[0]);
         _safeBatchTransferFrom(
             initialHolders[TREASURY_ID],
@@ -213,7 +213,7 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
         public
         onlyRole(CLAIM_MINTER_ROLE)
     {
-        _mint(to, 0, amount, "");
+        _mint(to, CLAIM_TOKEN_ID, amount, "");
     }
 
     function mintPhotos(

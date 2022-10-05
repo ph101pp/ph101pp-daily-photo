@@ -296,27 +296,16 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         address[][] memory newInitialHolders,
         uint256[] memory newInitialHoldersRange
     ) public view virtual whenPaused returns (bytes32) {
-        require(
-            fromAddresses.length == toAddresses.length,
-            "fromAddresses.length == toAddresses.length"
-        );
-        require(
-            fromAddresses.length == ids.length,
-            "fromAddresses.length == ids.length"
-        );
-        require(
-            fromAddresses.length == amounts.length,
-            "fromAddresses.length == amounts.length"
-        );
-        require(
-            newInitialHolders.length == newInitialHoldersRange.length,
-            "newInitialHolders.length == newInitialHoldersRange.length"
-        );
+        require(fromAddresses.length == toAddresses.length, "E:01");
+        require(fromAddresses.length == ids.length, "E:02");
+        require(fromAddresses.length == amounts.length, "E:03");
+        require(newInitialHolders.length == newInitialHoldersRange.length, "E:04");
+        require(newInitialHoldersRange[0] == 0, "E:05");
 
         for (uint256 j = 1; j < newInitialHoldersRange.length; j++) {
             require(
                 newInitialHoldersRange[j] > newInitialHoldersRange[j - 1],
-                "newInitialHoldersRange[j] > newInitialHoldersRange[j-1]"
+                "E:06"
             );
         }
 
@@ -325,27 +314,22 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
             address to = toAddresses[i];
             uint256[] memory id = ids[i];
             uint256[] memory amount = amounts[i];
-            require(id.length == amount.length, "id.length == amount.length");
+            require(id.length == amount.length, "E:07");
 
             for (uint256 k = 0; k < id.length; k++) {
                 uint256 tokenId = id[k];
                 uint256 balance = amount[k];
 
-                require(_manualMint[tokenId] == false);
-                require(_balancesInitialized[tokenId][from] == false);
-                require(_balancesInitialized[tokenId][to] == false);
-                require(
-                    balanceOf(from, tokenId) >= balance,
-                    "balanceOf(from, tokenId) >= balance"
-                );
+                require(exists(tokenId) == true, "E:11");
+                require(_manualMint[tokenId] == false, "E:12");
+                require(_balancesInitialized[tokenId][from] == false, "E:13");
+                require(_balancesInitialized[tokenId][to] == false, "E:14");
+                require(balanceOf(from, tokenId) >= balance, "E:08");
 
                 address[] memory currentInitialHolders = initialHolders(
                     tokenId
                 );
-                require(
-                    _includesAddress(currentInitialHolders, from),
-                    "_includesAddress(currentInitialHolders, from)"
-                );
+                require(_includesAddress(currentInitialHolders, from), "E:09");
 
                 uint256 newInitialHoldersIndex = _findInRange(
                     newInitialHoldersRange,
@@ -354,10 +338,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
                 address[] memory nextInitialHolders = newInitialHolders[
                     newInitialHoldersIndex
                 ];
-                require(
-                    _includesAddress(nextInitialHolders, to),
-                    "_includesAddress(nextInitialHolders, to)"
-                );
+                require(_includesAddress(nextInitialHolders, to), "E:10");
             }
         }
 

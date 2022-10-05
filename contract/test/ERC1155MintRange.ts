@@ -177,11 +177,231 @@ describe("ERC1155MintRange", function () {
         expect(balances2[i].toNumber()).to.equal(balance);
         expect(await c.totalSupply(i + 1)).to.equal(balance);
       }
-    })
+    });
+
+    it("Should fail when a token was minted since getMintRangeInput was called", async function () {
+      const newTokens = 5;
+      const { c, account1 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address];
+      await c.setInitialHolders(initialHolders);
+
+      const inputs = await c.getMintRangeInput(5);
+      await c.mint(account1.address, 1, 1, []);
+      await expect(c.mintRange(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+
+      const inputs2 = await c.getMintRangeInput(5);
+      await expect(c.mintRange(...inputs2)).to.not.be.rejected;
+
+      const inputs3 = await c.getMintRangeInput(5);
+      await c.mintBatch(account1.address, [20, 21], [1,1], []);
+      await expect(c.mintRange(...inputs3)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+     });
 
   });
 
-  describe("updateInitialHoldersRange / verifyUpdateInitialHolderRangeInput", function () {
+  describe("safeTransfer(Batch)", function () {
+
+    it("should transfer existing tokens that are minted with mintRange", async function () {
+      const newTokens = 10;
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
+      await c.setInitialHolders(initialHolders);
+      const inputs = await c.getMintRangeInput(newTokens);
+      await c.mintRange(...inputs);
+
+      expect(await c.balanceOf(account1.address, 0)).to.equal(9999)
+
+      await c.connect(account1).safeTransferFrom(account1.address, account5.address, 0, 999, []);
+
+      expect(await c.balanceOf(account1.address, 0)).to.equal(9000)
+      expect(await c.balanceOf(account5.address, 0)).to.equal(999)
+
+      await c.connect(account5).safeTransferFrom(account5.address, account1.address, 0, 9, []);
+
+      expect(await c.balanceOf(account1.address, 0)).to.equal(9009)
+      expect(await c.balanceOf(account5.address, 0)).to.equal(990)
+
+    });
+
+    it("should batch transfer existing tokens that are minted with mintRange", async function () {
+      const newTokens = 10;
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
+      await c.setInitialHolders(initialHolders);
+      const inputs = await c.getMintRangeInput(newTokens);
+      await c.mintRange(...inputs);
+
+      expect(await c.balanceOf(account1.address, 0)).to.equal(9999)
+      expect(await c.balanceOf(account1.address, 1)).to.equal(2)
+      expect(await c.balanceOf(account1.address, 2)).to.equal(3)
+
+      expect(await c.balanceOf(account5.address, 0)).to.equal(0)
+      expect(await c.balanceOf(account5.address, 1)).to.equal(0)
+      expect(await c.balanceOf(account5.address, 2)).to.equal(0)
+
+      await c.connect(account1).safeBatchTransferFrom(account1.address, account5.address, [0, 1, 2], [1, 1, 1], []);
+
+      expect(await c.balanceOf(account1.address, 0)).to.equal(9998)
+      expect(await c.balanceOf(account1.address, 1)).to.equal(1)
+      expect(await c.balanceOf(account1.address, 2)).to.equal(2)
+
+      expect(await c.balanceOf(account5.address, 0)).to.equal(1)
+      expect(await c.balanceOf(account5.address, 1)).to.equal(1)
+      expect(await c.balanceOf(account5.address, 2)).to.equal(1)
+    });
+  });
+
+  describe("initialHolders", function () {
+    it("Should return current initial holders when called without params", async function () {
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
+      const initialHolders2 = [account5.address, account6.address, account7.address, account8.address];
+
+      await expect(c["initialHolders()"]()).to.be.revertedWith("No initial holders set. Use _setInitialHolders()");
+
+      await c.setInitialHolders(initialHolders);
+
+      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders);
+
+      const inputs = await c.getMintRangeInput(5);
+      await c.mintRange(...inputs);
+      await c.setInitialHolders(initialHolders2);
+      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders2);
+    });
+
+    it("Should return initial holders for tokenId (also after they where updated)", async function () {
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
+      const initialHolders2 = [account5.address, account6.address, account7.address, account8.address];
+
+      await c.setInitialHolders(initialHolders);
+
+      const inputs = await c.getMintRangeInput(5);
+      await c.mintRange(...inputs);
+      await c.setInitialHolders(initialHolders2);
+      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders2);
+
+      expect(await c["initialHolders(uint256)"](0)).to.deep.equal(initialHolders);
+      expect(await c["initialHolders(uint256)"](1)).to.deep.equal(initialHolders);
+      expect(await c["initialHolders(uint256)"](2)).to.deep.equal(initialHolders);
+      expect(await c["initialHolders(uint256)"](3)).to.deep.equal(initialHolders);
+      expect(await c["initialHolders(uint256)"](4)).to.deep.equal(initialHolders);
+    });
+  });
+
+  describe("verifyUpdateInitialHoldersRangeInput", function () {
+
+    it("should return a hash when successfull", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+    })
+
+    it("should fail when contract is not paused", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("Pausable: not paused");
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejectedWith("Pausable: not paused");
+    })
+
+    it("should fail when to address is not part of new initial holders", async function () {
+      const { c, account1, account2, account3 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account3.address]], [0])).to.be.rejectedWith("E:10");
+    });
+
+    it("should fail when number of initial holders dont match range", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account1.address], [account2.address]], [0])).to.be.rejectedWith("E:04");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account1.address]], [0, 1])).to.be.rejectedWith("E:04");
+    });
+
+    it("should fail when range does not start at 0 or isnt consecutive", async function () {
+      const { c, account1, account2, account3 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [1])).to.be.rejectedWith("E:05");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account1.address], [account2.address], [account3.address]], [0, 3, 2])).to.be.rejectedWith("E:06");
+    });
+
+    it("should fail number of amounts, ids, to and from dont match", async function () {
+      const { c, account1, account2, account3 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1], [1]], [[account2.address]], [0])).to.be.rejectedWith("E:03");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1], [1]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("E:02");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address, account3.address], [[1]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("E:01");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address, account3.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("E:01");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1, 2]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("E:07");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1, 1]], [[account2.address]], [0])).to.be.rejectedWith("E:07");
+    });
+
+    it("should fail when from account balance is less than amount", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[2]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account2.address], [account1.address], [[1]], [[2]], [[account1.address]], [0])).to.be.rejectedWith("E:08");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[3]], [[account2.address]], [0])).to.be.rejectedWith("E:08");
+    });
+
+    it("should fail when id does not exist", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[3]], [[2]], [[account2.address]], [0])).to.be.rejectedWith("E:11");
+    });
+
+    it("should fail when token balance for from/to addresses is initialized", async function () {
+      const { c, account1, account2, account3 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address, account2.address]);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.connect(account1).safeTransferFrom(account1.address, account3.address, 1, 1, []);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("E:13");
+      await expect(c.verifyUpdateInitialHolderRangeInput([account2.address], [account3.address], [[1]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("E:14");
+    });
+
+    it("should fail when token was minted manually", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      await c.setInitialHolders([account1.address]);
+      await c.mint(account1.address, 1, 1, []);
+      const input = await c.getMintRangeInput(3);
+      await c.mintRange(...input);
+      await c.pause();
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[0]], [[1]], [[account2.address]], [0])).to.not.be.rejected;
+      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[account2.address]], [0])).to.be.rejectedWith("E:12");
+    });
+
+  });
+
+  describe("_getUpdateInitialHoldersRangeInput / verifyUpdateInitialHoldersRangeInput", function () {
     const exampleRanges = [
       {
         initial: [0, 4, 5],
@@ -424,96 +644,6 @@ describe("ERC1155MintRange", function () {
       }
     });
 
-  });
-
-  describe("safeTransfer(Batch)", function () {
-
-    it("should transfer existing tokens that are minted with mintRange", async function () {
-      const newTokens = 10;
-      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
-      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
-      await c.setInitialHolders(initialHolders);
-      const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
-
-      expect(await c.balanceOf(account1.address, 0)).to.equal(9999)
-
-      await c.connect(account1).safeTransferFrom(account1.address, account5.address, 0, 999, []);
-
-      expect(await c.balanceOf(account1.address, 0)).to.equal(9000)
-      expect(await c.balanceOf(account5.address, 0)).to.equal(999)
-
-      await c.connect(account5).safeTransferFrom(account5.address, account1.address, 0, 9, []);
-
-      expect(await c.balanceOf(account1.address, 0)).to.equal(9009)
-      expect(await c.balanceOf(account5.address, 0)).to.equal(990)
-
-    });
-
-    it("should batch transfer existing tokens that are minted with mintRange", async function () {
-      const newTokens = 10;
-      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
-      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
-      await c.setInitialHolders(initialHolders);
-      const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
-
-      expect(await c.balanceOf(account1.address, 0)).to.equal(9999)
-      expect(await c.balanceOf(account1.address, 1)).to.equal(2)
-      expect(await c.balanceOf(account1.address, 2)).to.equal(3)
-
-      expect(await c.balanceOf(account5.address, 0)).to.equal(0)
-      expect(await c.balanceOf(account5.address, 1)).to.equal(0)
-      expect(await c.balanceOf(account5.address, 2)).to.equal(0)
-
-      await c.connect(account1).safeBatchTransferFrom(account1.address, account5.address, [0, 1, 2], [1, 1, 1], []);
-
-      expect(await c.balanceOf(account1.address, 0)).to.equal(9998)
-      expect(await c.balanceOf(account1.address, 1)).to.equal(1)
-      expect(await c.balanceOf(account1.address, 2)).to.equal(2)
-
-      expect(await c.balanceOf(account5.address, 0)).to.equal(1)
-      expect(await c.balanceOf(account5.address, 1)).to.equal(1)
-      expect(await c.balanceOf(account5.address, 2)).to.equal(1)
-    });
-  });
-
-  describe("initialHolders", function () {
-    it("Should return current initial holders when called without params", async function () {
-      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
-      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
-      const initialHolders2 = [account5.address, account6.address, account7.address, account8.address];
-
-      await expect(c["initialHolders()"]()).to.be.revertedWith("No initial holders set. Use _setInitialHolders()");
-
-      await c.setInitialHolders(initialHolders);
-
-      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders);
-
-      const inputs = await c.getMintRangeInput(5);
-      await c.mintRange(...inputs);
-      await c.setInitialHolders(initialHolders2);
-      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders2);
-    });
-
-    it("Should return initial holders for tokenId (also after they where updated)", async function () {
-      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
-      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
-      const initialHolders2 = [account5.address, account6.address, account7.address, account8.address];
-
-      await c.setInitialHolders(initialHolders);
-
-      const inputs = await c.getMintRangeInput(5);
-      await c.mintRange(...inputs);
-      await c.setInitialHolders(initialHolders2);
-      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders2);
-
-      expect(await c["initialHolders(uint256)"](0)).to.deep.equal(initialHolders);
-      expect(await c["initialHolders(uint256)"](1)).to.deep.equal(initialHolders);
-      expect(await c["initialHolders(uint256)"](2)).to.deep.equal(initialHolders);
-      expect(await c["initialHolders(uint256)"](3)).to.deep.equal(initialHolders);
-      expect(await c["initialHolders(uint256)"](4)).to.deep.equal(initialHolders);
-    });
   });
 
   describe("totalSupply", function () {
