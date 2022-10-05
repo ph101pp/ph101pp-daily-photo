@@ -36,6 +36,9 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
 
     uint256 public _lastRangeTokenId = 0;
     bool public _zeroMinted = false;
+    
+    // used to check validity of updateInitialHolderRangeInput
+    uint256 private _pauseTimestamp;
 
     /**
      * @dev Implement: Return initial token balance for address.
@@ -50,7 +53,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
     /**
      * @dev Set initial holders. mintRange will distribute tokens to these holders
      */
-    function _setInitialHolders(address[] memory addresses) internal virtual {
+    function _setInitialHolders(address[] memory addresses) internal virtual whenNotPaused {
         _initialHoldersRange.push(_zeroMinted ? _lastRangeTokenId + 1 : 0);
         _initialHolders.push(addresses);
     }
@@ -75,8 +78,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
                 amounts,
                 newInitialHolders,
                 newInitialHoldersRange,
-                _initialHolders,
-                _initialHoldersRange,
+                _pauseTimestamp,
                 paused()
             )
         );
@@ -139,6 +141,10 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
         }
     }
 
+    function _pause() internal virtual override {
+        _pauseTimestamp = block.timestamp;
+        super._pause();
+    }
     /**
      * @dev Returns true if tokenId was minted.
      */
@@ -351,8 +357,7 @@ abstract contract ERC1155MintRange is ERC1155_, Pausable {
                     amounts,
                     newInitialHolders,
                     newInitialHoldersRange,
-                    _initialHolders,
-                    _initialHoldersRange,
+                    _pauseTimestamp,
                     paused()
                 )
             );

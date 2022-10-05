@@ -401,7 +401,7 @@ describe("ERC1155MintRange", function () {
 
   });
 
-  describe("_getUpdateInitialHoldersRangeInput / verifyUpdateInitialHoldersRangeInput", function () {
+  describe("updateInitialHoldersRangeInput / _getUpdateInitialHoldersRangeInput / verifyUpdateInitialHoldersRangeInput", function () {
     const exampleRanges = [
       {
         initial: [0, 4, 5],
@@ -644,6 +644,24 @@ describe("ERC1155MintRange", function () {
       }
     });
 
+    it("should fail to update if unpaused between generating input and updating ", async function () {
+      const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address];
+      await c.setInitialHolders(initialHolders);
+      const mintIntput = await c.getMintRangeInput(5);
+      await c.mintRange(...mintIntput);
+      await c.pause();
+      const newInitialHolders = [account1.address, account3.address];
+      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      await c.unpause();
+      await c.pause();
+
+      await expect(c.updateInitialHoldersRange(...rangeInput)).to.be.rejected;
+      
+      const rangeInput2 = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      await expect(c.updateInitialHoldersRange(...rangeInput2)).to.not.be.rejected;
+    });
+
   });
 
   describe("totalSupply", function () {
@@ -741,11 +759,18 @@ describe("ERC1155MintRange", function () {
   describe("Pausable (when paused)", function () {
     it("should fail to mintRange()", async function () {
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
-      await c.pause();
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
+      await c.pause();
       const inputs = await c.getMintRangeInput(10);
       await expect(c.mintRange(...inputs)).to.be.rejectedWith("Pausable: paused");
+    });
+
+    it("should fail to setInitialHolders()", async function () {
+      const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address, account3.address, account4.address];
+      await c.pause();
+      await expect(c.setInitialHolders(initialHolders)).to.be.rejectedWith("Pausable: paused");
     });
 
     it("should fail to mint()", async function () {
