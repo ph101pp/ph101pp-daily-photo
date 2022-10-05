@@ -19,8 +19,6 @@ describe("Ph101ppDailyPhoto", function () {
     if(latest < nowTimestamp) {
       await time.increaseTo(nowTimestamp);
     }
-    // const PDPTokenId = await ethers.getContractFactory("Ph101ppDailyPhotoTokenId");
-    // const pdpTokenId = await PDPTokenId.deploy();
 
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto");
     const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
@@ -273,6 +271,37 @@ describe("Ph101ppDailyPhoto", function () {
 
     });
 
+    it("should claim mints from treasury and burn claims when redeemClaimBatch is called", async function () {
+
+      const { pdp, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
+      
+      const input1 = await pdp.getMintRangeInput(5);
+      await pdp.mintPhotos(...input1, 1);
+
+      const newTreasury = account2.address
+      await pdp.setInitialHolders(newTreasury, vault.address);
+
+      const input2 = await pdp.getMintRangeInput(5);
+      await pdp.mintPhotos(...input2, 1);
+
+      await pdp.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
+      
+      expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
+
+      await expect(pdp.connect(account1).redeemClaimBatch([8, 9, 7], [1, 1, 1])).to.be.rejected;
+      await expect(pdp.connect(account1).redeemClaimBatch([8], [1, 1])).to.be.rejected;
+      await expect(pdp.connect(account1).redeemClaimBatch([8, 9], [1])).to.be.rejected;
+      await expect(pdp.connect(account1).redeemClaimBatch([8, 2], [1, 1])).to.be.rejectedWith("Can't batch claim tokens from multiple treasury wallets.");
+      await pdp.connect(account1).redeemClaimBatch([4, 2], [1, 1]);
+
+      expect(await pdp.balanceOf(account1.address, 0)).to.equal(0);
+      expect(await pdp.balanceOf(account1.address, 2)).to.equal(1);
+      expect(await pdp.balanceOf(account1.address, 4)).to.equal(1);
+
+      expect(await pdp.balanceOf(treasury.address, 2)).to.equal(0);
+      expect(await pdp.balanceOf(treasury.address, 4)).to.equal(0);
+    });
+
     it("should claim mint from treasury and burn claim when redeemClaim is called", async function () {
 
       const { pdp, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
@@ -290,11 +319,8 @@ describe("Ph101ppDailyPhoto", function () {
       
       expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
 
-      await pdp.connect(account1).redeemClaims([2], [1]);
-      await expect(pdp.connect(account1).redeemClaims([8, 9], [1, 1])).to.be.reverted;
-      await expect(pdp.connect(account1).redeemClaims([8], [1, 1])).to.be.reverted;
-      await expect(pdp.connect(account1).redeemClaims([8, 9], [1])).to.be.reverted;
-      await pdp.connect(account1).redeemClaims([8], [1]);
+      await pdp.connect(account1).redeemClaim(8);
+      await pdp.connect(account1).redeemClaim(2);
 
       expect(await pdp.balanceOf(account1.address, 0)).to.equal(0);
       expect(await pdp.balanceOf(account1.address, 2)).to.equal(1);

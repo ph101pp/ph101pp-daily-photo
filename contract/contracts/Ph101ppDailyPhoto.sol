@@ -9,7 +9,11 @@ import "./DateTime.sol";
 
 // import "hardhat/console.sol";
 
-contract Ph101ppDailyPhoto is ERC1155MintRangeUpdateable, ERC2981, AccessControl {
+contract Ph101ppDailyPhoto is
+    ERC1155MintRangeUpdateable,
+    ERC2981,
+    AccessControl
+{
     uint256 public constant START_DATE = 1661990400; // Sept 1, 2022
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
@@ -133,11 +137,7 @@ contract Ph101ppDailyPhoto is ERC1155MintRangeUpdateable, ERC2981, AccessControl
             tokenDate = CLAIM_TOKEN;
             currentUri = permanentBaseUri();
         } else {
-            (
-                uint256 year,
-                uint256 month,
-                uint256 day
-            ) = tokenIdToDate(tokenId);
+            (uint256 year, uint256 month, uint256 day) = tokenIdToDate(tokenId);
 
             tokenDate = string.concat(
                 Strings.toString(year),
@@ -182,7 +182,7 @@ contract Ph101ppDailyPhoto is ERC1155MintRangeUpdateable, ERC2981, AccessControl
             uint256 day
         )
     {
-        require(tokenId > 0, "No date associated with claims!");
+        require(tokenId > 0, "No date associated with claims!"); // No date associated with claims!
         uint256 tokenTimestamp = _timestampFromTokenId(tokenId);
         return _timestampToDate(tokenTimestamp);
     }
@@ -201,17 +201,31 @@ contract Ph101ppDailyPhoto is ERC1155MintRangeUpdateable, ERC2981, AccessControl
         return _timestampToTokenId(tokenTimestamp);
     }
 
-    function redeemClaims(uint256[] memory tokenIds, uint256[] memory amounts)
-        public
-    {
-        uint256 claimsRequired = 0;
-        for (uint i = 0; i < amounts.length; i++) {
+    function redeemClaim(uint256 tokenId) public {
+        address[] memory initialHolders = initialHolders(tokenId);
+        _burn(msg.sender, CLAIM_TOKEN_ID, 1);
+        _safeTransferFrom(
+            initialHolders[TREASURY_ID],
+            msg.sender,
+            tokenId,
+            1,
+            ""
+        );
+    }
+
+    function redeemClaimBatch(
+        uint256[] memory tokenIds,
+        uint256[] memory amounts
+    ) public {
+        uint256 claimsRequired = amounts[0];
+        address[] memory initialHolders0 = initialHolders(tokenIds[0]);
+        for (uint i = 1; i < amounts.length; i++) {
             claimsRequired += amounts[i];
+            require(initialHolders0[TREASURY_ID] == initialHolders(tokenIds[i])[TREASURY_ID], "Can't batch claim tokens from multiple treasury wallets.");
         }
         _burn(msg.sender, CLAIM_TOKEN_ID, claimsRequired);
-        address[] memory initialHolders = initialHolders(tokenIds[0]);
         _safeBatchTransferFrom(
-            initialHolders[TREASURY_ID],
+            initialHolders0[TREASURY_ID],
             msg.sender,
             tokenIds,
             amounts,

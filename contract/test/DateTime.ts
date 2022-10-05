@@ -67,7 +67,7 @@ async function runTestCase(dateTime: DateTimeTestContract, testCase: TestCase): 
 describe("DateTime", function () {
 
   async function deployFixture() {
-    const DateTime = await ethers.getContractFactory("DateTimeTestContract");
+    const DateTime = await ethers.getContractFactory("TestDateTime");
     const dateTime = await DateTime.deploy();
     return {dateTime};
   }

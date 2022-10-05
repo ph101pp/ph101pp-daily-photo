@@ -31,7 +31,7 @@ pragma solidity ^0.8.0;
 
 import "./DateTime.sol";
 
-contract DateTimeTestContract {
+contract TestDateTime {
 	uint256 public constant SECONDS_PER_DAY = 24 * 60 * 60;
 	int256 public constant OFFSET19700101 = 2440588;
 

@@ -4,7 +4,7 @@ pragma solidity ^0.8.12;
 import "./ERC1155MintRangeUpdateable.sol";
 import "hardhat/console.sol";
 
-contract ERC1155MintRangeTestContract is ERC1155MintRangeUpdateable {
+contract TestERC1155MintRange is ERC1155MintRangeUpdateable {
     constructor() ERC1155_("") {}
 
     function initialBalanceOf(address, uint256 tokenId)
