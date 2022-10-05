@@ -1,4 +1,4 @@
-import { ERC1155MintRangeTestContract, Ph101ppDailyPhoto } from "../typechain-types";
+import { TestERC1155MintRangeUpdateable, Ph101ppDailyPhoto } from "../typechain-types";
 
 function findInRange(range: number[], needle: number) {
   for (let i = range.length - 1; i >= 0; i--) {
@@ -10,7 +10,7 @@ function findInRange(range: number[], needle: number) {
 }
 
 export default async function _getUpdateInitialHoldersRangeInput(
-  c: ERC1155MintRangeTestContract | Ph101ppDailyPhoto,
+  c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
   from: number,
   to: number,
   newInitialHolders: string[]

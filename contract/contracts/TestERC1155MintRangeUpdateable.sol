@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import "./ERC1155MintRange.sol";
+import "./ERC1155MintRangeUpdateable.sol";
 import "hardhat/console.sol";
 
-contract TestERC1155MintRange is ERC1155MintRange {
+contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
     constructor() ERC1155_("") {}
 
     function initialBalanceOf(address, uint256 tokenId)
@@ -27,12 +27,40 @@ contract TestERC1155MintRange is ERC1155MintRange {
         _setInitialHolders(addresses);
     }
 
+    function updateInitialHoldersRange(
+        address[] memory fromAddresses,
+        address[] memory toAddresses,
+        uint256[][] memory ids,
+        uint256[][] memory amounts,
+        address[][] memory newInitialHolders,
+        uint256[] memory newInitialHoldersRange,
+        bytes32 inputChecksum
+    ) public virtual {
+        _updateInitialHoldersRange(
+            fromAddresses,
+            toAddresses,
+            ids,
+            amounts,
+            newInitialHolders,
+            newInitialHoldersRange,
+            inputChecksum
+        );
+    }
+
     function mintRange(
         uint256[] memory ids,
         uint256[][] memory amounts,
         bytes32 checkSum
     ) public virtual {
         _mintRange(ids, amounts, checkSum);
+    }
+
+    function pause() public {
+        _pause();
+    }
+
+    function unpause() public {
+        _unpause();
     }
 
     function mint(

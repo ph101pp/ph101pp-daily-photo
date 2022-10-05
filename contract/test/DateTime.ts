@@ -1,7 +1,7 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { DateTimeTestContract } from "../typechain-types";
+import { TestDateTime } from "../typechain-types";
 
 type TestCase = {
   ts: number,
@@ -49,7 +49,7 @@ const testCases: TestCase[]=[
   },
 ];
 
-async function runTestCase(dateTime: DateTimeTestContract, testCase: TestCase): Promise<void> {
+async function runTestCase(dateTime: TestDateTime, testCase: TestCase): Promise<void> {
   const epochTimestamp = await dateTime.timestampFromDate(
     testCase.year,
     testCase.month,
