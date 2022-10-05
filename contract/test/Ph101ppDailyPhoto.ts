@@ -294,6 +294,9 @@ describe("Ph101ppDailyPhoto", function () {
       expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
 
       await pdp.connect(account1).redeemClaims([2], [1]);
+      await expect(pdp.connect(account1).redeemClaims([8, 9], [1, 1])).to.be.reverted;
+      await expect(pdp.connect(account1).redeemClaims([8], [1, 1])).to.be.reverted;
+      await expect(pdp.connect(account1).redeemClaims([8, 9], [1])).to.be.reverted;
       await pdp.connect(account1).redeemClaims([8], [1]);
 
       expect(await pdp.balanceOf(account1.address, 0)).to.equal(0);
@@ -303,6 +306,7 @@ describe("Ph101ppDailyPhoto", function () {
       expect(await pdp.balanceOf(treasury.address, 2)).to.equal(0);
       expect(await pdp.balanceOf(newTreasury, 8)).to.equal(0);
     });
+
   });
 
   describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function(){
