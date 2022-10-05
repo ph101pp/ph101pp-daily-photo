@@ -19,14 +19,10 @@ describe("Ph101ppDailyPhoto", function () {
     if(latest < nowTimestamp) {
       await time.increaseTo(nowTimestamp);
     }
-    const PDPTokenId = await ethers.getContractFactory("Ph101ppDailyPhotoTokenId");
-    const pdpTokenId = await PDPTokenId.deploy();
+    // const PDPTokenId = await ethers.getContractFactory("Ph101ppDailyPhotoTokenId");
+    // const pdpTokenId = await PDPTokenId.deploy();
 
-    const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
-      libraries: {
-        Ph101ppDailyPhotoTokenId: pdpTokenId.address,
-      },
-    });
+    const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto");
     const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
 
     return {pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2};
@@ -256,6 +252,7 @@ describe("Ph101ppDailyPhoto", function () {
         expect(balanceDistribution[i]).to.be.gt(0.8*photos/maxSupply);
       }
     });
+
   })
 
   describe("Claim tokens", function(){

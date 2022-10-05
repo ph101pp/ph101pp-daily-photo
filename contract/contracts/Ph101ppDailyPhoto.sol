@@ -5,17 +5,18 @@ import "./ERC1155MintRange.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "./Ph101ppDailyPhotoTokenId.sol";
+import "./DateTime.sol";
 
 // import "hardhat/console.sol";
 
 contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
+    uint256 public constant START_DATE = 1661990400; // Sept 1, 2022
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
-    string private constant FUTURE_TOKEN = "FUTURE";
+    uint256 public constant CLAIM_TOKEN_ID = 0;
     string private constant CLAIM_TOKEN = "CLAIM";
-    uint256 private constant CLAIM_TOKEN_ID = 0;
+    string private constant FUTURE_TOKEN = "FUTURE";
 
     uint256 private constant TREASURY_ID = 0;
     uint256 private constant VAULT_ID = 1;
@@ -108,7 +109,8 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
         onlyRole(URI_UPDATER_ROLE)
     {
         require(
-            validUptoTokenId > _lastPermanentUriValidUptoTokenId || _permanentUris.length == 0,
+            validUptoTokenId > _lastPermanentUriValidUptoTokenId ||
+                _permanentUris.length == 0,
             "Error: URI must be valid for more tokenIds than previous URI."
         );
         _permanentUris.push(newUri);
@@ -135,7 +137,7 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
                 uint256 year,
                 uint256 month,
                 uint256 day
-            ) = Ph101ppDailyPhotoTokenId.tokenIdToDate(tokenId);
+            ) = tokenIdToDate(tokenId);
 
             tokenDate = string.concat(
                 Strings.toString(year),
@@ -180,7 +182,9 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
             uint256 day
         )
     {
-        return Ph101ppDailyPhotoTokenId.tokenIdToDate(tokenId);
+        require(tokenId > 0, "No date associated with claims!");
+        uint256 tokenTimestamp = _timestampFromTokenId(tokenId);
+        return _timestampToDate(tokenTimestamp);
     }
 
     function tokenIdFromDate(
@@ -188,7 +192,13 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
         uint256 month,
         uint256 day
     ) public pure returns (uint256 tokenId) {
-        return Ph101ppDailyPhotoTokenId.tokenIdFromDate(year, month, day);
+        require(DateTime.isValidDate(year, month, day), "Invalid date!");
+        uint256 tokenTimestamp = DateTime.timestampFromDate(year, month, day);
+        require(
+            tokenTimestamp >= START_DATE,
+            "Invalid date! Project started September 1, 2022!"
+        );
+        return _timestampToTokenId(tokenTimestamp);
     }
 
     function redeemClaims(uint256[] memory tokenIds, uint256[] memory amounts)
@@ -266,5 +276,33 @@ contract Ph101ppDailyPhoto is ERC1155MintRange, ERC2981, AccessControl {
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    function _timestampToDate(uint256 timestamp)
+        private
+        pure
+        returns (
+            uint256 year,
+            uint256 month,
+            uint256 day
+        )
+    {
+        return DateTime.timestampToDate(timestamp);
+    }
+
+    function _timestampFromTokenId(uint256 tokenId)
+        private
+        pure
+        returns (uint256 timestamp)
+    {
+        return START_DATE + ((tokenId - 1) * 1 days);
+    }
+
+    function _timestampToTokenId(uint256 timestamp)
+        private
+        pure
+        returns (uint256 tokenId)
+    {
+        return ((timestamp - START_DATE) / 1 days) + 1;
     }
 }
