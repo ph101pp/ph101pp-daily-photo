@@ -223,7 +223,7 @@ describe("Ph101ppDailyPhoto", function () {
     });
   });
 
-  describe("Mint Photos", function(){
+  describe.skip("Mint Photos", function(){
     it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { pdp, vault, treasury } = await loadFixture(deployFixture);
       const photos = 1000;
@@ -250,7 +250,6 @@ describe("Ph101ppDailyPhoto", function () {
         expect(balanceDistribution[i]).to.be.gt(0.8*photos/maxSupply);
       }
     });
-
   })
 
   describe("Claim tokens", function(){
@@ -445,24 +444,72 @@ describe("Ph101ppDailyPhoto", function () {
     });
   });
 
-  describe.skip("Gas consumption over time", function(){
+  describe("ERC2981 Token Royalties", function(){
 
-    it("should not increase gas when called multiple times: setProxyURI ", async function () {
-      const { pdp, mutableUri } = await loadFixture(deployFixture);
-
-      for(let i=0; i<1000; i++) {
-        await pdp.setProxyURI(mutableUri+i);
-      }
+    it("should set default royalties during deploy", async function () {
+      const { pdp, owner } = await loadFixture(deployFixture);
+      expect(await pdp.royaltyInfo(0, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(1, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(100, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(1000, 100)).to.deep.equal([owner.address, 5]);
     });
 
-    it("should not increase gas when called multiple times: setPermanentURI ", async function () {
-      const { pdp, immutableUri } = await loadFixture(deployFixture);
+    it("should be able to set new default royalties", async function () {
+      const { pdp, owner, account1 } = await loadFixture(deployFixture);
+      await pdp.setDefaultRoyalty(account1.address, 100);
+      expect(await pdp.royaltyInfo(0, 100)).to.deep.equal([account1.address, 1]);
+      expect(await pdp.royaltyInfo(1, 100)).to.deep.equal([account1.address, 1]);
+      expect(await pdp.royaltyInfo(100, 100)).to.deep.equal([account1.address, 1]);
+      expect(await pdp.royaltyInfo(1000, 100)).to.deep.equal([account1.address, 1]);
 
-      for(let i=0; i<1000; i++) {
-        await pdp.setPermanentURI(immutableUri+i, i);
-      }
+      await pdp.setDefaultRoyalty(owner.address, 0);
+      expect(await pdp.royaltyInfo(0, 100)).to.deep.equal([owner.address, 0]);
+      expect(await pdp.royaltyInfo(1, 100)).to.deep.equal([owner.address, 0]);
+      expect(await pdp.royaltyInfo(100, 100)).to.deep.equal([owner.address, 0]);
+      expect(await pdp.royaltyInfo(1000, 100)).to.deep.equal([owner.address, 0]);
     });
+
+    it("should be able to set and reset royalties for single token", async function () {
+      const { pdp, owner, account1 } = await loadFixture(deployFixture);
+      await pdp.setTokenRoyalty(1, account1.address, 10000);
+      await pdp.setTokenRoyalty(2, account1.address, 50);
+      await pdp.setTokenRoyalty(3, account1.address, 100);
+      expect(await pdp.royaltyInfo(0, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(1, 100)).to.deep.equal([account1.address, 100]);
+      expect(await pdp.royaltyInfo(2, 100)).to.deep.equal([account1.address, 0]);
+      expect(await pdp.royaltyInfo(3, 100)).to.deep.equal([account1.address, 1]);
+      expect(await pdp.royaltyInfo(4, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(1000, 100)).to.deep.equal([owner.address, 5]);
+      
+      await pdp.resetTokenRoyalty(2);
+      await pdp.resetTokenRoyalty(3);
+
+      expect(await pdp.royaltyInfo(0, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(1, 100)).to.deep.equal([account1.address, 100]);
+      expect(await pdp.royaltyInfo(2, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(3, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(4, 100)).to.deep.equal([owner.address, 5]);
+      expect(await pdp.royaltyInfo(1000, 100)).to.deep.equal([owner.address, 5]);
+
+    });
+
   });
 
+  describe("AccessControl", function(){
+
+    it("should set default roles during deploy", async function () {
+      const { pdp, owner } = await loadFixture(deployFixture);
+      expect(await pdp.royaltyInfo(0, 100)).to.deep.equal([owner.address, 5]);
+
+
+    });
+
+    it("should be able to set new default royalties", async function () {
+    });
+
+    it("should be able to set and reset royalties for single token", async function () {
+    });
+
+  });
 });
 
