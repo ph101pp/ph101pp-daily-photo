@@ -13,7 +13,7 @@ describe("Ph101ppDailyPhoto", function () {
     const mutableUri = "mutable_.uri/";
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
-    const [owner, treasury, vault, account1, account2] = await ethers.getSigners();
+    const [owner, treasury, vault, account1, account2, account3, account4] = await ethers.getSigners();
     const latest = await time.latest();
     
     if(latest < nowTimestamp) {
@@ -23,7 +23,7 @@ describe("Ph101ppDailyPhoto", function () {
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto");
     const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
 
-    return {pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2};
+    return {pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4};
   }
 
   describe("URI storing / updating", function () {
@@ -495,19 +495,60 @@ describe("Ph101ppDailyPhoto", function () {
 
   });
 
-  describe("AccessControl", function(){
+  describe.only("AccessControl", function(){
 
     it("should set default roles during deploy", async function () {
       const { pdp, owner } = await loadFixture(deployFixture);
-      expect(await pdp.royaltyInfo(0, 100)).to.deep.equal([owner.address, 5]);
-
-
+      expect(await pdp.hasRole(await pdp.CLAIM_MINTER_ROLE(), owner.address)).to.be.true;
+      expect(await pdp.hasRole(await pdp.PHOTO_MINTER_ROLE(), owner.address)).to.be.true;
+      expect(await pdp.hasRole(await pdp.URI_UPDATER_ROLE(), owner.address)).to.be.true;
+      expect(await pdp.hasRole(await pdp.DEFAULT_ADMIN_ROLE(), owner.address)).to.be.true;
     });
 
-    it("should be able to set new default royalties", async function () {
+    it("should fail to execute access guarded functions without role", async function () {
+      const { pdp, account1 } = await loadFixture(deployFixture);
+      await pdp.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, 100, account1.address, account1.address);
+      await expect( pdp.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
+      await pdp.unpause();
+      const mintInput = await pdp.getMintRangeInput(4);
+      await expect( pdp.connect(account1).mintPhotos(...mintInput, 4)).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).pause()).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).setPermanentURI("",100)).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).setProxyURI("")).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
     });
 
-    it("should be able to set and reset royalties for single token", async function () {
+    it("should execute access guarded functions with special role", async function () {
+      const { pdp, account1, account2, account3, account4 } = await loadFixture(deployFixture);
+
+      await pdp.grantRole(await pdp.DEFAULT_ADMIN_ROLE(), account1.address);
+      await pdp.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, 100, account1.address, account1.address);
+      await expect( pdp.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
+      await pdp.unpause();
+      await expect( pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).setDefaultRoyalty(account1.address, 100)).to.not.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.not.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
+      
+      await pdp.grantRole(await pdp.PHOTO_MINTER_ROLE(), account2.address);
+      const mintInput = await pdp.getMintRangeInput(4);
+      await expect( pdp.connect(account2).mintPhotos(...mintInput, 4)).to.not.be.rejectedWith("AccessControl");
+      
+      await pdp.grantRole(await pdp.CLAIM_MINTER_ROLE(), account3.address);
+      await expect( pdp.connect(account3).mintClaims(account1.address, 5)).to.not.be.rejectedWith("AccessControl");
+      
+      await pdp.grantRole(await pdp.URI_UPDATER_ROLE(), account4.address);
+      await expect( pdp.connect(account4).setPermanentURI("", 100)).to.not.be.rejectedWith("AccessControl");
+      await expect( pdp.connect(account4).setProxyURI("")).to.not.be.rejectedWith("AccessControl");
     });
 
   });
