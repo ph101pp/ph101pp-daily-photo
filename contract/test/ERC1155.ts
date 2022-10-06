@@ -1,8 +1,6 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { expect, assert } from "chai";
+import {loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { ethers } from "hardhat";
 import { ContractTransaction } from "ethers";
-import { Ph101ppDailyPhotoTokenId__factory } from "../typechain-types/factories/contracts/Ph101ppDailyPhotoTokenId__factory";
 
 const interations = 100;
 async function cost(tx: Promise<ContractTransaction>): Promise<number> {
@@ -60,15 +58,15 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
       report.mint.TestERC1155 += await cost(erc.mint(account1.address, i, 10, []));
       report.mint.TestERC1155MintRange += await cost(c1.mint(account1.address, i, 10, []));
       report.mint.TestERC1155MintRangeUpdateable += await cost(c2.mint(account1.address, i, 10, []));
-      report.mint.Ph101ppDailyPhoto += await cost(pdp.mintClaims(account1.address, 1));
     }
+    report.mint.Ph101ppDailyPhoto += await cost(pdp.mintClaims(account1.address, 1))*100;
 
     for (let i = 0; i < interations; i++) {
       report.safeTransferFrom.TestERC1155 += await cost(erc.connect(account1).safeTransferFrom(account1.address, account2.address, i, 10, []));
       report.safeTransferFrom.TestERC1155MintRange += await cost(c1.connect(account1).safeTransferFrom(account1.address, account2.address, i, 10, []));
       report.safeTransferFrom.TestERC1155MintRangeUpdateable += await cost(c2.connect(account1).safeTransferFrom(account1.address, account2.address, i, 10, []));
-      report.safeTransferFrom.Ph101ppDailyPhoto += await cost(pdp.connect(account1).safeTransferFrom(account1.address, account2.address, 0, 1, []));
     }
+    report.safeTransferFrom.Ph101ppDailyPhoto += await cost(pdp.connect(account1).safeTransferFrom(account1.address, account2.address, 0, 1, []))*100;
 
     for (let i = 0; i < interations; i++) {
       report.burn.TestERC1155 += await cost(erc.connect(account2).burn(account2.address, i, 10));
@@ -149,7 +147,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     console.log(report);
   });
 
-  it.only("mintRange() transfer() transfer()", async function () {
+  it("mintRange() transfer() transfer()", async function () {
     const { erc, c1, c2, pdp, treasury, account1, account2 } = await loadFixture(deployFixture);
 
     await c1.setInitialHolders([account1.address]);

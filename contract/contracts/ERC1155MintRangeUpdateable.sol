@@ -59,11 +59,25 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT
         );
 
+        address[][] memory localInitialHoders = _initialHolders;
+
+        for(uint256 k = 0; k<localInitialHoders.length; k++) {
+            for(uint256 i=0; i<localInitialHoders[k].length; i++) {
+                delete _initialHoldersMappings[k][localInitialHoders[k][i]];
+            }
+        }
+        for(uint256 k = 0; k<newInitialHolders.length; k++) {
+            for(uint256 i=0; i<newInitialHolders[k].length; i++) {
+                _initialHoldersMappings[k][newInitialHolders[k][i]] = true;
+            }
+        }
+
         _initialHolders = newInitialHolders;
         _initialHoldersRange = newInitialHoldersRange;
+        
 
         _unpause();
-        for (uint i = 0; i < toAddresses.length; i++) {
+        for (uint256 i = 0; i < toAddresses.length; i++) {
             emit TransferBatch(
                 msg.sender,
                 fromAddresses[i],
@@ -72,7 +86,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 amounts[i]
             );
         }
-        _pause();
+        super._pause();
     }
 
     function _pause() internal virtual override {
@@ -120,14 +134,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
                 require(exists(tokenId) == true, "E:11");
                 require(_manualMint[tokenId] == false, "E:12");
-                require(_balancesInitialized[tokenId][from] == false, "E:13");
-                require(_balancesInitialized[tokenId][to] == false, "E:14");
+                require(_balances[tokenId][from] == 0, "E:13");
+                require(_balances[tokenId][to] == 0, "E:14");
                 require(balanceOf(from, tokenId) >= balance, "E:08");
 
-                address[] memory currentInitialHolders = initialHolders(
-                    tokenId
-                );
-                require(_includesAddress(currentInitialHolders, from), "E:09");
+                require(isInitialHolderOf(from, tokenId), "E:09");
 
                 uint256 newInitialHoldersIndex = _findInRange(
                     newInitialHoldersRange,
@@ -136,7 +147,14 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 address[] memory nextInitialHolders = newInitialHolders[
                     newInitialHoldersIndex
                 ];
-                require(_includesAddress(nextInitialHolders, to), "E:10");
+                bool toAddressInNextInitialHolders = false;
+                for (uint h = 0; h < nextInitialHolders.length; h++) {
+                    if (nextInitialHolders[h] == to) {
+                        toAddressInNextInitialHolders = true;
+                        break;
+                    }
+                }
+                require(toAddressInNextInitialHolders, "E:10");
             }
         }
 
@@ -153,21 +171,5 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     paused()
                 )
             );
-    }
-
-    /**
-     * @dev Utility to find Address in array of addresses
-     */
-    function _includesAddress(address[] memory array, address value)
-        private
-        pure
-        returns (bool)
-    {
-        for (uint i = 0; i < array.length; i++) {
-            if (array[i] == value) {
-                return true;
-            }
-        }
-        return false;
     }
 }

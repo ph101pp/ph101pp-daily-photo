@@ -12,6 +12,11 @@ import "./ERC1155_.sol";
  * and adds tracking of total supply per id.
  */
 abstract contract ERC1155MintRange is ERC1155_ {
+    
+    struct InitialHoldersMapping {
+        mapping(address => bool) map;
+    }
+    
     string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
@@ -27,9 +32,10 @@ abstract contract ERC1155MintRange is ERC1155_ {
     mapping(uint256 => bool) public _manualMint;
     uint256 public _manualMints = 0;
 
-    // Track initial holders across tokenID ranges;
+    // Track initial holders across tokenID ranges + lookup mapping;
     address[][] public _initialHolders;
     uint256[] public _initialHoldersRange;
+    mapping(uint => mapping(address => bool)) public _initialHoldersMappings;
 
     uint256 public _lastRangeTokenId = 0;
     bool public _zeroMinted = false;
@@ -50,6 +56,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
     function _setInitialHolders(address[] memory addresses) internal virtual {
         _initialHoldersRange.push(_zeroMinted ? _lastRangeTokenId + 1 : 0);
         _initialHolders.push(addresses);
+        for(uint256 i=0; i<addresses.length; i++) {
+            _initialHoldersMappings[_initialHolders.length-1][addresses[i]] = true;
+        }
     }
 
     /**
@@ -79,7 +88,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         if (_zeroMinted == false) {
             _zeroMinted = true;
         }
-        for (uint i = 0; i < addresses.length; i++) {
+        for (uint256 i = 0; i < addresses.length; i++) {
             emit TransferBatch(
                 msg.sender,
                 address(0),
@@ -112,21 +121,15 @@ abstract contract ERC1155MintRange is ERC1155_ {
             "ERC1155: address zero is not a valid owner"
         );
 
-        // Pre initialization
         if (
             _inRange(id) &&
             !_balancesInitialized[id][account] &&
-            !_manualMint[id]
+            !_manualMint[id] &&
+            isInitialHolderOf(account, id)
         ) {
-            address[] memory addresses = initialHolders(id);
-            for (uint i = 0; i < addresses.length; i++) {
-                if (account == addresses[i]) {
-                    return initialBalanceOf(account, id);
-                }
-            }
+            return initialBalanceOf(account, id);
         }
 
-        // Post initialization
         return _balances[id][account];
     }
 
@@ -153,6 +156,19 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
+     * @dev Utility to find Address in array of addresses
+     */
+    function isInitialHolderOf(address account, uint256 tokenId)
+        public
+        view
+        returns (bool)
+    {
+        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
+        uint index = _findInRange(_initialHoldersRange, tokenId);
+        return _initialHoldersMappings[index][account];
+    }
+
+    /**
      * @dev Total amount of tokens with a given id.
      */
     function totalSupply(uint256 tokenId)
@@ -165,7 +181,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         if (_inRange(tokenId) && !_manualMint[tokenId]) {
             uint256 totalSupplySum = 0;
             address[] memory initialHolderAddresses = initialHolders(tokenId);
-            for (uint i = 0; i < initialHolderAddresses.length; i++) {
+            for (uint256 i = 0; i < initialHolderAddresses.length; i++) {
                 totalSupplySum += initialBalanceOf(
                     initialHolderAddresses[i],
                     tokenId
@@ -257,7 +273,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
             _maybeInitializeBalance(from, id);
             _maybeInitializeBalance(to, id);
         }
-
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
@@ -270,19 +285,15 @@ abstract contract ERC1155MintRange is ERC1155_ {
             account != address(0) &&
             _inRange(id) &&
             !_balancesInitialized[id][account] &&
-            !_manualMint[id]
+            !_manualMint[id] &&
+            isInitialHolderOf(account, id)
         ) {
-            _balancesInitialized[id][account] = true;
-            address[] memory addresses = initialHolders(id);
-            for (uint i = 0; i < addresses.length; i++) {
-                if (account == addresses[i]) {
-                    _balances[id][account] = initialBalanceOf(account, id);
-                    return;
-                }
+            uint256 balance = initialBalanceOf(account, id);
+            if (balance > 0) {
+                _balancesInitialized[id][account] = true;
+                _balances[id][account] = balance;
             }
         }
-        // Post initialization
-        // no-op
     }
 
     /**
@@ -307,5 +318,4 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
         return 0;
     }
-
 }
