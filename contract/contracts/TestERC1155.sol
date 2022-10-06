@@ -12,6 +12,7 @@ contract TestERC1155 is
     ERC1155_,
     Pausable,
     ERC2981,
+    // ERC1155Supply,
     AccessControl
 {
     constructor() ERC1155_("") {
@@ -40,7 +41,7 @@ contract TestERC1155 is
         address from,
         uint256 id,
         uint256 amount
-    ) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public virtual {
         _burn(from, id, amount);
     }
 
@@ -48,7 +49,7 @@ contract TestERC1155 is
         address from,
         uint256[] memory ids,
         uint256[] memory amounts
-    ) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public virtual {
         _burnBatch(from, ids, amounts);
     }
 

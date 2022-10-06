@@ -221,7 +221,7 @@ contract Ph101ppDailyPhoto is
         address[] memory initialHolders0 = initialHolders(tokenIds[0]);
         for (uint i = 1; i < amounts.length; i++) {
             claimsRequired += amounts[i];
-            // require(initialHolders0[TREASURY_ID] == initialHolders(tokenIds[i])[TREASURY_ID], "Can't batch claim tokens from multiple treasury wallets.");
+            require(initialHolders0[TREASURY_ID] == initialHolders(tokenIds[i])[TREASURY_ID], "Can't batch claim tokens from multiple treasury wallets.");
         }
         _burn(msg.sender, CLAIM_TOKEN_ID, claimsRequired);
         _safeBatchTransferFrom(

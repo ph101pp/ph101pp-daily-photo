@@ -495,7 +495,7 @@ describe("Ph101ppDailyPhoto", function () {
 
   });
 
-  describe.only("AccessControl", function(){
+  describe("AccessControl", function(){
 
     it("should set default roles during deploy", async function () {
       const { pdp, owner } = await loadFixture(deployFixture);

@@ -4,7 +4,6 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
 
 // import "hardhat/console.sol";
 
