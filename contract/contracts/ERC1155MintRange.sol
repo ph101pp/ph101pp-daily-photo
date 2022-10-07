@@ -12,11 +12,6 @@ import "./ERC1155_.sol";
  * and adds tracking of total supply per id.
  */
 abstract contract ERC1155MintRange is ERC1155_ {
-    
-    struct InitialHoldersMapping {
-        mapping(address => bool) map;
-    }
-    
     string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
     string private constant ERROR_NO_INITIAL_HOLDERS =
@@ -30,15 +25,15 @@ abstract contract ERC1155MintRange is ERC1155_ {
 
     // Mapping to keep track of tokens that are minted via ERC1155._mint() or  ERC1155._mintBatch()
     mapping(uint256 => bool) public _manualMint;
-    uint256 public _manualMints = 0;
+    uint256 public _manualMints;
 
     // Track initial holders across tokenID ranges + lookup mapping;
     address[][] public _initialHolders;
     uint256[] public _initialHoldersRange;
     mapping(uint => mapping(address => bool)) public _initialHoldersMappings;
 
-    uint256 public _lastRangeTokenId = 0;
-    bool public _zeroMinted = false;
+    uint256 public _lastRangeTokenId;
+    bool public _zeroMinted;
 
     /**
      * @dev Implement: Return initial token balance for address.

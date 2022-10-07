@@ -310,11 +310,13 @@ export function testERC1155MintRange(contractName: string) {
             expect(await c["initialHolders(uint256)"](i)).to.deep.equal(initialHolders);
             for (let h = 0; h < initialHolders.length; h++) {
               expect(await c.isInitialHolderOf(initialHolders[h], i)).to.be.true;
+              expect(await c.isInitialHolderOf(initialHolders2[h], i)).to.be.false;
             }
           }
           else {
             expect(await c["initialHolders(uint256)"](i)).to.deep.equal(initialHolders2);
             for (let h = 0; h < initialHolders2.length; h++) {
+              expect(await c.isInitialHolderOf(initialHolders[h], i)).to.be.false;
               expect(await c.isInitialHolderOf(initialHolders2[h], i)).to.be.true;
             }
           }
