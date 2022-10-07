@@ -17,7 +17,7 @@ export default function getFutureJSON(dateString: string): object {
   const metadata = {
     "name": formattedDate,
     "created_by": "Ph101pp",
-    "external_url": `https://ph101pp.xyz/daily-photo/${dateString}`,
+    "external_url": `https://daily-photo.ph101pp.xyz/${dateString}`,
     "description": `This photo will be taken on ${weekday} ${formattedDate}.`,
     "attributes": [
       {
