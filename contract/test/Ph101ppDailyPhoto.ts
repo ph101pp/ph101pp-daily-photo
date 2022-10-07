@@ -3,27 +3,32 @@ import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 import getPh101ppDailyPhotoUpdateInitialHoldersRangeInput from "../scripts/getPh101ppDailyPhotoUpdateInitialHoldersRangeInput";
 import { Ph101ppDailyPhoto } from "../typechain-types";
+import { testERC1155MintRange } from "./ERC1155MintRange";
+import { testERC1155MintRangePausable } from "./ERC1155MintRangePausable";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
-const nowTimestamp = Math.ceil(Date.now()/1000)+SECONDS_PER_DAY*3;
+const nowTimestamp = Math.ceil(Date.now() / 1000) + SECONDS_PER_DAY * 3;
 
 describe("Ph101ppDailyPhoto", function () {
+  testPh101ppDailyPhoto();
+});
 
+export function testPh101ppDailyPhoto() {
   async function deployFixture() {
     const mutableUri = "mutable_.uri/";
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
     const [owner, treasury, vault, account1, account2, account3, account4] = await ethers.getSigners();
     const latest = await time.latest();
-    
-    if(latest < nowTimestamp) {
+
+    if (latest < nowTimestamp) {
       await time.increaseTo(nowTimestamp);
     }
 
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto");
     const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
 
-    return {pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4};
+    return { pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4 };
   }
 
   describe("URI storing / updating", function () {
@@ -40,7 +45,7 @@ describe("Ph101ppDailyPhoto", function () {
       await pdp.setProxyURI(mutableUri2);
       expect(await pdp.proxyBaseUri()).to.equal(mutableUri2);
     });
-    
+
     it("Should correcly update immutableUri via setPermanentURI() and permanentBaseUriHistory to reflect this.", async function () {
       const immutableUri2 = "2.immutable.uri";
       const immutableUri3 = "3.immutable.uri";
@@ -48,14 +53,14 @@ describe("Ph101ppDailyPhoto", function () {
       expect(await pdp.permanentBaseUri()).to.equal(immutableUri);
       await pdp.setPermanentURI(immutableUri2, 100);
       expect(await pdp.permanentBaseUri()).to.equal(immutableUri2);
-      
+
       const history = await pdp.permanentBaseUriHistory();
       expect(history.length).to.equal(2);
       expect(history[0]).to.equal(immutableUri);
       expect(history[1]).to.equal(immutableUri2);
-      
+
       await pdp.setPermanentURI(immutableUri3, 101);
-      
+
       const histor2 = await pdp.permanentBaseUriHistory();
       expect(histor2.length).to.equal(3);
       expect(histor2[0]).to.equal(immutableUri);
@@ -73,7 +78,7 @@ describe("Ph101ppDailyPhoto", function () {
     });
   });
 
-  describe("tokenID <> date conversion", function(){
+  describe("tokenID <> date conversion", function () {
     type TokenIdTest = {
       tokenID: number,
       year: number,
@@ -120,10 +125,10 @@ describe("Ph101ppDailyPhoto", function () {
       }
     ]
 
-    async function testDate2TokenID(pdp: Ph101ppDailyPhoto, test:TokenIdTest) {
+    async function testDate2TokenID(pdp: Ph101ppDailyPhoto, test: TokenIdTest) {
       const [year, month, day] = await pdp.tokenIdToDate(test.tokenID);
       const tokenId = await pdp.tokenIdFromDate(test.year, test.month, test.day);
-          
+
       expect(year).to.equal(test.year);
       expect(month).to.equal(test.month);
       expect(day).to.equal(test.day);
@@ -133,7 +138,7 @@ describe("Ph101ppDailyPhoto", function () {
     it("should correcty convert date string <> token ID", async function () {
       const { pdp } = await loadFixture(deployFixture);
 
-      for(const i in tokenIDTests) {
+      for (const i in tokenIDTests) {
         await testDate2TokenID(pdp, tokenIDTests[i]);
       }
     });
@@ -148,88 +153,88 @@ describe("Ph101ppDailyPhoto", function () {
     it("should fail to translate date before Sept 1, 2022 to tokenId", async function () {
       const { pdp } = await loadFixture(deployFixture);
       await expect(
-        pdp.tokenIdFromDate(2022,8,1)
+        pdp.tokenIdFromDate(2022, 8, 1)
       ).to.be.revertedWith('Invalid date! Project started September 1, 2022!');
     });
 
     it("should fail to translate date if invalid date (incl leap years)", async function () {
       const { pdp } = await loadFixture(deployFixture);
       await expect(
-        pdp.tokenIdFromDate(5138,13,17)
+        pdp.tokenIdFromDate(5138, 13, 17)
       ).to.be.revertedWith('Invalid date!');
       await expect(
-        pdp.tokenIdFromDate(2023,2,29)
+        pdp.tokenIdFromDate(2023, 2, 29)
       ).to.be.revertedWith('Invalid date!');
       await expect(
-        pdp.tokenIdFromDate(2025,2,29)
+        pdp.tokenIdFromDate(2025, 2, 29)
       ).to.be.revertedWith('Invalid date!');
       assert(
-        await pdp.tokenIdFromDate(2024,2,29),
-      "20240229 should be valid date");
+        await pdp.tokenIdFromDate(2024, 2, 29),
+        "20240229 should be valid date");
     });
   });
 
-  describe("URI() for tokenIDs", function(){
+  describe("URI() for tokenIDs", function () {
 
     it("should return correct url for unminted tokenId:1 ", async function () {
       const tokenId = 1;
       const year = 2022;
       const month = 9;
       const day = 1;
-      const tokenDate = `${year}${month<=9?"0":""}${month}${day<=9?"0":""}${day}`
+      const tokenDate = `${year}${month <= 9 ? "0" : ""}${month}${day <= 9 ? "0" : ""}${day}`
 
       const { pdp, mutableUri } = await loadFixture(deployFixture);
 
-      expect(await pdp.uri(tokenId)).to.equal(mutableUri+tokenDate+".json");
+      expect(await pdp.uri(tokenId)).to.equal(mutableUri + tokenDate + ".json");
     });
 
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
       const tokenId = 0;
       const { pdp, immutableUri } = await loadFixture(deployFixture);
-      expect(await pdp.uri(tokenId)).to.equal(immutableUri+"CLAIM.json");
+      expect(await pdp.uri(tokenId)).to.equal(immutableUri + "CLAIM.json");
     });
 
     it("should return mutable url for all unminted nfts ", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
       await pdp.setPermanentURI(immutableUri, 100);
 
-      for(let i=1; i<100; i++) {
+      for (let i = 1; i < 100; i++) {
         expect(await pdp.uri(i)).to.include(mutableUri);
       }
     });
 
     it("should return immutable url for all minted nfts ", async function () {
-      const { pdp, mutableUri,immutableUri } = await loadFixture(deployFixture);
+      const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
       await pdp.setPermanentURI(immutableUri, 100);
       const inputs = await pdp.getMintRangeInput(50);
       await pdp.mintPhotos(...inputs, 5);
 
-      for(let i=1; i<100; i++) {
-        if(i>50) expect(await pdp.uri(i)).to.include(mutableUri);
+      for (let i = 1; i < 100; i++) {
+        if (i > 50) expect(await pdp.uri(i)).to.include(mutableUri);
         else expect(await pdp.uri(i)).to.include(immutableUri);
       }
     });
 
     it("should return mutable url for minted nfts after _uriValidUptoTokenId", async function () {
-      const { pdp, mutableUri,immutableUri } = await loadFixture(deployFixture);
+      const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
       await pdp.setPermanentURI(immutableUri, 10);
       const inputs = await pdp.getMintRangeInput(50);
       await pdp.mintPhotos(...inputs, 5);
 
-      for(let i=1; i<50; i++) {
-        if(i>10) expect(await pdp.uri(i)).to.include(mutableUri);
+      for (let i = 1; i < 50; i++) {
+        if (i > 10) expect(await pdp.uri(i)).to.include(mutableUri);
         else expect(await pdp.uri(i)).to.include(immutableUri);
       }
     });
   });
 
-  describe.skip("Mint Photos", function(){
+  describe("Mint Photos", function () {
     it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { pdp, vault, treasury } = await loadFixture(deployFixture);
       const photos = 1000;
       const maxSupply = 5;
       const input = await pdp.getMintRangeInput(photos);
-      
+
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
@@ -238,21 +243,21 @@ describe("Ph101ppDailyPhoto", function () {
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
 
-      const balanceDistribution: {[key:number] : number} = {};
-      
-      for(let i = 0; i<photos; i++){
+      const balanceDistribution: { [key: number]: number } = {};
+
+      for (let i = 0; i < photos; i++) {
         expect(vaultBalances[i]).to.equal(1);
-        balanceDistribution[treasuryBalances[i].toNumber()] = balanceDistribution[treasuryBalances[i].toNumber()]??0;
+        balanceDistribution[treasuryBalances[i].toNumber()] = balanceDistribution[treasuryBalances[i].toNumber()] ?? 0;
         balanceDistribution[treasuryBalances[i].toNumber()]++;
       }
       expect(balanceDistribution[0]).to.equal(undefined);
-      for(let i = 1; i<maxSupply; i++) {
-        expect(balanceDistribution[i]).to.be.gt(0.8*photos/maxSupply);
+      for (let i = 1; i < maxSupply; i++) {
+        expect(balanceDistribution[i]).to.be.gt(0.8 * photos / maxSupply);
       }
     });
   })
 
-  describe("Claim tokens", function(){
+  describe("Claim tokens", function () {
     it("should mint 10 claim tokens to treasury wallet ", async function () {
       const { pdp, treasury, vault } = await loadFixture(deployFixture);
       expect(await pdp.balanceOf(treasury.address, 0)).to.equal(10);
@@ -263,7 +268,7 @@ describe("Ph101ppDailyPhoto", function () {
       const { pdp, treasury, account1 } = await loadFixture(deployFixture);
 
       await pdp.mintClaims(account1.address, 2);
-      
+
       expect(await pdp.totalSupply(0)).to.equal(12);
       expect(await pdp.balanceOf(treasury.address, 0)).to.equal(10);
       expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
@@ -273,7 +278,7 @@ describe("Ph101ppDailyPhoto", function () {
     it("should claim mints from treasury and burn claims when redeemClaimBatch is called", async function () {
 
       const { pdp, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
-      
+
       const input1 = await pdp.getMintRangeInput(5);
       await pdp.mintPhotos(...input1, 1);
 
@@ -284,7 +289,7 @@ describe("Ph101ppDailyPhoto", function () {
       await pdp.mintPhotos(...input2, 1);
 
       await pdp.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
-      
+
       expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
 
       await expect(pdp.connect(account1).redeemClaimBatch([8, 9, 7], [1, 1, 1])).to.be.rejected;
@@ -304,7 +309,7 @@ describe("Ph101ppDailyPhoto", function () {
     it("should claim mint from treasury and burn claim when redeemClaim is called", async function () {
 
       const { pdp, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
-      
+
       const input1 = await pdp.getMintRangeInput(5);
       await pdp.mintPhotos(...input1, 1);
 
@@ -315,7 +320,7 @@ describe("Ph101ppDailyPhoto", function () {
       await pdp.mintPhotos(...input2, 1);
 
       await pdp.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
-      
+
       expect(await pdp.balanceOf(account1.address, 0)).to.equal(2);
 
       await pdp.connect(account1).redeemClaim(8);
@@ -331,13 +336,13 @@ describe("Ph101ppDailyPhoto", function () {
 
   });
 
-  describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function(){
+  describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function () {
     it("should correcly update vault address only", async function () {
       const { pdp, vault, treasury, account1 } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = 5;
       const input = await pdp.getMintRangeInput(photos);
-      
+
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
@@ -346,7 +351,7 @@ describe("Ph101ppDailyPhoto", function () {
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
 
-      for(let i = 0; i<photos; i++){
+      for (let i = 0; i < photos; i++) {
         expect(vaultBalances[i]).to.equal(1);
         expect(treasuryBalances[i]).to.gte(1);
       }
@@ -360,13 +365,13 @@ describe("Ph101ppDailyPhoto", function () {
       const newTreasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
       const newVaultBalances = await pdp.balanceOfBatch(newVaultAddresses, ids);
       const newOldVaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
-      
-      for(let i = 0; i<photos; i++){
+
+      for (let i = 0; i < photos; i++) {
         expect(newVaultBalances[i]).to.equal(1);
         expect(newOldVaultBalances[i]).to.equal(0);
         expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
       }
-      
+
       expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
       expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
     });
@@ -376,7 +381,7 @@ describe("Ph101ppDailyPhoto", function () {
       const photos = 10;
       const maxSupply = 5;
       const input = await pdp.getMintRangeInput(photos);
-      
+
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
@@ -385,7 +390,7 @@ describe("Ph101ppDailyPhoto", function () {
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
 
-      for(let i = 0; i<photos; i++){
+      for (let i = 0; i < photos; i++) {
         expect(vaultBalances[i]).to.equal(1);
         expect(treasuryBalances[i]).to.gte(1);
       }
@@ -399,13 +404,13 @@ describe("Ph101ppDailyPhoto", function () {
       const newTreasuryBalances = await pdp.balanceOfBatch(newTreasuryAddresses, ids);
       const newOldTreasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
       const newVaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
-      
-      for(let i = 0; i<photos; i++){
+
+      for (let i = 0; i < photos; i++) {
         expect(newVaultBalances[i]).to.equal(1);
         expect(newOldTreasuryBalances[i]).to.equal(0);
         expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
       }
-      
+
       expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
       expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
     });
@@ -415,7 +420,7 @@ describe("Ph101ppDailyPhoto", function () {
       const photos = 10;
       const maxSupply = 5;
       const input = await pdp.getMintRangeInput(photos);
-      
+
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
@@ -424,27 +429,27 @@ describe("Ph101ppDailyPhoto", function () {
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
 
-      for(let i = 0; i<photos; i++){
+      for (let i = 0; i < photos; i++) {
         expect(vaultBalances[i]).to.equal(1);
         expect(treasuryBalances[i]).to.gte(1);
       }
 
       await pdp.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, Infinity, vault.address, treasury.address);
-      
+
       await pdp.updateInitialHoldersRange(...updateInitialHoldersInput);
 
       const newTreasuryBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const newVaultBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
 
-      for(let i = 0; i<photos; i++){
+      for (let i = 0; i < photos; i++) {
         expect(newVaultBalances[i]).to.equal(vaultBalances[i]);
         expect(newTreasuryBalances[i]).to.equal(treasuryBalances[i]);
       }
     });
   });
 
-  describe("ERC2981 Token Royalties", function(){
+  describe("ERC2981 Token Royalties", function () {
 
     it("should set default royalties during deploy", async function () {
       const { pdp, owner } = await loadFixture(deployFixture);
@@ -480,7 +485,7 @@ describe("Ph101ppDailyPhoto", function () {
       expect(await pdp.royaltyInfo(3, 100)).to.deep.equal([account1.address, 1]);
       expect(await pdp.royaltyInfo(4, 100)).to.deep.equal([owner.address, 5]);
       expect(await pdp.royaltyInfo(1000, 100)).to.deep.equal([owner.address, 5]);
-      
+
       await pdp.resetTokenRoyalty(2);
       await pdp.resetTokenRoyalty(3);
 
@@ -495,7 +500,7 @@ describe("Ph101ppDailyPhoto", function () {
 
   });
 
-  describe("AccessControl", function(){
+  describe("AccessControl", function () {
 
     it("should set default roles during deploy", async function () {
       const { pdp, owner } = await loadFixture(deployFixture);
@@ -509,19 +514,19 @@ describe("Ph101ppDailyPhoto", function () {
       const { pdp, account1 } = await loadFixture(deployFixture);
       await pdp.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, 100, account1.address, account1.address);
-      await expect( pdp.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
       await pdp.unpause();
       const mintInput = await pdp.getMintRangeInput(4);
-      await expect( pdp.connect(account1).mintPhotos(...mintInput, 4)).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).pause()).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).setPermanentURI("",100)).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).setProxyURI("")).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).mintPhotos(...mintInput, 4)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).pause()).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setPermanentURI("", 100)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setProxyURI("")).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
     });
 
     it("should execute access guarded functions with special role", async function () {
@@ -530,27 +535,27 @@ describe("Ph101ppDailyPhoto", function () {
       await pdp.grantRole(await pdp.DEFAULT_ADMIN_ROLE(), account1.address);
       await pdp.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, 100, account1.address, account1.address);
-      await expect( pdp.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
       await pdp.unpause();
-      await expect( pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).setDefaultRoyalty(account1.address, 100)).to.not.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.not.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
-      
+      await expect(pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setDefaultRoyalty(account1.address, 100)).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
+
       await pdp.grantRole(await pdp.PHOTO_MINTER_ROLE(), account2.address);
       const mintInput = await pdp.getMintRangeInput(4);
-      await expect( pdp.connect(account2).mintPhotos(...mintInput, 4)).to.not.be.rejectedWith("AccessControl");
-      
+      await expect(pdp.connect(account2).mintPhotos(...mintInput, 4)).to.not.be.rejectedWith("AccessControl");
+
       await pdp.grantRole(await pdp.CLAIM_MINTER_ROLE(), account3.address);
-      await expect( pdp.connect(account3).mintClaims(account1.address, 5)).to.not.be.rejectedWith("AccessControl");
-      
+      await expect(pdp.connect(account3).mintClaims(account1.address, 5)).to.not.be.rejectedWith("AccessControl");
+
       await pdp.grantRole(await pdp.URI_UPDATER_ROLE(), account4.address);
-      await expect( pdp.connect(account4).setPermanentURI("", 100)).to.not.be.rejectedWith("AccessControl");
-      await expect( pdp.connect(account4).setProxyURI("")).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account4).setPermanentURI("", 100)).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account4).setProxyURI("")).to.not.be.rejectedWith("AccessControl");
     });
 
   });
-});
+}
 
