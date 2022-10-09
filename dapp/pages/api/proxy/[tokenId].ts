@@ -6,7 +6,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const query = req.query.tokenId as string;
+  const query = req.query.tokenId;
 
   if (typeof query !== "string" || query.length !== 13) {
     return res.status(404).end();
@@ -20,8 +20,12 @@ export default async function handler(
 
   const arweaveURL = process.env.LATEST_MANIFEST_URI;
 
+  res.setHeader("Cache-Control", `s-maxage=${60 * 60 * 48}, stale-while-revalidate=59`);
+
   return fetch(arweaveURL + query)
-    .then((arweaveResult) => arweaveResult.json())
+    .then((arweaveResult) => {
+      return arweaveResult.json()
+    })
     .then(res.json)
     .catch(() => res.json(getFutureJSON(date)));
 }

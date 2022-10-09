@@ -1,26 +1,40 @@
 import React, { useCallback, useState } from "react";
-import Layout from "../components/layout"
+import Layout from "./layout"
 import ImageUploading, { ImageUploadingPropsType, ImageListType } from "react-images-uploading";
 import Exif from "exif-js";
 import Arweave from "arweave";
+import tokenIdAtom from "./_atoms/tokenIdAtom";
+import { useRecoilValue } from "recoil";
 
-const delay = (time:number) => new Promise(res=>setTimeout(res,time));
+const delay = (time: number) => new Promise(res => setTimeout(res, time));
 
-function base64ToArrayBuffer(base64:string) {
+// await octokit.repos.getContent({
+//   owner: context.owner,
+//   repo: context.repo,
+//   path: change.path
+// }).then(file=>{
+//   sha = Array.isArray(file.data) || file.status !== 200 ? null: file.data.sha
+// }).catch(()=>{});
+
+function base64ToArrayBuffer(base64: string) {
   base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
   var binary = atob(base64);
   var len = binary.length;
   var buffer = new ArrayBuffer(len);
   var view = new Uint8Array(buffer);
   for (var i = 0; i < len; i++) {
-      view[i] = binary.charCodeAt(i);
+    view[i] = binary.charCodeAt(i);
   }
   return buffer;
 }
 
 const arweave = Arweave.init({});
 
-export default function IndexPage() {
+export default function NewUpload() {
+
+  const tokenId = useRecoilValue(tokenIdAtom);
+  
+  console.log(tokenId);
 
   const [images, setImages] = useState<ImageListType>([]);
   const [transactionId, setTransactionId] = useState<string>();
@@ -30,7 +44,7 @@ export default function IndexPage() {
     setImages(imageList);
   };
 
-  const uploadToArweave = useCallback(async ()=>{
+  const uploadToArweave = useCallback(async () => {
     const dataB64 = images[0].data_url?.replace("data:image/jpeg;base64,", "");
 
     let data = base64ToArrayBuffer(dataB64);
@@ -51,7 +65,7 @@ export default function IndexPage() {
       status = await arweave.transactions.getStatus(transaction.id);
       console.log(status);
       await delay(1000);
-    } while(!status?.confirmed || status.confirmed.number_of_confirmations < 5);
+    } while (!status?.confirmed || status.confirmed.number_of_confirmations < 5);
     setTransactionId(transaction.id);
   }, [images]);
 
@@ -86,8 +100,7 @@ export default function IndexPage() {
             <button onClick={onImageRemoveAll}>Remove all images</button>
             {imageList.map((image, index) => {
               const data = image.data_url?.replace("data:image/jpeg;base64,", "");
-              
-              console.log(Exif.readFromBinaryFile(base64ToArrayBuffer(data??"")));
+              console.log(Exif.readFromBinaryFile(base64ToArrayBuffer(data ?? "")));
 
 
               return (
@@ -102,12 +115,12 @@ export default function IndexPage() {
             })}
           </div>
         )}
-      </ImageUploading>   
-      {images.length === 1 && 
+      </ImageUploading>
+      {images.length === 1 &&
         <button onClick={() => uploadToArweave()}>Upload to Arweave</button>
       }
-      { transactionId && 
-        <a href={`https://arweave.net/${transactionId}`}>{transactionId}</a> 
+      {transactionId &&
+        <a href={`https://arweave.net/${transactionId}`}>{transactionId}</a>
       }
     </Layout>
   )
