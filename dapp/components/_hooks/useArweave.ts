@@ -10,7 +10,7 @@ const arweave = Arweave.init({});
 type UploadToArweave = (imageB64: string) => Promise<void>;
 
 function useArweave(
-  statusAtom: RecoilState<ArweaveStatus>, 
+  statusAtom: RecoilState<ArweaveStatus|null>, 
   onComplete: (transactionId: string)=>void = ()=>{}
 ): UploadToArweave {
   const setStatus = useSetRecoilState(statusAtom);

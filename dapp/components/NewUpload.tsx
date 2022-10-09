@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import Layout from "./layout"
 import ImageUploading, { ImageUploadingPropsType, ImageListType, ImageType } from "react-images-uploading";
 import Exif from "exif-js";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import useArweave from "./_hooks/useArweave";
 import arweaveStatusAtom from "./_atoms/arweaveStatusAtom";
+import base64ToArrayBuffer from "./_helpers/base64ToArrayBuffer";
+import imageAtom from "./_atoms/imageAtom";
 
 
 // await octokit.repos.getContent({
@@ -20,20 +22,25 @@ export default function NewUpload() {
 
   const uploadToArweave = useArweave(arweaveStatusAtom("uploadImage"));
   const status = useRecoilValue(arweaveStatusAtom("uploadImage"));
-  console.log(status);
+  const [image, setImage] = useRecoilState(imageAtom);
 
-  const [image, setImage] = useState<ImageType>();
-
+  
   const onChange: ImageUploadingPropsType["onChange"] = (imageList, addUpdateIndex) => {
-    if(imageList.length >= 1) {
-      setImage(imageList[0]);
+    if(imageList.length >= 1 && imageList[0].dataURL) {
+      const image = imageList[0];
+      const data = imageList[0].dataURL.replace("data:image/jpeg;base64,", "");
+      setImage({
+        image,
+        dataURL: imageList[0].dataURL,
+        exif: Exif.readFromBinaryFile(base64ToArrayBuffer(data))
+      });
     }
   };
 
   return (
     <Layout>
       <ImageUploading
-        value={image?[image]:[]}
+        value={image?[image.image]:[]}
         onChange={onChange}
         maxNumber={1}
         dataURLKey="dataURL"
@@ -78,9 +85,9 @@ export default function NewUpload() {
         )}
       </ImageUploading>
       {image &&
-        <button onClick={() => image.dataURL && uploadToArweave(image.dataURL)}>Upload to Arweave</button>
+        <button onClick={() => uploadToArweave(image.dataURL)}>Upload to Arweave</button>
       }
-      {status.transactionId &&
+      {status?.transactionId &&
         <a href={`https://arweave.net/${status.transactionId}`}>{status.transactionId}</a>
       }
     </Layout>

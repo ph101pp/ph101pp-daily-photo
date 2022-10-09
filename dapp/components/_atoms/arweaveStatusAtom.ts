@@ -1,12 +1,12 @@
 import { atomFamily, selectorFamily, DefaultValue } from "recoil";
 import { ArweaveStatus } from "../_types/ArweaveStatus";
 
-const arweaveStatusAtom = atomFamily<ArweaveStatus, string>({
+const arweaveStatusAtom = atomFamily<ArweaveStatus | null, string>({
   key: "arweaveStatusAtom",
-  default:{}
+  default: null
 })
 
-const arweaveStatusSelector = selectorFamily<ArweaveStatus, string>({
+const arweaveStatusSelector = selectorFamily<ArweaveStatus | null, string>({
   key: "arweaveStatusSelector",
   get: (key)=>({get})=>get(arweaveStatusAtom(key)),
   set: (key)=>({set, get}, value) => {
