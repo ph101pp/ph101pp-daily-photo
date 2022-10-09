@@ -4,7 +4,7 @@ import tokenIdAtom from "./tokenIdAtom";
 const arweaveURL = process.env.LATEST_MANIFEST_URI;
 
 const existingTokenatom = selector<string>({
-  key: "ExistingTokenAtom",
+  key: "tokenDataAtom",
   get: async ({ get }) => {
     const tokenId = await get(tokenIdAtom);
     if(!tokenId) {

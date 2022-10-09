@@ -1,12 +1,11 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import Layout from "./layout"
-import ImageUploading, { ImageUploadingPropsType, ImageListType } from "react-images-uploading";
+import ImageUploading, { ImageUploadingPropsType, ImageListType, ImageType } from "react-images-uploading";
 import Exif from "exif-js";
-import Arweave from "arweave";
-import tokenIdAtom from "./_atoms/tokenIdAtom";
 import { useRecoilValue } from "recoil";
+import useArweave from "./_hooks/useArweave";
+import arweaveStatusAtom from "./_atoms/arweaveStatusAtom";
 
-const delay = (time: number) => new Promise(res => setTimeout(res, time));
 
 // await octokit.repos.getContent({
 //   owner: context.owner,
@@ -16,66 +15,28 @@ const delay = (time: number) => new Promise(res => setTimeout(res, time));
 //   sha = Array.isArray(file.data) || file.status !== 200 ? null: file.data.sha
 // }).catch(()=>{});
 
-function base64ToArrayBuffer(base64: string) {
-  base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
-  var binary = atob(base64);
-  var len = binary.length;
-  var buffer = new ArrayBuffer(len);
-  var view = new Uint8Array(buffer);
-  for (var i = 0; i < len; i++) {
-    view[i] = binary.charCodeAt(i);
-  }
-  return buffer;
-}
-
-const arweave = Arweave.init({});
 
 export default function NewUpload() {
 
-  const tokenId = useRecoilValue(tokenIdAtom);
-  
-  console.log(tokenId);
+  const uploadToArweave = useArweave(arweaveStatusAtom("uploadImage"));
+  const status = useRecoilValue(arweaveStatusAtom("uploadImage"));
+  console.log(status);
 
-  const [images, setImages] = useState<ImageListType>([]);
-  const [transactionId, setTransactionId] = useState<string>();
-  const maxNumber = 1;
+  const [image, setImage] = useState<ImageType>();
+
   const onChange: ImageUploadingPropsType["onChange"] = (imageList, addUpdateIndex) => {
-    // data for submit
-    setImages(imageList);
-  };
-
-  const uploadToArweave = useCallback(async () => {
-    const dataB64 = images[0].data_url?.replace("data:image/jpeg;base64,", "");
-
-    let data = base64ToArrayBuffer(dataB64);
-    console.log(data);
-    let transaction = await arweave.createTransaction({ data: data });
-    transaction.addTag('Content-Type', 'image/jpeg');
-    await arweave.transactions.sign(transaction);
-    let uploader = await arweave.transactions.getUploader(transaction);
-    console.log(transaction);
-
-    while (!uploader.isComplete) {
-      await uploader.uploadChunk();
-      console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
+    if(imageList.length >= 1) {
+      setImage(imageList[0]);
     }
-    console.log(uploader);
-    let status;
-    do {
-      status = await arweave.transactions.getStatus(transaction.id);
-      console.log(status);
-      await delay(1000);
-    } while (!status?.confirmed || status.confirmed.number_of_confirmations < 5);
-    setTransactionId(transaction.id);
-  }, [images]);
+  };
 
   return (
     <Layout>
       <ImageUploading
-        value={images}
+        value={image?[image]:[]}
         onChange={onChange}
-        maxNumber={maxNumber}
-        dataURLKey="data_url"
+        maxNumber={1}
+        dataURLKey="dataURL"
         acceptType={["jpg"]}
       >
         {({
@@ -100,7 +61,7 @@ export default function NewUpload() {
             <button onClick={onImageRemoveAll}>Remove all images</button>
             {imageList.map((image, index) => {
               const data = image.data_url?.replace("data:image/jpeg;base64,", "");
-              console.log(Exif.readFromBinaryFile(base64ToArrayBuffer(data ?? "")));
+              // console.log(Exif.readFromBinaryFile(base64ToArrayBuffer(data ?? "")));
 
 
               return (
@@ -116,11 +77,11 @@ export default function NewUpload() {
           </div>
         )}
       </ImageUploading>
-      {images.length === 1 &&
-        <button onClick={() => uploadToArweave()}>Upload to Arweave</button>
+      {image &&
+        <button onClick={() => image.dataURL && uploadToArweave(image.dataURL)}>Upload to Arweave</button>
       }
-      {transactionId &&
-        <a href={`https://arweave.net/${transactionId}`}>{transactionId}</a>
+      {status.transactionId &&
+        <a href={`https://arweave.net/${status.transactionId}`}>{status.transactionId}</a>
       }
     </Layout>
   )
