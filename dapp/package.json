@@ -1,22 +1,14 @@
 {
   "private": true,
-  "description": "An example project for NextAuth.js with Next.js",
-  "repository": "https://github.com/nextauthjs/next-auth-example.git",
-  "bugs": {
-    "url": "https://github.com/nextauthjs/next-auth/issues"
-  },
-  "homepage": "https://next-auth-example.vercel.app",
+  "description": "Ph101pp Daily Photo",
+  "repository": "https://github.com/greenish/ph101pp-daily-photo.git",
+  "homepage": "https://daily-photo.ph101pp.xyz",
   "scripts": {
     "dev": "next",
     "build": "next build",
     "start": "next start"
   },
-  "author": "Iain Collins <me@iaincollins.com>",
-  "contributors": [
-    "Balázs Orbán <info@balazsorban.com>",
-    "Nico Domino <yo@ndo.dev>",
-    "Lluis Agusti <hi@llu.lu>"
-  ],
+  "author": "Philipp Adrian <hello@philippadrian.com>",
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
@@ -27,7 +19,6 @@
     "js-base64": "^3.7.2",
     "next": "latest",
     "next-auth": "latest",
-    "nodemailer": "^6",
     "octokit": "^2.0.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
