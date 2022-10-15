@@ -4,7 +4,7 @@ import { useRecoilState } from "recoil";
 import base64ToArrayBuffer from "./_helpers/base64ToArrayBuffer";
 import imageAtom from "./_atoms/imageAtom";
 import Box from "@mui/material/Box";
-import { Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 
 function UploadImage() {
   const [image, setImage] = useRecoilState(imageAtom);
@@ -12,7 +12,7 @@ function UploadImage() {
   const onChange: ImageUploadingPropsType["onChange"] = (imageList, addUpdateIndex) => {
     console.log("onChange", imageList, addUpdateIndex)
     if (imageList.length >= 1) {
-      const index = (addUpdateIndex && addUpdateIndex[0]) ?? imageList.length-1;
+      const index = (addUpdateIndex && addUpdateIndex[0]) ?? imageList.length - 1;
       const image = imageList[index];
       if (image.dataURL) {
         const data = image.dataURL.replace("data:image/jpeg;base64,", "");
@@ -26,59 +26,70 @@ function UploadImage() {
     setImage(null);
   };
 
-  return (<ImageUploading
-    value={image ? [image.image] : []}
-    onChange={onChange}
-    maxNumber={1}
-    dataURLKey="dataURL"
-    acceptType={["jpg"]}
-  >
-    {({
-      imageList,
-      onImageUpload,
-      onImageRemoveAll,
-      onImageUpdate,
-      onImageRemove,
-      isDragging,
-      dragProps
-    }) => {
-      const {onDrop, ..._dragProps } = dragProps;
-      // write your building UI
-      return (<Box 
-        sx={{
-          display:"flex",
-          alignItems:"center",
-          justifyContent:"center"
-        }}
-      >
-        {image && (
-          <Box
-            component="img"
-            sx={{
-              width:"auto",
-              height:"400px"
-            }}
-            onClick={()=>onImageUpdate(0)}
-            src={image.dataURL}
-          />
-        )}
-        {!image && (
-          <Box
-            {...dragProps}
-            sx={{
-              height: "400px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              border: "5px dashed grey",
-              background:"white"
-            }}
-            onClick={onImageUpload}
-          >
-            <Typography>{isDragging ? "Drop Image" : "Upload Image"}</Typography>
-          </Box>
-        )}
-        {/* <button
+  return (
+    <Accordion expanded={true}>
+      <AccordionSummary>
+        <Typography variant="h6">Upload Image</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <ImageUploading
+          value={image ? [image.image] : []}
+          onChange={onChange}
+          maxNumber={1}
+          dataURLKey="dataURL"
+          acceptType={["jpg"]}
+        >
+          {({
+            imageList,
+            onImageUpload,
+            onImageRemoveAll,
+            onImageUpdate,
+            onImageRemove,
+            isDragging,
+            dragProps
+          }) => {
+            // write your building UI
+            return (<Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {image && (
+                <Box
+                  component="img"
+                  sx={{
+                    width: "auto",
+                    maxHeight: "400px",
+                    maxWidth: "100%",
+                    boxShadow: "0px 0px 10px white"
+                  }}
+                  onClick={() => {
+                    onImageRemoveAll();
+                    onImageUpdate(0)
+                  }}
+                  src={image.dataURL}
+                />
+              )}
+              {!image && (
+                <Box
+                  {...dragProps}
+                  sx={{
+                    height: "400px",
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    border: "5px dashed grey",
+                    background: "#333"
+                  }}
+                  onClick={onImageUpload}
+                >
+                  <Typography variant="h6">{isDragging ? "Drop Image" : "Upload Image"}</Typography>
+                </Box>
+              )}
+              {/* <button
           style={isDragging ? { color: "red" } : undefined}
           onClick={onImageUpload}
           {...dragProps}
@@ -101,10 +112,12 @@ function UploadImage() {
             </div>
           )
         })} */}
-      </Box>
-      )
-    }}
-  </ImageUploading>)
+            </Box>
+            )
+          }}
+        </ImageUploading>
+      </AccordionDetails>
+    </Accordion>)
 }
 
 export default UploadImage;

@@ -1,0 +1,22 @@
+{
+  "name": "Claim - Daily Photo",
+  "created_by": "Ph101pp",
+  "external_url": "https://daily-photo.ph101pp.xyz/",
+  "description": "Redeem for one photo from Ph101pp Daily Photo collection.",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Claim - Daily Photo"
+    },
+    {
+      "trait_type": "Revealed",
+      "value": false
+    }
+  ],
+  "image": "https://arweave.net/gnsheut4xCRlCqaRDap2vX1yrbA0OEWqKuUUMp-uELc",
+  "image_url": "https://arweave.net/gnsheut4xCRlCqaRDap2vX1yrbA0OEWqKuUUMp-uELc"
+}

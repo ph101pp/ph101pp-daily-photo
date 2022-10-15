@@ -12,7 +12,9 @@
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "@mui/icons-material": "^5.10.9",
     "@mui/material": "^5.10.8",
+    "@mui/x-date-pickers": "^5.0.4",
     "@octokit/rest": "^19.0.4",
     "arweave": "^1.11.6",
     "exif-js": "^2.3.0",
@@ -23,6 +25,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.37.0",
+    "react-hook-form-mui": "^5.7.2",
     "react-images-uploading": "^3.1.7",
     "recoil": "^0.7.5"
   },

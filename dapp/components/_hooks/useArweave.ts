@@ -7,14 +7,13 @@ import { ArweaveStatus } from "../_types/ArweaveStatus";
 
 const arweave = Arweave.init({});
 
-type UploadToArweave = (imageB64: string) => Promise<void>;
+type UploadToArweave = (imageB64: string) => Promise<string>;
 
 function useArweave(
   statusAtom: RecoilState<ArweaveStatus|null>, 
-  onComplete: (transactionId: string)=>void = ()=>{}
 ): UploadToArweave {
   const setStatus = useSetRecoilState(statusAtom);
-  return useCallback<UploadToArweave>(async (imageB64: string) => {
+  return useCallback<UploadToArweave>(async (imageB64) => {
     const dataB64 = imageB64.replace("data:image/jpeg;base64,", "");
     const data = base64ToArrayBuffer(dataB64);
     const transaction = await arweave.createTransaction({ data });
@@ -26,7 +25,7 @@ function useArweave(
     });
 
     let uploader = await arweave.transactions.getUploader(transaction);
-    // console.log(transaction);
+
     while (!uploader.isComplete) {
       await uploader.uploadChunk();
       setStatus({
@@ -35,9 +34,7 @@ function useArweave(
           totalChunks: uploader.totalChunks
         }
       });
-      // console.log(`${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`);
     }
-    // console.log(uploader);
     let transactionStatus;
     do {
       await delay(1000);
@@ -50,7 +47,11 @@ function useArweave(
       });
     } while (!transactionStatus?.confirmed || transactionStatus.confirmed.number_of_confirmations < 5);
 
-    onComplete(transaction.id);
+    setStatus({
+      completed: true
+    });
+
+    return transaction.id;
   }, [arweave, setStatus]);
 }
 

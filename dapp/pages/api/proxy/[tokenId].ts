@@ -1,6 +1,7 @@
 // This is an example of to protect an API route
 import type { NextApiRequest, NextApiResponse } from "next"
-import getFutureJSON from "../../../utils/getFutureJSON";
+import getFutureMetadata from "../../../utils/getFutureMetadata";
+import { isValidDate } from "../../../utils/isValidDate";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,7 +15,7 @@ export default async function handler(
 
   const [date, ext] = query.split(".");
 
-  if (ext !== "json" || date.length !== 8) {
+  if (ext !== "json" || !isValidDate(date)) {
     return res.status(404).end();
   }
 
@@ -27,5 +28,5 @@ export default async function handler(
       return arweaveResult.json()
     })
     .then(res.json)
-    .catch(() => res.json(getFutureJSON(date)));
+    .catch(() => res.json(getFutureMetadata(date)));
 }

@@ -7,4 +7,5 @@ export type ArweaveStatus = {
   uploadStatus?: UploadStatus,
   transactionStatus?: TransactionStatus,
   transactionId?: TransactionId
+  completed?: boolean
 }

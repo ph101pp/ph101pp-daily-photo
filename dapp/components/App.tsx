@@ -7,12 +7,27 @@ import Container from "@mui/material/Container";
 import NewUpload from "./NewUpload";
 import Header from "./Header";
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
 function App() {
   const tokenData = useRecoilValue(tokenDataAtom);
-  return <Container>
-    <Header />
-    {tokenData ? null : <NewUpload />}
-  </Container>
+  return (
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+
+      <Container>
+        <Header />
+        {tokenData ? null : <NewUpload />}
+      </Container>
+    </ThemeProvider>
+  )
 }
 
 export default () => (

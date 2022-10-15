@@ -3,19 +3,7 @@ import { useRouter } from 'next/router'
 import App from "../components/App";
 import {useSetRecoilState} from "recoil";
 import tokenIdAtom from "../components/_atoms/tokenIdAtom";
-
-function isValidDate(tokenId?:string) {
-  if(!tokenId) {
-    return false;
-  }
-  const year = parseInt(tokenId.slice(0, 4));
-  const month = parseInt(tokenId.slice(4, 6))-1;
-  const day = parseInt(tokenId.slice(6, 8));
-
-  const date = new Date(year, month, day);
-
-  return !isNaN(date as any);
-}
+import { isValidDate } from "../utils/isValidDate";
 
 function Root() {
   const setTokenId = useSetRecoilState(tokenIdAtom);
@@ -23,6 +11,7 @@ function Root() {
   const tokenId = route.query.tokenId as string;
 
   useEffect(()=>{
+    console.log("SET TOKENID", tokenId);
     if(isValidDate(tokenId)) {
       setTokenId(tokenId)
     }
