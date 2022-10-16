@@ -7,17 +7,15 @@ import { ArweaveStatus } from "../_types/ArweaveStatus";
 
 const arweave = Arweave.init({});
 
-type UploadToArweave = (imageB64: string) => Promise<string>;
+type UploadToArweave = (data:ArrayBuffer, contentType: string) => Promise<string>;
 
 function useArweave(
   statusAtom: RecoilState<ArweaveStatus|null>, 
 ): UploadToArweave {
   const setStatus = useSetRecoilState(statusAtom);
-  return useCallback<UploadToArweave>(async (imageB64) => {
-    const dataB64 = imageB64.replace("data:image/jpeg;base64,", "");
-    const data = base64ToArrayBuffer(dataB64);
+  return useCallback<UploadToArweave>(async (data, contentType) => {
     const transaction = await arweave.createTransaction({ data });
-    transaction.addTag('Content-Type', 'image/jpeg');
+    transaction.addTag('Content-Type', contentType);
     await arweave.transactions.sign(transaction);
 
     setStatus({

@@ -63,7 +63,6 @@ function UploadImage() {
                     width: "auto",
                     maxHeight: "400px",
                     maxWidth: "100%",
-                    boxShadow: "0px 0px 10px white"
                   }}
                   onClick={() => {
                     onImageRemoveAll();

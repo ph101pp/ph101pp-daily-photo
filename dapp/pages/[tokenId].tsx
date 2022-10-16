@@ -1,4 +1,4 @@
-import React, {Suspense, useEffect} from "react";
+import React, {useEffect} from "react";
 import { useRouter } from 'next/router'
 import App from "../components/App";
 import {useSetRecoilState} from "recoil";
@@ -7,8 +7,9 @@ import { isValidDate } from "../utils/isValidDate";
 
 function Root() {
   const setTokenId = useSetRecoilState(tokenIdAtom);
-  const route = useRouter();
-  const tokenId = route.query.tokenId as string;
+  const router = useRouter();
+
+  const tokenId = router.query.tokenId as string;
 
   useEffect(()=>{
     console.log("SET TOKENID", tokenId);
@@ -16,6 +17,10 @@ function Root() {
       setTokenId(tokenId)
     }
   }, [tokenId, setTokenId])
+
+  if (!router.isReady) {
+    return null;
+  }
 
   return <App/>;
 }

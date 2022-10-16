@@ -2,7 +2,7 @@
   "private": true,
   "description": "Ph101pp Daily Photo",
   "repository": "https://github.com/greenish/ph101pp-daily-photo.git",
-  "homepage": "https://daily-photo.ph101pp.xyz",
+  "homepage": "./",
   "scripts": {
     "dev": "next",
     "build": "next build",
@@ -27,7 +27,8 @@
     "react-hook-form": "^7.37.0",
     "react-hook-form-mui": "^5.7.2",
     "react-images-uploading": "^3.1.7",
-    "recoil": "^0.7.5"
+    "recoil": "^0.7.5",
+    "superstruct": "^0.16.5"
   },
   "devDependencies": {
     "@types/node": "^17",

@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
     // }),
   ],
   theme: {
-    colorScheme: "light",
+    colorScheme: "dark",
   },
   callbacks: {
     async jwt({token, account}) {
