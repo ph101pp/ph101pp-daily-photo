@@ -1,4 +1,5 @@
 import { atom, selector } from "recoil";
+import getBaseMetadata from "../../utils/getBaseMetadata";
 import getTokenMetadata from "../../utils/getTokenMetadata";
 import { TokenMetadataInputType } from "../_types/TokenMetadataInputType";
 import imageAtom from "./imageAtom";
@@ -24,15 +25,16 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
   get: ({ get }) => {
     const image = get(imageAtom);
     const userMetadataInput = get(tokenMetadataInputAtom);
+    const tokenId = get(tokenIdAtom);
 
     if(userMetadataInput) {
       return userMetadataInput;
     }
 
-    if (!image) {
+    if (!image || !tokenId) {
       return null;
     }
-
+    const baseMetadata = getBaseMetadata(tokenId);
     const autoCamera = `${image.exif.Make} ${image.exif.Model}`
     const exposureTime = parseFloat(image.exif.ExposureTime);
     const shutterSpeed = exposureTime >= 1 ? `${exposureTime}` : `1/${getShutterspeed(exposureTime)}`;
@@ -40,9 +42,9 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     return {
       settings: autoSettings,
       camera: autoCamera,
+      description: `Daily photo taken ${baseMetadata.name}`,
       place: "",
       country: "",
-      description: "",
     };
   },
   set: ({ set }, newValue)=>{

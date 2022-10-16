@@ -30,8 +30,10 @@ export default async function makeCommit(
   const remoteCommits = await octokit.repos.listCommits({
     owner: context.owner,
     repo: context.repo,
+    sha: context.branch,
     per_page: 1,
   })
+
   let latestCommitSha = remoteCommits.data[0].sha
   const treeSha = remoteCommits.data[0].commit.tree.sha
 
