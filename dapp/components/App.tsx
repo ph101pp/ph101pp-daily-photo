@@ -5,11 +5,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import NewToken from "./NewToken";
-import Header from "./Header";
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import ExistingToken from "./ExistingToken";
+import NextAuthHeader from "./NextAuthHeader";
 
 const darkTheme = createTheme({
   palette: {
@@ -22,9 +22,8 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-
       <Container>
-        <Header />
+        <NextAuthHeader />
         {tokenData ? <ExistingToken tokenMetadata = {tokenData}  /> : <NewToken />}
       </Container>
     </ThemeProvider>

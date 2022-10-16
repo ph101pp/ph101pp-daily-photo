@@ -8,7 +8,6 @@ import MetadataForm from "./MetadataForm";
 import MetadataPreview from "./MetadataPreview";
 import ExifData from "./ExifData";
 import UploadAndPublish from "./UploadAndPublish";
-import ArweaveProgress from "./ArweaveProgress";
 
 export default function NewToken() {
   return (
