@@ -18,7 +18,7 @@ const MetadataPreview = () => {
     imageTx: "TBD",
   });
   return (
-    <Accordion expanded={true}>
+    <Accordion defaultExpanded={true}>
       <AccordionSummary>
         <Typography variant="h6">Metadata Preview</Typography>
       </AccordionSummary>

@@ -27,7 +27,7 @@ function UploadImage() {
   };
 
   return (
-    <Accordion expanded={true}>
+    <Accordion defaultExpanded={true}>
       <AccordionSummary>
         <Typography variant="h6">Upload Image</Typography>
       </AccordionSummary>

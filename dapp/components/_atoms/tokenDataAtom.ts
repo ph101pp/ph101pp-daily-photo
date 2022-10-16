@@ -1,9 +1,10 @@
 import { selector } from "recoil";
+import { MetadataType } from "../../utils/getBaseMetadata";
 import tokenIdAtom from "./tokenIdAtom";
 
 const arweaveURL = process.env.LATEST_MANIFEST_URI;
 
-const existingTokenatom = selector<string>({
+const existingTokenatom = selector<MetadataType | null>({
   key: "tokenDataAtom",
   get: async ({ get }) => {
     const tokenId = await get(tokenIdAtom);
@@ -18,6 +19,8 @@ const existingTokenatom = selector<string>({
         else {
           return null;
         }
+      }).catch(()=>{
+        return null;
       });
   }
 });

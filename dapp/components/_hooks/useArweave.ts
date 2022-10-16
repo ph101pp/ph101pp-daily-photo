@@ -42,10 +42,10 @@ function useArweave(
             totalChunks: uploader.totalChunks
           }
         });
-        console.log("uploadStatus", {
-          chunks: uploader.uploadedChunks,
-          totalChunks: uploader.totalChunks
-        })
+        // console.log("uploadStatus", {
+        //   chunks: uploader.uploadedChunks,
+        //   totalChunks: uploader.totalChunks
+        // })
       }
       let transactionStatus;
       do {
@@ -57,10 +57,10 @@ function useArweave(
             confirmations: transactionStatus?.confirmed?.number_of_confirmations ?? 0
           }
         });
-        console.log("transactionStatus", {
-          status: transactionStatus?.status,
-          confirmations: transactionStatus?.confirmed?.number_of_confirmations ?? 0
-        })
+        // console.log("transactionStatus", {
+        //   status: transactionStatus?.status,
+        //   confirmations: transactionStatus?.confirmed?.number_of_confirmations ?? 0
+        // })
       } while (!transactionStatus?.confirmed || transactionStatus.confirmed.number_of_confirmations < 5);
   
       setStatus({

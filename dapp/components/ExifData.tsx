@@ -14,7 +14,7 @@ function ExifData() {
   return (
     <Accordion>
     <AccordionSummary>
-      <Typography variant="h6">Exif</Typography>
+      <Typography variant="h6">Image Exif Data</Typography>
     </AccordionSummary>
     <AccordionDetails>
       <Box

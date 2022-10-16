@@ -1,10 +1,8 @@
 // This is an example of to protect an API route
 import { getToken } from "next-auth/jwt"
 import { Octokit } from "@octokit/rest"
-import { Base64 } from "js-base64";
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import genCommitToGithub from "../../utils/genCommitToGithub";
 import { githubContext } from "../../utils/githubContext";
 
 

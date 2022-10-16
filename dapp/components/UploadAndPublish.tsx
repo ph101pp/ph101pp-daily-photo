@@ -1,4 +1,7 @@
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
+import DoneIcon from '@mui/icons-material/Done';
 import { useRecoilValue } from "recoil";
 import arweaveStatusAtom from "./_atoms/arweaveStatusAtom";
 import imageAtom from "./_atoms/imageAtom";
@@ -9,8 +12,10 @@ import useArweave from "./_hooks/useArweave";
 import base64ToArrayBuffer from "./_helpers/base64ToArrayBuffer";
 import getTokenMetadata from "../utils/getTokenMetadata";
 import { CommitPostDataType } from "../utils/CommitPostType";
+import ArweaveProgress from "./ArweaveProgress";
+import { useCallback, useState } from "react";
 
-const MetadataPreview = () => {
+const UploadAndPublish = () => {
   const tokenId = useRecoilValue(tokenIdAtom);
   const metadataInput = useRecoilValue(tokenMetadataInputAtom);
   const image = useRecoilValue(imageAtom);
@@ -18,12 +23,15 @@ const MetadataPreview = () => {
   const uploadImage = useArweave(arweaveStatusAtom("uploadImage"));
   const uploadMetadata = useArweave(arweaveStatusAtom("uploadMetadata"));
   const uploadManifest = useArweave(arweaveStatusAtom("uploadManifest"));
+  const [inProgress, setInProgress] = useState(false);
+  const [isDone, setIsDone] = useState(false);
 
   if (!tokenId || !metadataInput || !image || !manifest) {
     return null;
   }
 
   const uploadData = async () => {
+    setInProgress(true);
     const dataB64 = image.dataURL.replace("data:image/jpeg;base64,", "");
     const data = base64ToArrayBuffer(dataB64);
     const [imageTx, executeImageTx] = await uploadImage(data, "image/jpeg");
@@ -33,14 +41,14 @@ const MetadataPreview = () => {
       imageTx
     });
     const [tokenTx, executeTokenTx] = await uploadMetadata(JSON.stringify(tokenMetadata), "application/json");
-    const newManifest = { 
-      ...manifest, 
+    const newManifest = {
+      ...manifest,
       paths: {
         ...manifest.paths,
         [`${tokenId}.json`]: {
           id: tokenTx
-        } 
-      } 
+        }
+      }
     };
 
     const [manifestTx, executeManifestTx] = await uploadManifest(JSON.stringify(newManifest), "application/x.arweave-manifest+json");
@@ -68,28 +76,51 @@ const MetadataPreview = () => {
     }
 
     await fetch("/api/commit", {
-      method:"POST", 
-      body:JSON.stringify(commitData)
+      method: "POST",
+      body: JSON.stringify(commitData)
     });
 
+    setIsDone(true);
     console.log("Done");
-  }
+  };
 
-  return (
+  return (<>
+    <ArweaveProgress statusAtomName="uploadImage" label="Image" />
+    <ArweaveProgress statusAtomName="uploadMetadata" label="Metadata" />
+    <ArweaveProgress statusAtomName="uploadManifest" label="Manifest" />
+
     <Box
       sx={{
-        margin: "16px 0"
+        padding: "16px 0"
       }}
     >
-      <Button
-        fullWidth={true}
-        variant="contained"
-        onClick={() => confirm("Upload data to Arweave?") && uploadData()}
-      >
-        Upload & Publish
-      </Button>
+      {!isDone && (
+        <LoadingButton
+          fullWidth={true}
+          loading={inProgress}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="contained"
+          onClick={() => confirm("Upload data to Arweave?") && uploadData()}
+        >
+          Upload & Publish
+        </LoadingButton>
+      )}
+      {isDone && (
+        <LoadingButton
+          fullWidth={true}
+          loading={false}
+          loadingPosition="start"
+          startIcon={<DoneIcon />}
+          variant="contained"
+          color="success"
+        >
+          Uploaded & Published
+        </LoadingButton>
+      )}
     </Box>
+  </>
   )
 }
 
-export default MetadataPreview;
+export default UploadAndPublish;

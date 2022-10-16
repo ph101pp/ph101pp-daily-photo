@@ -52,7 +52,7 @@ function MetadataForm() {
   }
 
   return (
-    <Accordion expanded={true}>
+    <Accordion defaultExpanded={true}>
       <AccordionSummary>
         <Typography variant="h6">Update Metadata</Typography>
       </AccordionSummary>

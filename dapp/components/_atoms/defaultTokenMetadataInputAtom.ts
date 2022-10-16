@@ -1,6 +1,5 @@
-import { atom, selector } from "recoil";
+import { selector } from "recoil";
 import getBaseMetadata from "../../utils/getBaseMetadata";
-import getTokenMetadata from "../../utils/getTokenMetadata";
 import { TokenMetadataInputType } from "../_types/TokenMetadataInputType";
 import imageAtom from "./imageAtom";
 import tokenIdAtom from "./tokenIdAtom";
@@ -42,7 +41,7 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     return {
       settings: autoSettings,
       camera: autoCamera,
-      description: `Daily photo taken ${baseMetadata.name}`,
+      description: `Photo taken ${baseMetadata.name}`,
       place: "",
       country: "",
     };

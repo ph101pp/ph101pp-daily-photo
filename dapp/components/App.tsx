@@ -4,11 +4,12 @@ import tokenDataAtom from "./_atoms/tokenDataAtom"
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import NewUpload from "./NewUpload";
+import NewToken from "./NewToken";
 import Header from "./Header";
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import ExistingToken from "./ExistingToken";
 
 const darkTheme = createTheme({
   palette: {
@@ -24,7 +25,7 @@ function App() {
 
       <Container>
         <Header />
-        {tokenData ? null : <NewUpload />}
+        {tokenData ? <ExistingToken tokenMetadata = {tokenData}  /> : <NewToken />}
       </Container>
     </ThemeProvider>
   )

@@ -4,7 +4,7 @@ const months = ["January", "February", "March", "April", "May", "June",
 
 const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-export type Metadata = {
+export type MetadataType = {
   "name": string,
   "created_by": string,
   "external_url": string,
@@ -19,7 +19,7 @@ export type Metadata = {
   "image_url"?: string
 }
 
-export default function getBaseMetadata(dateString: string): Metadata {
+export default function getBaseMetadata(dateString: string): MetadataType {
   const year = parseInt(dateString.slice(0, 4));
   const month = parseInt(dateString.slice(4, 6)) - 1;
   const day = parseInt(dateString.slice(6, 8));
