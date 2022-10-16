@@ -9,7 +9,6 @@ import NewToken from "./NewToken";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import ExistingToken from "./ExistingToken";
-import NextAuthHeader from "./NextAuthHeader";
 
 const darkTheme = createTheme({
   palette: {
@@ -23,7 +22,6 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Container>
-        <NextAuthHeader />
         {tokenData ? <ExistingToken tokenMetadata = {tokenData}  /> : <NewToken />}
       </Container>
     </ThemeProvider>
