@@ -1,4 +1,4 @@
-import getBaseMetadata, { Metadata } from "./getBaseMetadata";
+import getBaseMetadata, { MetadataType } from "./getBaseMetadata";
 
 export default function getTokenMetadata({
   dateString,
@@ -16,7 +16,7 @@ export default function getTokenMetadata({
   camera: string,
   settings:string,
   imageTx:string
-}): Metadata {
+}): MetadataType {
   const baseMetadata = getBaseMetadata(dateString);
   return {
     "description": `${description}`,
