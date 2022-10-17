@@ -7,28 +7,20 @@ import UploadAndPublish from "./UploadAndPublish";
 import NextAuthHeader from "./NextAuthHeader";
 import { useSession } from "next-auth/react";
 import { useRecoilValue } from "recoil";
-import tokenIdAtom from "./_atoms/tokenIdAtom";
-import getFutureMetadata from "../utils/getFutureMetadata";
 import ExistingToken from "./ExistingToken";
 import manifestAtom from "./_atoms/manifestAtom";
+import { MetadataType } from "../utils/getBaseMetadata";
 
-export default function NewToken() {
-  const { data: session } = useSession()
-  const tokenId = useRecoilValue(tokenIdAtom);
+export default function NewToken({ futureTokenData }: { futureTokenData: MetadataType }) {
   const manifest = useRecoilValue(manifestAtom);
 
-  if(!tokenId) {
-    return null;
-  }
-  
-  const futureTokenData = getFutureMetadata(tokenId);
 
-  if(!session || !manifest) {
-    return <ExistingToken tokenMetadata = {futureTokenData}  />
+  if (!manifest) {
+    return <ExistingToken tokenMetadata={futureTokenData} />
   }
 
   return (
-    <>  
+    <>
       <NextAuthHeader />
       <UploadImage title={futureTokenData.name} />
       <ExifData />

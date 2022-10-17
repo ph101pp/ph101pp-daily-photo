@@ -8,6 +8,9 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import ExistingToken from "./ExistingToken";
 import Loading from "./Loading";
+import getFutureMetadata from "../utils/getFutureMetadata";
+import tokenIdAtom from "./_atoms/tokenIdAtom";
+import { useSession } from "next-auth/react";
 
 const darkTheme = createTheme({
   palette: {
@@ -17,9 +20,25 @@ const darkTheme = createTheme({
 
 function App() {
   const tokenData = useRecoilValue(tokenDataAtom);
-  return  tokenData ? 
-    <ExistingToken tokenMetadata = { tokenData }  /> : 
-    <NewToken />;
+  const tokenId = useRecoilValue(tokenIdAtom);
+  const { data: session, status } = useSession();
+  
+  if(!tokenId) {
+    return null;
+  }
+  
+  const futureTokenData = getFutureMetadata(tokenId);
+
+  if(tokenData) {
+    return <ExistingToken tokenMetadata = { tokenData }  />
+  }
+
+  if(!session) {
+    return <ExistingToken tokenMetadata = { futureTokenData }  />
+  }
+
+  return <NewToken futureTokenData={futureTokenData} />
+
 }
 
 export default () => (
