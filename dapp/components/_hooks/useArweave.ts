@@ -4,7 +4,12 @@ import delay from "../_helpers/delay";
 import { RecoilState, useSetRecoilState } from "recoil";
 import { ArweaveStatus } from "../_types/ArweaveStatus";
 
-const arweave = Arweave.init({});
+const arweave = Arweave.init({
+  host: 'arweave.net',
+  port: 443,
+  protocol: 'https',
+  logging: true
+});
 
 type TransactionId = string;
 type Execute = ()=>Promise<string>;
