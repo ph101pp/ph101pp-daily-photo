@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 const nextConfig = {
   async redirects() {
     return [
