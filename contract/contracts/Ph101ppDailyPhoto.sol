@@ -20,7 +20,6 @@ contract Ph101ppDailyPhoto is
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
     uint256 public constant CLAIM_TOKEN_ID = 0;
     string private constant CLAIM_TOKEN = "CLAIM";
-    string private constant FUTURE_TOKEN = "FUTURE";
 
     uint256 private constant TREASURY_ID = 0;
     uint256 private constant VAULT_ID = 1;
