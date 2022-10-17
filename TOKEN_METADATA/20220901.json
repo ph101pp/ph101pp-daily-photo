@@ -1,0 +1,69 @@
+{
+  "description": "Photo taken Thursday, September 1, 2022",
+  "image": "https://arweave.net/bvBmNlsyFF__bccAaciE1aSvHtuVk6Eqv-wKdduT-aU",
+  "image_url": "https://arweave.net/bvBmNlsyFF__bccAaciE1aSvHtuVk6Eqv-wKdduT-aU",
+  "name": "Thursday, September 1, 2022",
+  "created_by": "Ph101pp",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220901",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Long Island City, Brooklyn, NYC"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/13 ISO320"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662001200
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Daily Photo"
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "trait_type": "Month Name",
+      "value": "September"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 1
+    }
+  ],
+  "image_details": {
+    "size": 15558540,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "01df65ce6d1da17653460f80ddebffe0227c541306878c2fd2c8147b243dd8ca"
+  }
+}
