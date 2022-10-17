@@ -9,7 +9,8 @@ export default function getFutureMetadata(dateString: string): MetadataType {
       {
         "trait_type": "Revealed",
         "value": false
-      }
+      },
+      ...baseMetadata.attributes
     ],
     "description": `This photo will be taken on ${formattedDate}.`,
     "image": "https://arweave.net/PadvL0JxAXygBESPC-ewSbMv3pDGm56z8N7KHdno5hc",

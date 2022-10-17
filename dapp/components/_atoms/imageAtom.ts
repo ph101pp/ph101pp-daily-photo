@@ -4,8 +4,12 @@ import { ImageType } from "react-images-uploading";
 const imageAtom = atom<{
   image: ImageType,
   dataURL: string,
+  file: {
+    type: string,
+    size: number
+  }
   exif: any
-} | null >({
+} | null >({
   key: "imageAtom",
   default: null
 });

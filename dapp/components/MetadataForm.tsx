@@ -50,6 +50,7 @@ function MetadataForm() {
   if (!input) {
     return null;
   }
+  const {image_details, ...defaultInput} = input;
 
   return (
     <Accordion defaultExpanded={true}>
@@ -58,7 +59,7 @@ function MetadataForm() {
       </AccordionSummary>
       <AccordionDetails>
         <FormContainer
-          defaultValues={input}
+          defaultValues={defaultInput}
           onSuccess={data => {
             setInput({
               settings: data.settings,
@@ -66,6 +67,7 @@ function MetadataForm() {
               description: data.description,
               place: data.place,
               country: data.country,
+              image_details
             })
           }}
         >

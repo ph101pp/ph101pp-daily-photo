@@ -14,10 +14,11 @@ function UploadImage() {
     if (imageList.length >= 1) {
       const index = (addUpdateIndex && addUpdateIndex[0]) ?? imageList.length - 1;
       const image = imageList[index];
-      if (image.dataURL) {
+      if (image.dataURL && image.file) {
         const data = image.dataURL.replace("data:image/jpeg;base64,", "");
         return setImage({
           image,
+          file: image.file,
           dataURL: image.dataURL,
           exif: Exif.readFromBinaryFile(base64ToArrayBuffer(data))
         });
@@ -25,7 +26,7 @@ function UploadImage() {
     }
     setImage(null);
   };
-
+  console.log(image)
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary>

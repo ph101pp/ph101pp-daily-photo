@@ -1,5 +1,6 @@
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box, Button } from "@mui/material";
 import { MetadataType } from "../utils/getBaseMetadata";
+import Image from "next/image";
 
 const ExistingToken = ({ tokenMetadata }: { tokenMetadata: MetadataType }) => {
   return (<>
@@ -15,6 +16,12 @@ const ExistingToken = ({ tokenMetadata }: { tokenMetadata: MetadataType }) => {
             justifyContent: "center"
           }}
         >
+          {/* {tokenMetadata.image && 
+            <Image
+              src={tokenMetadata.image}
+              height={400}
+            />
+          } */}
           <Box
             component="img"
             sx={{

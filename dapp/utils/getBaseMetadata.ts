@@ -10,13 +10,20 @@ export type MetadataType = {
   "external_url": string,
   "attributes": Array<{
     "trait_type": string,
-    "value": string|number|boolean,
+    "value": string | number | boolean,
     "display_type"?: string,
-    "max_value"?:string|number,
+    "max_value"?: string | number,
   }>
   "description"?: string,
   "image"?: string,
   "image_url"?: string
+  "image_details"?: {
+    "size": number,
+    "type": string,
+    "width": number,
+    "height": number,
+    "sha256": string
+  }
 }
 
 export default function getBaseMetadata(dateString: string): MetadataType {

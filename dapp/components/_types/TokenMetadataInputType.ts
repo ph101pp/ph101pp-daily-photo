@@ -4,4 +4,11 @@ export type TokenMetadataInputType = {
   place: string,
   country: string,
   description: string,
+  image_details: {
+    size: number,
+    type: string,
+    width: number,
+    height: number,
+    sha256: string
+  }
 }

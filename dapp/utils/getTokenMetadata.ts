@@ -1,3 +1,4 @@
+import { TokenMetadataInputType } from "../components/_types/TokenMetadataInputType";
 import getBaseMetadata, { MetadataType } from "./getBaseMetadata";
 
 export default function getTokenMetadata({
@@ -7,16 +8,12 @@ export default function getTokenMetadata({
   country,
   camera,
   settings,
+  image_details,
   imageTx
 }:{
   dateString: string,
-  description:string,
-  place:string,
-  country:string,
-  camera: string,
-  settings:string,
   imageTx:string
-}): MetadataType {
+} & TokenMetadataInputType): MetadataType {
   const baseMetadata = getBaseMetadata(dateString);
   return {
     "description": `${description}`,
@@ -42,5 +39,6 @@ export default function getTokenMetadata({
       },
       ...baseMetadata.attributes,
     ],
+    "image_details": image_details
   }
 }
