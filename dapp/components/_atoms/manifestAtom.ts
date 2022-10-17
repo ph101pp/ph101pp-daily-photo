@@ -7,7 +7,6 @@ const manifestAtom = selector<ManifestType | null>({
     return fetch("/api/manifest")
     .then(response => response.json())
     .then(manifest =>{
-      console.log(manifest);
       if(ManifestType.is(manifest)) {
         return manifest;
       }

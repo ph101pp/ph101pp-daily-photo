@@ -10,6 +10,9 @@ const nextConfig = {
   },
   env: {
     LATEST_MANIFEST_URI: process.env.LATEST_MANIFEST_URI
-  }
+  },
+  images: {
+    domains: ['arweave.net'],
+  },
 }
 module.exports = nextConfig

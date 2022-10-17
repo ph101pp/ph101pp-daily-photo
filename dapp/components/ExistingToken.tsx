@@ -3,6 +3,10 @@ import { MetadataType } from "../utils/getBaseMetadata";
 import Image from "next/image";
 
 const ExistingToken = ({ tokenMetadata }: { tokenMetadata: MetadataType }) => {
+  const maxSize = 500;
+  const ratio = tokenMetadata.image_details.height / tokenMetadata.image_details.width;
+  const width = ratio < 1 ? maxSize : tokenMetadata.image_details.width * maxSize / tokenMetadata.image_details.height;
+  const height = ratio > 1 ? maxSize : tokenMetadata.image_details.height * maxSize / tokenMetadata.image_details.width;
   return (<>
     <Accordion defaultExpanded={true}>
       <AccordionSummary>
@@ -16,21 +20,14 @@ const ExistingToken = ({ tokenMetadata }: { tokenMetadata: MetadataType }) => {
             justifyContent: "center"
           }}
         >
-          {/* {tokenMetadata.image && 
+          {tokenMetadata.image &&
             <Image
+              layout={"fixed"}
               src={tokenMetadata.image}
-              height={400}
+              height={height}
+              width={width}
             />
-          } */}
-          <Box
-            component="img"
-            sx={{
-              width: "auto",
-              maxHeight: "400px",
-              maxWidth: "100%",
-            }}
-            src={tokenMetadata.image}
-          />
+          }
         </Box>
       </AccordionDetails>
     </Accordion>

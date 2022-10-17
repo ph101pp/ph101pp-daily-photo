@@ -18,5 +18,12 @@
     }
   ],
   "image": "https://arweave.net/gnsheut4xCRlCqaRDap2vX1yrbA0OEWqKuUUMp-uELc",
-  "image_url": "https://arweave.net/gnsheut4xCRlCqaRDap2vX1yrbA0OEWqKuUUMp-uELc"
+  "image_url": "https://arweave.net/gnsheut4xCRlCqaRDap2vX1yrbA0OEWqKuUUMp-uELc",
+  "image_details": {
+    "size": 7664958,
+    "type": "image/jpeg",
+    "width": 3000,
+    "height": 2000,
+    "sha256": "19d8963a48cb670c3e328544e541a2d9d877f37a060429b6c0dcca65060e88d8"
+  }
 }

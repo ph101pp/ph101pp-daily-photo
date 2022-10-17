@@ -10,10 +10,12 @@ import { useRecoilValue } from "recoil";
 import tokenIdAtom from "./_atoms/tokenIdAtom";
 import getFutureMetadata from "../utils/getFutureMetadata";
 import ExistingToken from "./ExistingToken";
+import manifestAtom from "./_atoms/manifestAtom";
 
 export default function NewToken() {
   const { data: session, status } = useSession()
   const tokenId = useRecoilValue(tokenIdAtom);
+  const manifest = useRecoilValue(manifestAtom);
 
   if(!tokenId) {
     return null;
@@ -21,7 +23,7 @@ export default function NewToken() {
   
   const futureTokenData = getFutureMetadata(tokenId);
 
-  if(!session) {
+  if(!session || !manifest) {
     return <ExistingToken tokenMetadata = {futureTokenData}  />
   }
 

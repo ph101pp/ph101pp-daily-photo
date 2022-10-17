@@ -10,7 +10,6 @@ function UploadImage() {
   const [image, setImage] = useRecoilState(imageAtom);
 
   const onChange: ImageUploadingPropsType["onChange"] = (imageList, addUpdateIndex) => {
-    console.log("onChange", imageList, addUpdateIndex)
     if (imageList.length >= 1) {
       const index = (addUpdateIndex && addUpdateIndex[0]) ?? imageList.length - 1;
       const image = imageList[index];
@@ -26,7 +25,7 @@ function UploadImage() {
     }
     setImage(null);
   };
-  console.log(image)
+
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary>

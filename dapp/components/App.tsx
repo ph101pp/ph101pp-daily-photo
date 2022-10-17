@@ -1,14 +1,13 @@
 import React, { Suspense } from "react";
 import { useRecoilValue } from "recoil";
 import tokenDataAtom from "./_atoms/tokenDataAtom"
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import NewToken from "./NewToken";
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import ExistingToken from "./ExistingToken";
+import Loading from "./Loading";
 
 const darkTheme = createTheme({
   palette: {
@@ -18,22 +17,20 @@ const darkTheme = createTheme({
 
 function App() {
   const tokenData = useRecoilValue(tokenDataAtom);
-  return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <Container>
-        {tokenData ? <ExistingToken tokenMetadata = {tokenData}  /> : <NewToken />}
-      </Container>
-    </ThemeProvider>
-  )
+  return  tokenData ? 
+    <ExistingToken tokenMetadata = { tokenData }  /> : 
+    <NewToken />;
 }
 
 export default () => (
-  <Suspense
-    fallback={
-      <Box sx={{ display: "flex", justifyContent: "center" }}><CircularProgress /></Box>
-    }
-  >
-    <App />
-  </Suspense>
+  <ThemeProvider theme={darkTheme}>
+    <CssBaseline />
+    <Container>
+      <Suspense
+        fallback={<Loading />}
+      >
+        <App />
+      </Suspense>
+    </Container>
+  </ThemeProvider>
 )
