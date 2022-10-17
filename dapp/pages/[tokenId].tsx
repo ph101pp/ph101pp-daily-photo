@@ -12,7 +12,6 @@ function Root() {
   const tokenId = router.query.tokenId as string;
 
   useEffect(()=>{
-    console.log("SET TOKENID", tokenId);
     if(isValidDate(tokenId)) {
       setTokenId(tokenId)
     }

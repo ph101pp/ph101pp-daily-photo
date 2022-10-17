@@ -1,12 +1,12 @@
 import ImageUploading, { ImageUploadingPropsType, ImageListType, ImageType } from "react-images-uploading";
 import Exif from "exif-js";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import base64ToArrayBuffer from "./_helpers/base64ToArrayBuffer";
 import imageAtom from "./_atoms/imageAtom";
 import Box from "@mui/material/Box";
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
 
-function UploadImage() {
+function UploadImage({title}:{ title:string }) {
   const [image, setImage] = useRecoilState(imageAtom);
 
   const onChange: ImageUploadingPropsType["onChange"] = (imageList, addUpdateIndex) => {
@@ -29,7 +29,7 @@ function UploadImage() {
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary>
-        <Typography variant="h6">Upload Image</Typography>
+        <Typography variant="h6">{`Upload Image: ${title}`}</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <ImageUploading

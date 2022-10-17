@@ -5,7 +5,6 @@ import { Octokit } from "@octokit/rest"
 import type { NextApiRequest, NextApiResponse } from "next";
 import { githubContext } from "../../utils/githubContext";
 
-
 const path = "LATEST_MANIFEST.json";
 
 export default async function handler(

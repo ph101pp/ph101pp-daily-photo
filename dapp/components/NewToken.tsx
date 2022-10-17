@@ -13,7 +13,7 @@ import ExistingToken from "./ExistingToken";
 import manifestAtom from "./_atoms/manifestAtom";
 
 export default function NewToken() {
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const tokenId = useRecoilValue(tokenIdAtom);
   const manifest = useRecoilValue(manifestAtom);
 
@@ -30,7 +30,7 @@ export default function NewToken() {
   return (
     <>  
       <NextAuthHeader />
-      <UploadImage />
+      <UploadImage title={futureTokenData.name} />
       <ExifData />
       <MetadataForm />
       <MetadataPreview />
