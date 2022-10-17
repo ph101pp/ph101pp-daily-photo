@@ -1,10 +1,19 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { isValidDate } from "./utils/isValidDate";
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
-  if (url.pathname === '/') {
+  const query = url.pathname.slice(1);
+  const [date] = query.split(".");
+
+  if(
+    url.pathname.slice(0, 4) !== "/api" &&
+    // url.pathname.slice(0, 6) !== "/claim" &&
+    url.pathname.slice(0, 6) !== "/_next" &&
+    ( url.pathname === '/' || !isValidDate(date))
+  ) {
     const now = new Date();
     const month = now.getMonth() + 1;
     const day = now.getDate();

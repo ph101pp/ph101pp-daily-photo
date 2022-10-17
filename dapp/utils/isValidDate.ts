@@ -8,5 +8,5 @@ export function isValidDate(tokenId?:string) {
 
   const date = new Date(year, month, day);
 
-  return !isNaN(date as any);
+  return !isNaN(date as any) && date.getTime()/1000>=1661990400;
 }
