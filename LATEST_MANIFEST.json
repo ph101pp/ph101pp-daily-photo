@@ -1,0 +1,9 @@
+{
+  "manifest": "arweave/paths",
+  "version": "0.1.0",
+  "paths": {
+    "CLAIM.json": {
+      "id": "_ASCpK7YEEn3fHbJSg79eCnVAFD43YU2Hqwr2zdtTtQ"
+    }
+  }
+}
