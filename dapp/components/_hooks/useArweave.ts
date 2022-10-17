@@ -22,6 +22,9 @@ function useArweave(
   return useCallback<UploadToArweave>(async (data, contentType) => {
     const transaction = await arweave.createTransaction({ data });
     transaction.addTag('Content-Type', contentType);
+    transaction.addTag('author', "Ph101pp");
+    transaction.addTag('project', "Daily Photo");
+    transaction.addTag('website', "https://daily-photo.ph101pp.xyz");
     await arweave.transactions.sign(transaction);
     const transactionStarted = Date.now();
 
