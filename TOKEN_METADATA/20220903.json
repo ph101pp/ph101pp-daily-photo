@@ -1,0 +1,69 @@
+{
+  "description": "Photo taken on Saturday, September 3, 2022",
+  "image": "https://arweave.net/JzizXYiF4KX_nyqiKW4ku-Ek6jCIZ0kfWK0tkco8ttk",
+  "image_url": "https://arweave.net/JzizXYiF4KX_nyqiKW4ku-Ek6jCIZ0kfWK0tkco8ttk",
+  "name": "Saturday, September 3, 2022",
+  "created_by": "Ph101pp",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220903",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Nom Wah Tea Parlor, NYC"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2 ISO1000"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662174000
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Daily Photo"
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "trait_type": "Month Name",
+      "value": "September"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 3
+    }
+  ],
+  "image_details": {
+    "size": 14569123,
+    "type": "image/jpeg",
+    "width": 5352,
+    "height": 3568,
+    "sha256": "9fbae6959dbbbc1023adeb4e71fe251ed2e226eb26e3860c67dc29e577af6299"
+  }
+}
