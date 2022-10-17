@@ -8,7 +8,7 @@ const arweave = Arweave.init({
   host: 'arweave.net',
   port: 443,
   protocol: 'https',
-  logging: true
+  logging: false
 });
 
 type TransactionId = string;
