@@ -17,7 +17,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if(req.method !== 'POST') {
-    return res.status(405).end({ message: 'Only POST requests allowed' })
+    return res.status(405).json({ message: 'Only POST requests allowed' })
   }
   const params = JSON.parse(req.body);
   if(!CommitPostDataType.is(params)) {

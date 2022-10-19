@@ -3,16 +3,16 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isValidDate } from "./utils/isValidDate";
 
-export function middleware(request: NextRequest) {
+function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
   const query = url.pathname.slice(1);
   const [date] = query.split(".");
 
-  if(
-    url.pathname.slice(0, 4) !== "/api" &&
-    // url.pathname.slice(0, 6) !== "/claim" &&
-    url.pathname.slice(0, 6) !== "/_next" &&
-    ( url.pathname === '/' || !isValidDate(date))
+  if (
+    !url.pathname.startsWith("/api/") &&
+    !url.pathname.startsWith("/_next") &&
+    // !url.pathname.startsWith("/claim") &&
+    !isValidDate(date)
   ) {
     const now = new Date();
     const month = now.getMonth() + 1;
@@ -23,10 +23,18 @@ export function middleware(request: NextRequest) {
 }
 
 // More on how NextAuth.js middleware works: https://next-auth.js.org/configuration/nextjs#middleware
-export default withAuth({
-  callbacks: {
-    authorized({ req, token }) {
-      return !req.url.includes("api/") || req.url.includes("api/proxy") || token?.email === "hello@philippadrian.com";
+export default withAuth(
+  middleware,
+  {
+    callbacks: {
+      authorized({ req, token }) {
+        const path: string = req.nextUrl.pathname;
+        return true || (
+          !path.startsWith("/api/") || // close all api routes
+          path.startsWith("/api/proxy/") || // except for the proxy 
+          token?.email === "hello@philippadrian.com" // or if logged in.
+          ); 
+      },
     },
-  },
-});
+  }
+);

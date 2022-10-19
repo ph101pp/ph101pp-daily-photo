@@ -3,6 +3,8 @@ import { useCallback } from "react";
 import delay from "../_helpers/delay";
 import { RecoilState, useSetRecoilState } from "recoil";
 import { ArweaveStatus } from "../_types/ArweaveStatus";
+import { ArwalletType } from "../_types/ArwalletType";
+import Transaction from "arweave/node/lib/transaction";
 
 const arweave = Arweave.init({
   host: 'arweave.net',
@@ -17,15 +19,16 @@ type UploadToArweave = (data:ArrayBuffer|string, contentType: string) => Promise
 
 function useArweave(
   statusAtom: RecoilState<ArweaveStatus|null>, 
+  key: ArwalletType | null
 ): UploadToArweave {
   const setStatus = useSetRecoilState(statusAtom);
   return useCallback<UploadToArweave>(async (data, contentType) => {
-    const transaction = await arweave.createTransaction({ data });
+    const transaction: Transaction = await arweave.createTransaction({ data }, key ?? "use_wallet");
     transaction.addTag('Content-Type', contentType);
     transaction.addTag('author', "Ph101pp");
     transaction.addTag('project', "Daily Photo");
     transaction.addTag('website', "https://daily-photo.ph101pp.xyz");
-    await arweave.transactions.sign(transaction);
+    await arweave.transactions.sign(transaction, key ?? "use_wallet");
     const transactionStarted = Date.now();
 
     setStatus({

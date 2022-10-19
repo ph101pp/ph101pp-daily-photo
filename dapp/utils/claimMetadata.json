@@ -2,7 +2,7 @@
   "name": "Claim - Daily Photo",
   "created_by": "Ph101pp",
   "external_url": "https://daily-photo.ph101pp.xyz/",
-  "description": "Redeemable for one photo from Ph101pp Daily Photo collection.",
+  "description": "This claim is redeemable for one photo from the Ph101pp Daily Photo collection.",
   "attributes": [
     {
       "trait_type": "Artist",

@@ -60,7 +60,7 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     return {
       settings: autoSettings,
       camera: autoCamera,
-      description: `Photo taken on ${baseMetadata.name}`,
+      description: `This photo was taken on ${baseMetadata.name}.`,
       place: "",
       country: "",
       image_details: {

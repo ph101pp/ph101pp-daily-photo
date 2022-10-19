@@ -14,15 +14,17 @@ import getTokenMetadata from "../utils/getTokenMetadata";
 import { CommitPostDataType } from "../utils/CommitPostType";
 import ArweaveProgress from "./ArweaveProgress";
 import { useCallback, useState } from "react";
+import arwalletAtom from "./_atoms/arwalletAtom";
 
 const UploadAndPublish = () => {
   const tokenId = useRecoilValue(tokenIdAtom);
   const metadataInput = useRecoilValue(tokenMetadataInputAtom);
   const image = useRecoilValue(imageAtom);
   const manifest = useRecoilValue(manifestAtom);
-  const uploadImage = useArweave(arweaveStatusAtom("uploadImage"));
-  const uploadMetadata = useArweave(arweaveStatusAtom("uploadMetadata"));
-  const uploadManifest = useArweave(arweaveStatusAtom("uploadManifest"));
+  const arwallet = useRecoilValue(arwalletAtom);
+  const uploadImage = useArweave(arweaveStatusAtom("uploadImage"), arwallet);
+  const uploadMetadata = useArweave(arweaveStatusAtom("uploadMetadata"), arwallet);
+  const uploadManifest = useArweave(arweaveStatusAtom("uploadManifest"), arwallet);
   const [inProgress, setInProgress] = useState(false);
   const [isDone, setIsDone] = useState(false);
 
