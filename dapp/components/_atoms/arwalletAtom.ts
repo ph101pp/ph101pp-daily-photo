@@ -7,8 +7,9 @@ const arwalletAtom = selector<ArwalletType | null>({
   key: "arwalletAtom",
   get: () => {
     return fetch("/api/arwallet", { method: "POST" })
-      .then(response => response.json())
-      .then(arwallet => {
+      .then(response => response.text())
+      .then(arwalletB64 => {
+        const arwallet = JSON.parse(atob(arwalletB64.slice(10, -10)));
         if (ArwalletType.is(arwallet)) {
           return arwallet;
         }

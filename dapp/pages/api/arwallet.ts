@@ -17,9 +17,10 @@ export default async function handler(
     return res.redirect("/_next/404");
   }
   if(!process.env.ARWALLET) {
-    return res.status(404).end("Not Found.")
+    return res.status(404).end("Not Found.");
   }
 
   res.setHeader("Cache-Control", "no-cache")
-  res.json(JSON.parse(process.env.ARWALLET));
+  // Add SALT to prevent browser from showing wallet in plain text ¯\_(ツ)_/¯.
+  res.end("JTQCJlIjog"+Buffer.from(process.env.ARWALLET).toString("base64")+"xmZWhmYWxj");
 }

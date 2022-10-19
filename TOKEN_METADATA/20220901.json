@@ -1,14 +1,14 @@
 {
-  "description": "Photo taken Thursday, September 1, 2022",
-  "image": "https://arweave.net/bvBmNlsyFF__bccAaciE1aSvHtuVk6Eqv-wKdduT-aU",
-  "image_url": "https://arweave.net/bvBmNlsyFF__bccAaciE1aSvHtuVk6Eqv-wKdduT-aU",
+  "description": "This photo was taken on Thursday, September 1, 2022.",
+  "image": "https://arweave.net/F2zMJ0dLhq_wRd08eHswtbOGf8mV9vB4wP_W7rHv4ag",
+  "image_url": "https://arweave.net/F2zMJ0dLhq_wRd08eHswtbOGf8mV9vB4wP_W7rHv4ag",
   "name": "Thursday, September 1, 2022",
   "created_by": "Ph101pp",
   "external_url": "https://daily-photo.ph101pp.xyz/20220901",
   "attributes": [
     {
       "trait_type": "Place",
-      "value": "Long Island City, Brooklyn, NYC"
+      "value": "Long Island City, Queens, NYC"
     },
     {
       "trait_type": "Country",
