@@ -1,7 +1,7 @@
 {
-  "description": "Photo taken on Saturday, September 3, 2022",
-  "image": "https://arweave.net/JzizXYiF4KX_nyqiKW4ku-Ek6jCIZ0kfWK0tkco8ttk",
-  "image_url": "https://arweave.net/JzizXYiF4KX_nyqiKW4ku-Ek6jCIZ0kfWK0tkco8ttk",
+  "description": "This photo was taken on Saturday, September 3, 2022.",
+  "image": "https://arweave.net/P2wGRkvNMscIho-_dzSB4LiHbWAbYR7AqMVs33WDW9g",
+  "image_url": "https://arweave.net/P2wGRkvNMscIho-_dzSB4LiHbWAbYR7AqMVs33WDW9g",
   "name": "Saturday, September 3, 2022",
   "created_by": "Ph101pp",
   "external_url": "https://daily-photo.ph101pp.xyz/20220903",
@@ -21,6 +21,10 @@
     {
       "trait_type": "Settings",
       "value": "23mm 1/250s ƒ/2 ISO1000"
+    },
+    {
+      "trait_type": "Revealed",
+      "value": "true"
     },
     {
       "trait_type": "Artist",
@@ -60,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 14569123,
+    "size": 14611566,
     "type": "image/jpeg",
     "width": 5352,
     "height": 3568,
-    "sha256": "9fbae6959dbbbc1023adeb4e71fe251ed2e226eb26e3860c67dc29e577af6299"
+    "sha256": "9c8e1a697030769de0270775a10d6872e1a9cefba00219b4b1805baf93f189c4"
   }
 }
