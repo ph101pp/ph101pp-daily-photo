@@ -56,7 +56,7 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
         }}>
           {status.uploadStatus && (
             <Box sx={{ display: 'flex', alignItems: 'center', minWidth: "100px" }}>
-              <Box sx={{ minWidth: 120, padding: "8px 0px" }}>
+              <Box sx={{ minWidth: "120px", padding: "8px 0px" }}>
                 <Typography variant="body2" color="text.secondary">{
                   "Upload:"
                 }</Typography>
@@ -68,7 +68,7 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
                     value={status.uploadStatus.chunks * 100 / status.uploadStatus.totalChunks}
                   />
                 </Box>
-                <Box sx={{ minWidth: 50 }}>
+                <Box sx={{ minWidth: "50px" }}>
                   <Typography variant="body2" color="text.secondary">{
                     `${status.uploadStatus.chunks} / ${status.uploadStatus.totalChunks}`
                   }</Typography>
@@ -78,7 +78,7 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
           )}
           {status.transactionStatus && (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ minWidth: 120, padding: "8px 0px" }}>
+              <Box sx={{ minWidth: "120px", padding: "8px 0px" }}>
                 <Typography variant="body2" color="text.secondary">{
                   "Confirmations:"
                 }</Typography>
@@ -90,7 +90,7 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
                     value={status.transactionStatus.confirmations * 100 / Math.max(status.transactionStatus.confirmations, 5)}
                   />
                 </Box>
-                <Box sx={{ minWidth: 50 }}>
+                <Box sx={{ minWidth: "50px" }}>
                   <Typography variant="body2" color="text.secondary">{
                     `${status.transactionStatus.confirmations} / ${Math.max(status.transactionStatus.confirmations, 5)}`
                   }</Typography>
@@ -104,7 +104,7 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
           width: "50px",
           justifyContent: "center"
         }}>
-          {status.transactionStarted && <CircularProgressWithLabel size={50} value={(Date.now() - status.transactionStarted)} />}
+          {status.tick && <CircularProgressWithLabel size={50} value={(status.tick)} />}
         </Box>
       </Box>
     </Box>
