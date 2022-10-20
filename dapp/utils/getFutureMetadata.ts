@@ -8,7 +8,7 @@ export default function getFutureMetadata(dateString: string): MetadataType {
     attributes: [
       {
         "trait_type": "Revealed",
-        "value": false
+        "value": "false"
       },
       ...baseMetadata.attributes
     ],
