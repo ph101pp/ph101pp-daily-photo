@@ -1,0 +1,73 @@
+{
+  "description": "This photo was taken on Sunday, September 4, 2022.",
+  "image": "https://arweave.net/n456z0B4m5-P7xKw_aOTQm1UCE3nEDNoLa-XuDVd5OE",
+  "image_url": "https://arweave.net/n456z0B4m5-P7xKw_aOTQm1UCE3nEDNoLa-XuDVd5OE",
+  "name": "Sunday, September 4, 2022",
+  "created_by": "Ph101pp",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220904",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Red Hook, Brooklyn, NYC"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/3.2 ISO320"
+    },
+    {
+      "trait_type": "Revealed",
+      "value": "true"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662260400
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Daily Photo"
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "trait_type": "Month Name",
+      "value": "September"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 4
+    }
+  ],
+  "image_details": {
+    "size": 3597499,
+    "type": "image/jpeg",
+    "width": 1925,
+    "height": 2888,
+    "sha256": "411d8317a56e6f25015a2515fc524d29cd1ea6a72603164f3fe91a7b95bc45f9"
+  }
+}
