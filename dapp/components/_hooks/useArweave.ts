@@ -43,12 +43,10 @@ function useArweave(
 
     async function execute(): Promise<string> {
       let uploader = await arweave.transactions.getUploader(transaction);
-      const uploadStarted = Date.now();
       while (!uploader.isComplete) {
         await uploader.uploadChunk();
         setStatus({
           uploadStatus: {
-            uploadStarted,
             chunks: uploader.uploadedChunks,
             totalChunks: uploader.totalChunks
           }

@@ -14,7 +14,7 @@ async function main() {
   // const tx = await pdp.setMutableURI("https://ph101pp-daily-photo.vercel.app/api/proxy/");
   
   const input = await pdp.getMintRangeInput(122);
-  const tx = await pdp.mintPhotos(...input, 3);
+  const tx = await pdp.mintPhotos(...input, 2);
 
   const receipt = await tx.wait();
 
