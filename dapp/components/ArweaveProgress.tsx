@@ -46,7 +46,8 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
       <Typography variant="h6" color="text.secondary">{label}</Typography>
       <Box
         sx={{
-          dispay: "flex",
+          display: "flex",
+          flexGrow: 1
         }}
       >
         <Box sx={{
@@ -101,10 +102,16 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
         </Box>
         <Box sx={{
           display: "flex",
-          width: "50px",
-          justifyContent: "center"
+          width:"70px",
+          justifyContent: "center",
+          alignItems:"center"
         }}>
-          {status.tick && <CircularProgressWithLabel size={50} value={(status.tick)} />}
+          {status.transactionStarted && 
+            <CircularProgressWithLabel 
+              size={50} 
+              value={Math.floor((Date.now()-status.transactionStarted)/1000)} 
+            />
+          }
         </Box>
       </Box>
     </Box>

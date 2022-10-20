@@ -5,6 +5,7 @@ import { RecoilState, useSetRecoilState } from "recoil";
 import { ArweaveStatus } from "../_types/ArweaveStatus";
 import { ArwalletType } from "../_types/ArwalletType";
 import Transaction from "arweave/node/lib/transaction";
+import { TransactionUploader } from "arweave/node/lib/transaction-uploader";
 
 const arweave = Arweave.init({
   host: 'arweave.net',
@@ -41,8 +42,9 @@ function useArweave(
       execute
     ];
 
-    async function execute(): Promise<string> {
+    async function waitForUpload() {
       let uploader = await arweave.transactions.getUploader(transaction);
+
       while (!uploader.isComplete) {
         await uploader.uploadChunk();
         setStatus({
@@ -56,6 +58,9 @@ function useArweave(
         //   totalChunks: uploader.totalChunks
         // })
       }
+    }
+
+    async function waitForTransaction(){
       let transactionStatus;
       do {
         await delay(1000);
@@ -71,7 +76,15 @@ function useArweave(
         //   confirmations: transactionStatus?.confirmed?.number_of_confirmations ?? 0
         // })
       } while (!transactionStatus?.confirmed || transactionStatus.confirmed.number_of_confirmations < 5);
-  
+    }
+
+    async function execute(): Promise<string> {
+      
+      await Promise.all([
+        waitForUpload(),
+        waitForTransaction()
+      ]);
+      
       setStatus({
         completed: true
       });
