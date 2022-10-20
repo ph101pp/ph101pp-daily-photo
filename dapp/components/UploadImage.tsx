@@ -37,7 +37,7 @@ function UploadImage({title}:{ title:string }) {
           onChange={onChange}
           maxNumber={1}
           dataURLKey="dataURL"
-          acceptType={["jpg"]}
+          acceptType={["jpg", "jpeg"]}
         >
           {({
             imageList,
