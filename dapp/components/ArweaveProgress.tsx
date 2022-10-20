@@ -104,7 +104,7 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
           width: "50px",
           justifyContent: "center"
         }}>
-          {status.tick && <CircularProgressWithLabel size={50} value={(status.tick)} />}
+          {status.transactionStarted && <CircularProgressWithLabel size={50} value={(Date.now() - status.transactionStarted)} />}
         </Box>
       </Box>
     </Box>
