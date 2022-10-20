@@ -1,7 +1,7 @@
 {
-  "description": "Photo taken on Friday, September 2, 2022",
-  "image": "https://arweave.net/1RAxXWEtqpnbM7krgiNAjBwBryVGnLD2c_WEhmJ3Ot8",
-  "image_url": "https://arweave.net/1RAxXWEtqpnbM7krgiNAjBwBryVGnLD2c_WEhmJ3Ot8",
+  "description": "This photo was taken on Friday, September 2, 2022.",
+  "image": "https://arweave.net/ncseuWXdVkegzGYeBofN7HrZuAnx8SOORNfeSa8X37o",
+  "image_url": "https://arweave.net/ncseuWXdVkegzGYeBofN7HrZuAnx8SOORNfeSa8X37o",
   "name": "Friday, September 2, 2022",
   "created_by": "Ph101pp",
   "external_url": "https://daily-photo.ph101pp.xyz/20220902",
@@ -60,10 +60,10 @@
     }
   ],
   "image_details": {
-    "size": 10376655,
+    "size": 10393419,
     "type": "image/jpeg",
     "width": 5298,
     "height": 3532,
-    "sha256": "fcfa11d68a981f0f50a53828d5d0a50acf2c3c612cc090373ede43cda4dbccd0"
+    "sha256": "afd85decbe521d8a27a99f043086b605c1687d8663568169747b5d29794ae879"
   }
 }
