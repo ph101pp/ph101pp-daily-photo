@@ -1,0 +1,73 @@
+{
+  "description": "This photo was taken on Monday, September 5, 2022.",
+  "image": "https://arweave.net/1wrEf8CkhqwyzVSFqIQh3cDltc5FqUd1pINDpr6QRVw",
+  "image_url": "https://arweave.net/1wrEf8CkhqwyzVSFqIQh3cDltc5FqUd1pINDpr6QRVw",
+  "name": "Monday, September 5, 2022",
+  "created_by": "Ph101pp",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220905",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Long Island City, Queens, NYC"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO3200"
+    },
+    {
+      "trait_type": "Revealed",
+      "value": "true"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662346800
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Daily Photo"
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "trait_type": "Month Name",
+      "value": "September"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 5
+    }
+  ],
+  "image_details": {
+    "size": 16412108,
+    "type": "image/jpeg",
+    "width": 6012,
+    "height": 4008,
+    "sha256": "902a338cd013cd73e8c916a7e24073a701db4620f8ff4502743f75900f449a32"
+  }
+}
