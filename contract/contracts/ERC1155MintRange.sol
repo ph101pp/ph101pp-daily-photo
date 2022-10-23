@@ -174,15 +174,15 @@ abstract contract ERC1155MintRange is ERC1155_ {
     {
         // Pre initialization
         if (_inRange(tokenId) && !_manualMint[tokenId]) {
-            uint256 totalSupplySum = 0;
+            uint256 initialTotalSupplySum = 0;
             address[] memory initialHolderAddresses = initialHolders(tokenId);
             for (uint256 i = 0; i < initialHolderAddresses.length; i++) {
-                totalSupplySum += initialBalanceOf(
+                initialTotalSupplySum += initialBalanceOf(
                     initialHolderAddresses[i],
                     tokenId
                 );
             }
-            return uint256(int256(totalSupplySum) + _totalSupply[tokenId]);
+            return uint256(int256(initialTotalSupplySum) + _totalSupply[tokenId]);
         }
 
         // manually minted
@@ -190,7 +190,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
-     * @dev Convenience method to generate mintRange inputs for x new tokens.
+     * @dev Generate mintRange inputs for x new tokens.
      */
     function getMintRangeInput(uint256 numberOfTokens)
         public
@@ -252,7 +252,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
 
             // when minting
             if (from == address(0)) {
-                // set _manualMint flag if minted via _mint||_mintBatch
+                // set _manualMint flag if id doesnt exist -> minted via _mint||_mintBatch
                 if (!exists(id)) {
                     _manualMint[id] = true;
                     _manualMints++;
@@ -275,7 +275,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Writes dynamic initial Balance to state if uninitialized.
      */
     function _maybeInitializeBalance(address account, uint256 id) private {
-        // Pre initialization
         if (
             account != address(0) &&
             _inRange(id) &&
