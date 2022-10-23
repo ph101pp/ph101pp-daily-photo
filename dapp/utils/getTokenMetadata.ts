@@ -39,7 +39,7 @@ export default function getTokenMetadata({
       },
       {
         "trait_type": "Revealed",
-        "value": "true"
+        "value": "Yes"
       },
       ...baseMetadata.attributes,
     ],

@@ -62,10 +62,6 @@ export default function getBaseMetadata(dateString: string): BaseMetadataType {
         "value": weekday
       },
       {
-        "trait_type": "Month Name",
-        "value": months[month]
-      },
-      {
         "display_type": "number",
         "trait_type": "Month",
         "value": month + 1

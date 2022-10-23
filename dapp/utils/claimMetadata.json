@@ -1,7 +1,7 @@
 {
   "name": "Claim - Daily Photo",
   "created_by": "Ph101pp",
-  "external_url": "https://daily-photo.ph101pp.xyz/",
+  "external_url": "https://daily-photo.ph101pp.xyz/claim",
   "description": "This claim is redeemable for one photo from the Ph101pp Daily Photo collection.",
   "attributes": [
     {
@@ -14,16 +14,16 @@
     },
     {
       "trait_type": "Revealed",
-      "value": "false"
+      "value": "No"
     }
   ],
-  "image": "https://arweave.net/gnsheut4xCRlCqaRDap2vX1yrbA0OEWqKuUUMp-uELc",
-  "image_url": "https://arweave.net/gnsheut4xCRlCqaRDap2vX1yrbA0OEWqKuUUMp-uELc",
-  "image_details": {
-    "size": 7664958,
-    "type": "image/jpeg",
-    "width": 3000,
-    "height": 2000,
-    "sha256": "19d8963a48cb670c3e328544e541a2d9d877f37a060429b6c0dcca65060e88d8"
+  "image": "https://arweave.net/S4OFT7mPFp55SISQGNnJrJBaQ2yHezZFCDj7v_d8n8c",
+  "image_url": "https://arweave.net/S4OFT7mPFp55SISQGNnJrJBaQ2yHezZFCDj7v_d8n8c",
+  "image_details":{
+    "size":7108402,
+    "type":"image/jpeg",
+    "width":3000,
+    "height":2000,
+    "sha256":"5705984596ad2f71814de257d500fbd83150361ca1171cf61e68eaf4d210a3e0"
   }
 }
