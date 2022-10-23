@@ -41,7 +41,7 @@ export default function getBaseMetadata(dateString: string): BaseMetadataType {
 
   return {
     "name": formattedDate,
-    "created_by": "Ph101pp",
+    "created_by": "Philipp Adrian",
     "external_url": `https://daily-photo.ph101pp.xyz/${dateString}`,
     "attributes": [
       {
