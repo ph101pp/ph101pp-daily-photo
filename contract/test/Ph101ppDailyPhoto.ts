@@ -190,8 +190,8 @@ export function testPh101ppDailyPhoto() {
 
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
       const tokenId = 0;
-      const { pdp, immutableUri } = await loadFixture(deployFixture);
-      expect(await pdp.uri(tokenId)).to.equal(immutableUri + "CLAIM.json");
+      const { pdp, mutableUri } = await loadFixture(deployFixture);
+      expect(await pdp.uri(tokenId)).to.equal(mutableUri + "CLAIM.json");
     });
 
     it("should return mutable url for all unminted nfts ", async function () {
