@@ -15,6 +15,7 @@ async function main() {
   // const tx = await pdp.setPermanentURI("https://arweave.net/1a-HDKflsjG2_b3jAuMYTrQyB13BNarkz0WZdCEBj0E/", 1);
   // const tx = await pdp.setMutableURI("https://ph101pp-daily-photo.vercel.app/api/proxy/");
   
+  // const input = await pdp.getMintRangeInput(122);
   const input = await pdp.getMintRangeInput(20);
   const tx = await pdp.mintPhotos(...input, 2);
   const receipt = await tx.wait();
