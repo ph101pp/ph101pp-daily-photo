@@ -9,6 +9,12 @@ export default async function handler(
 ) {
   const query = req.query.tokenId;
 
+  if (query === "CLAIM.json") {
+    res.setHeader("Cache-Control", `s-maxage=${60 * 60 * 24}, stale-while-revalidate=59`);
+
+    return res.json(getClaimMetadata())
+  }
+
   if (typeof query !== "string" || query.length !== 13) {
     return res.status(404).end();
   }

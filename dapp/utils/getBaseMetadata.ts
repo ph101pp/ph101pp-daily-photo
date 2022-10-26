@@ -54,10 +54,6 @@ export default function getBaseMetadata(dateString: string): BaseMetadataType {
         "value": timestamp
       },
       {
-        "trait_type": "Collection",
-        "value": "Daily Photo"
-      },
-      {
         "trait_type": "Weekday",
         "value": weekday
       },

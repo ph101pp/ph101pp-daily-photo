@@ -38,8 +38,8 @@ export default function getTokenMetadata({
         "value": settings
       },
       {
-        "trait_type": "Revealed",
-        "value": "Yes"
+        "trait_type": "Type",
+        "value": "Photo"
       },
       ...baseMetadata.attributes,
     ],

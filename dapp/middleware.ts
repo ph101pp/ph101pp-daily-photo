@@ -11,7 +11,7 @@ function middleware(request: NextRequest) {
   if (
     !url.pathname.startsWith("/api/") &&
     !url.pathname.startsWith("/_next") &&
-    // !url.pathname.startsWith("/claim") &&
+    !url.pathname.startsWith("/claim") &&
     !isValidDate(date)
   ) {
     const now = new Date();
