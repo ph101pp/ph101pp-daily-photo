@@ -26,7 +26,7 @@ contract Ph101ppDailyPhoto is
 
     string[] private _permanentUris;
     string private _proxyUri;
-    uint256 private _lastPermanentUriValidUptoTokenId;
+    uint256 private _lastPermanentUriValidUpToTokenId;
 
     uint256[] private _maxSupplies;
     uint256[] private _maxSupplyRange;
@@ -107,17 +107,17 @@ contract Ph101ppDailyPhoto is
         );
     }
 
-    function setPermanentURI(string memory newUri, uint256 validUptoTokenId)
+    function setPermanentURI(string memory newUri, uint256 validUpToTokenId)
         public
         onlyRole(URI_UPDATER_ROLE)
     {
         require(
-            validUptoTokenId > _lastPermanentUriValidUptoTokenId ||
+            validUpToTokenId > _lastPermanentUriValidUpToTokenId ||
                 _permanentUris.length == 0,
             "Error: URI must be valid for more tokenIds than previous URI."
         );
         _permanentUris.push(newUri);
-        _lastPermanentUriValidUptoTokenId = validUptoTokenId;
+        _lastPermanentUriValidUpToTokenId = validUpToTokenId;
     }
 
     function setProxyURI(string memory newProxyUri)
@@ -134,7 +134,7 @@ contract Ph101ppDailyPhoto is
         if (tokenId == CLAIM_TOKEN_ID) {
             // ... is claim -> return claim
             tokenDate = CLAIM_TOKEN;
-            currentUri = permanentBaseUri();
+            currentUri = proxyBaseUri();
         } else {
             (uint256 year, uint256 month, uint256 day) = tokenIdToDate(tokenId);
 
@@ -147,7 +147,7 @@ contract Ph101ppDailyPhoto is
             );
 
             if (
-                exists(tokenId) && _lastPermanentUriValidUptoTokenId >= tokenId
+                exists(tokenId) && _lastPermanentUriValidUpToTokenId >= tokenId
             ) {
                 // ... uri updated since token -> immutable uri
                 currentUri = permanentBaseUri();
