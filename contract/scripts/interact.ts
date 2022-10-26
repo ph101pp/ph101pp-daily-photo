@@ -21,8 +21,6 @@ async function main() {
   const receipt = await tx.wait();
   console.log(receipt)
 
-  // console.log(await pdp.uri(129))
-
 
 }
 
