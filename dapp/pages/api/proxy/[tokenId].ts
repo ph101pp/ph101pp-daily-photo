@@ -1,5 +1,6 @@
 // This is an example of to protect an API route
 import type { NextApiRequest, NextApiResponse } from "next"
+import getClaimMetadata from "../../../utils/getClaimMetadata";
 import getFutureMetadata from "../../../utils/getFutureMetadata";
 import { isValidDate } from "../../../utils/isValidDate";
 
@@ -11,7 +12,6 @@ export default async function handler(
 
   if (query === "CLAIM.json") {
     res.setHeader("Cache-Control", `s-maxage=${60 * 60 * 24}, stale-while-revalidate=59`);
-
     return res.json(getClaimMetadata())
   }
 

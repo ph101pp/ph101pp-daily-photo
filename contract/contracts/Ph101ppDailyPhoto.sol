@@ -7,8 +7,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./DateTime.sol";
 
-// import "hardhat/console.sol";
-
 contract Ph101ppDailyPhoto is
     ERC1155MintRangeUpdateable,
     ERC2981,
