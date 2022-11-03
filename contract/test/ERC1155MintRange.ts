@@ -122,9 +122,23 @@ export function testERC1155MintRange(contractName: string) {
         const inputs = await c.getMintRangeInput(newTokens);
         const tx: ContractTransaction = await c.mintRange(...inputs);
         const receipt = await tx.wait();
+        const transferEvents = receipt.events?.filter(e => e.event === "TransferBatch");
 
-        expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(initialHolders.length);
+        const initialHoldersBalances = [];
 
+        for(let i=0; i<initialHolders.length; i++) {
+          const addresses = new Array(newTokens).fill(initialHolders[i]);
+          initialHoldersBalances.push(await c.balanceOfBatch(addresses, inputs[0]));
+        }
+
+        expect(transferEvents?.length).to.equal(initialHolders.length);
+        expect(transferEvents?.length).to.equal(inputs[1].length);
+        
+        for(let i=0; i<(transferEvents?.length??0); i++) {
+          const event = transferEvents?.[i]!;
+          expect(inputs[1][i]).to.deep.equal(event.args?.[4]);
+          expect(inputs[1][i]).to.deep.equal(initialHoldersBalances[i]);
+        }
       });
 
       it("should correcly allocate dynamic balances when calling mintRange", async function () {

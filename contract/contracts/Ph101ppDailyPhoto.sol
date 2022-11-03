@@ -55,7 +55,7 @@ contract Ph101ppDailyPhoto is
     {
         address[] memory addresses = initialHolders(tokenId);
         if (account == addresses[TREASURY_ID]) {
-            // before any mintRange happened
+            // before max supply is set
             if (_maxSupplyRange.length <= 0) {
                 return 0;
             }

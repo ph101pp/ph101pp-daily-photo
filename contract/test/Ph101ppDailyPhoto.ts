@@ -232,27 +232,40 @@ export function testPh101ppDailyPhoto() {
     it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { pdp, vault, treasury } = await loadFixture(deployFixture);
       const photos = 1000;
-      const maxSupply = 5;
+      const maxSupply = 2;
       const input = await pdp.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-      await pdp.mintPhotos(...input, maxSupply);
+      const tx = await pdp.mintPhotos(...input, maxSupply);
+      const receipt = await tx.wait();;
       const ids = input[0];
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
+
+      const transferEvents = receipt.events?.filter(e => e.event === "TransferBatch") || [];
+
+      expect(transferEvents?.length).to.equal(2);
+
+      for(let i=0; i<(transferEvents?.length??0); i++) {
+        const event = transferEvents?.[i]!;
+        expect(input[1][i]).to.deep.equal(event.args?.[4]);
+      }
 
       const balanceDistribution: { [key: number]: number } = {};
 
       for (let i = 0; i < photos; i++) {
         expect(vaultBalances[i]).to.equal(1);
+        expect(vaultBalances[i]).to.equal(input[1][1][i]);
+        expect(treasuryBalances[i]).to.equal(input[1][0][i]);
+
         balanceDistribution[treasuryBalances[i].toNumber()] = balanceDistribution[treasuryBalances[i].toNumber()] ?? 0;
         balanceDistribution[treasuryBalances[i].toNumber()]++;
       }
       expect(balanceDistribution[0]).to.equal(undefined);
       for (let i = 1; i < maxSupply; i++) {
-        expect(balanceDistribution[i]).to.be.gt(0.8 * photos / maxSupply);
+        expect(balanceDistribution[i]).to.be.gte(0.8 * photos / maxSupply);
       }
     });
   })
