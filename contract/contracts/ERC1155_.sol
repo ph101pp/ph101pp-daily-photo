@@ -22,7 +22,7 @@ contract ERC1155_ is Context, ERC165, IERC1155, IERC1155MetadataURI {
 
     // Mapping from token ID to account balances
 /////////////////////////////////////////////////////////////////////////
-//  ONLY DIFFERENCE BETWEEN ERC1155 and ERC1155_ (private => internal)
+//  PH101PP: ONLY DIFFERENCE BETWEEN ERC1155 and ERC1155_ is visibility of _balances
 /////////////////////////////////////////////////////////////////////////
 //  mapping(uint256 => mapping(address => uint256)) private _balances;
 /////////////////////////////////////////////////////////////////////////

@@ -26,7 +26,7 @@ contract Ph101ppDailyPhoto is
 
     string[] private _permanentUris;
     string private _proxyUri;
-    uint private _lastPermanentUriValidUpToTokenId;
+    uint public lastTokenIdWithPermanentUri;
 
     uint[] private _maxSupplies;
     uint[] private _maxSupplyRange;
@@ -76,7 +76,7 @@ contract Ph101ppDailyPhoto is
         public
         onlyRole(PHOTO_MINTER_ROLE)
     {
-        uint firstId = _zeroMinted ? _lastRangeTokenId + 1 : 0;
+        uint firstId = isZeroMinted ? lastRangeTokenId + 1 : 0;
         if (_maxSupplies.length > 0) {
             uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
             if (lastId == firstId) {
@@ -123,12 +123,12 @@ contract Ph101ppDailyPhoto is
         onlyRole(URI_UPDATER_ROLE)
     {
         require(
-            validUpToTokenId > _lastPermanentUriValidUpToTokenId ||
+            validUpToTokenId > lastTokenIdWithPermanentUri ||
                 _permanentUris.length == 0,
-            "Error: URI must be valid for more tokenIds than previous URI."
+            "Error: TokenId must be larger than lastTokenIdWithValidPermanentUri."
         );
         _permanentUris.push(newUri);
-        _lastPermanentUriValidUpToTokenId = validUpToTokenId;
+        lastTokenIdWithPermanentUri = validUpToTokenId;
     }
 
     function setProxyURI(string memory newProxyUri)
@@ -157,9 +157,7 @@ contract Ph101ppDailyPhoto is
                 Strings.toString(day)
             );
 
-            if (
-                exists(tokenId) && _lastPermanentUriValidUpToTokenId >= tokenId
-            ) {
+            if (exists(tokenId) && lastTokenIdWithPermanentUri >= tokenId) {
                 // ... uri updated since token -> immutable uri
                 currentUri = permanentBaseUri();
             } else {
@@ -179,12 +177,13 @@ contract Ph101ppDailyPhoto is
         uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
         return _maxSupplies[supplyIndex];
     }
+
     /**
      * @dev Returns max initial supply of a token.
      */
     function maxInitialSupply() public view returns (uint) {
         require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
-        return _maxSupplies[_maxSupplies.length-1];
+        return _maxSupplies[_maxSupplies.length - 1];
     }
 
     function proxyBaseUri() public view returns (string memory) {

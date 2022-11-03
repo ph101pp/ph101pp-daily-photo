@@ -30,18 +30,18 @@ export default async function _getUpdateInitialHoldersRangeInput(
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
   const amounts: number[][] = [];
-  const lastTokenId = await c._lastRangeTokenId();
+  const lastTokenId = await c.lastRangeTokenId();
 
   const too = to == Infinity ? lastTokenId : to;
 
-  const zeroMinted = await c._zeroMinted();
+  const zeroMinted = await c.isZeroMinted();
 
   if (zeroMinted) {
     for (let i = from; i <= too; i++) {
       const currentInitialHolders = await c["initialHolders(uint256)"](i);
 
       const balances = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
-      const isManuallyMinted = await c._manualMint(i);
+      const isManuallyMinted = await c.isManualMint(i);
       if (isManuallyMinted) {
         continue;
       }
@@ -55,7 +55,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
         }
 
         const balance = balances[a].toNumber();
-        const isBalanceInitialized = await c._balancesInitialized(i, fromAddress)
+        const isBalanceInitialized = await c.isBalanceInitialized(i, fromAddress)
 
         if (!isBalanceInitialized && balance > 0) {
           let addressIndex = fromAddresses.indexOf(fromAddress);

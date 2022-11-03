@@ -131,7 +131,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 uint balance = amount[k];
 
                 require(exists(tokenId) == true, "E:11");
-                require(_manualMint[tokenId] == false, "E:12");
+                require(isManualMint[tokenId] == false, "E:12");
                 require(_balances[tokenId][from] == 0, "E:13");
                 require(_balances[tokenId][to] == 0, "E:14");
                 require(balanceOf(from, tokenId) >= balance, "E:08");

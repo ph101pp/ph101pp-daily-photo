@@ -73,7 +73,7 @@ export function testPh101ppDailyPhoto() {
       const immutableUri3 = "3.immutable.uri";
       const { pdp, owner } = await loadFixture(deployFixture);
       const tx = await pdp.setPermanentURI(immutableUri2, 100);
-      await expect(pdp.setPermanentURI(immutableUri3, 100)).to.be.revertedWith("Error: URI must be valid for more tokenIds than previous URI.");
+      await expect(pdp.setPermanentURI(immutableUri3, 100)).to.be.revertedWith("Error: TokenId must be larger than lastTokenIdWithValidPermanentUri.");
       await pdp.setPermanentURI(immutableUri3, 101);
     });
   });

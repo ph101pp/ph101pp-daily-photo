@@ -16,22 +16,24 @@ abstract contract ERC1155MintRange is ERC1155_ {
         "No initial holders set. Use _setInitialHolders()";
 
     // Mapping from token ID to balancesInitialzed flag
-    mapping(uint => mapping(address => bool)) public _balancesInitialized;
+    mapping(uint => mapping(address => bool)) public isBalanceInitialized;
 
-    // Mapping from token ID to totalSupply
-    mapping(uint => int256) public _totalSupply;
+    // Mapping from token ID to totalSupplyDelta
+    mapping(uint => int256) private _totalSupplyDelta;
 
-    // Mapping to keep track of tokens that are minted via ERC1155._mint() or  ERC1155._mintBatch()
-    mapping(uint => bool) public _manualMint;
-    uint public _manualMints;
+    // Mapping to keep track of tokens minted via ERC1155._mint() or  ERC1155._mintBatch()
+    mapping(uint => bool) public isManualMint;
+    // used to check validity of mintRangeInput
+    uint private _manualMintsCount;
 
     // Track initial holders across tokenID ranges + lookup mapping;
-    address[][] public _initialHolders;
-    uint[] public _initialHoldersRange;
-    mapping(uint => mapping(address => bool)) public _initialHoldersMappings;
+    address[][] internal _initialHolders;
+    uint[] internal _initialHoldersRange;
+    mapping(uint => mapping(address => bool)) internal _initialHoldersMappings;
 
-    uint public _lastRangeTokenId;
-    bool public _zeroMinted;
+    // last tokenId minted via mintRange.
+    uint public lastRangeTokenId;
+    bool public isZeroMinted;
 
     /**
      * @dev Implement: Return initial token balance for address.
@@ -47,7 +49,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Set initial holders. mintRange will distribute tokens to these holders
      */
     function _setInitialHolders(address[] memory addresses) internal virtual {
-        _initialHoldersRange.push(_zeroMinted ? _lastRangeTokenId + 1 : 0);
+        _initialHoldersRange.push(isZeroMinted ? lastRangeTokenId + 1 : 0);
         _initialHolders.push(addresses);
         for(uint i=0; i<addresses.length; i++) {
             _initialHoldersMappings[_initialHolders.length-1][addresses[i]] = true;
@@ -69,17 +71,17 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 ids,
                 amounts,
                 addresses,
-                _lastRangeTokenId,
-                _zeroMinted,
-                _manualMints
+                lastRangeTokenId,
+                isZeroMinted,
+                _manualMintsCount
             )
         );
         require(inputChecksum == checksum, ERROR_INVALID_MINT_RANGE_INPUT);
 
-        _lastRangeTokenId = ids[ids.length - 1];
+        lastRangeTokenId = ids[ids.length - 1];
 
-        if (_zeroMinted == false) {
-            _zeroMinted = true;
+        if (isZeroMinted == false) {
+            isZeroMinted = true;
         }
         for (uint i = 0; i < addresses.length; i++) {
             emit TransferBatch(
@@ -96,7 +98,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Returns true if tokenId was minted.
      */
     function exists(uint tokenId) public view virtual returns (bool) {
-        return _inRange(tokenId) || _manualMint[tokenId] == true;
+        return _inRange(tokenId) || isManualMint[tokenId] == true;
     }
 
     /**
@@ -116,8 +118,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
 
         if (
             _inRange(id) &&
-            !_balancesInitialized[id][account] &&
-            !_manualMint[id] &&
+            !isBalanceInitialized[id][account] &&
+            !isManualMint[id] &&
             isInitialHolderOf(account, id)
         ) {
             return initialBalanceOf(account, id);
@@ -171,7 +173,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         returns (uint)
     {
         // Pre initialization
-        if (_inRange(tokenId) && !_manualMint[tokenId]) {
+        if (_inRange(tokenId) && !isManualMint[tokenId]) {
             uint initialTotalSupplySum = 0;
             address[] memory initialHolderAddresses = initialHolders(tokenId);
             for (uint i = 0; i < initialHolderAddresses.length; i++) {
@@ -180,11 +182,11 @@ abstract contract ERC1155MintRange is ERC1155_ {
                     tokenId
                 );
             }
-            return uint(int256(initialTotalSupplySum) + _totalSupply[tokenId]);
+            return uint(int256(initialTotalSupplySum) + _totalSupplyDelta[tokenId]);
         }
 
         // manually minted
-        return uint(_totalSupply[tokenId]);
+        return uint(_totalSupplyDelta[tokenId]);
     }
 
     /**
@@ -199,7 +201,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
             bytes32
         )
     {
-        uint firstId = _zeroMinted ? _lastRangeTokenId + 1 : 0;
+        uint firstId = isZeroMinted ? lastRangeTokenId + 1 : 0;
         address[] memory holders = initialHolders();
         uint[] memory ids = new uint[](numberOfTokens);
         uint[][] memory amounts = new uint[][](holders.length);
@@ -207,7 +209,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint newIndex = 0;
         for (uint i = 0; newIndex < numberOfTokens; i++) {
             uint newId = firstId + i;
-            if (_manualMint[newId]) {
+            if (isManualMint[newId]) {
                 continue;
             }
             ids[newIndex] = newId;
@@ -224,16 +226,15 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 ids,
                 amounts,
                 holders,
-                _lastRangeTokenId,
-                _zeroMinted,
-                _manualMints
+                lastRangeTokenId,
+                isZeroMinted,
+                _manualMintsCount
             )
         );
 
         return (ids, amounts, checksum);
     }
-
-
+    
     /**
      * @dev See {ERC1155-_beforeTokenTransfer}.
      */
@@ -250,17 +251,17 @@ abstract contract ERC1155MintRange is ERC1155_ {
 
             // when minting
             if (from == address(0)) {
-                // set _manualMint flag if id doesnt exist -> minted via _mint||_mintBatch
+                // set isManualMint flag if id doesnt exist -> minted via _mint||_mintBatch
                 if (!exists(id)) {
-                    _manualMint[id] = true;
-                    _manualMints++;
+                    isManualMint[id] = true;
+                    _manualMintsCount++;
                 }
                 // track supply
-                _totalSupply[id] += int256(amounts[i]);
+                _totalSupplyDelta[id] += int256(amounts[i]);
             }
             // track supply when burning
             if (to == address(0)) {
-                _totalSupply[id] -= int256(amounts[i]);
+                _totalSupplyDelta[id] -= int256(amounts[i]);
             }
             // initialize balances if minted via _mintRange
             _maybeInitializeBalance(from, id);
@@ -276,13 +277,13 @@ abstract contract ERC1155MintRange is ERC1155_ {
         if (
             account != address(0) &&
             _inRange(id) &&
-            !_balancesInitialized[id][account] &&
-            !_manualMint[id] &&
+            !isBalanceInitialized[id][account] &&
+            !isManualMint[id] &&
             isInitialHolderOf(account, id)
         ) {
             uint balance = initialBalanceOf(account, id);
             if (balance > 0) {
-                _balancesInitialized[id][account] = true;
+                isBalanceInitialized[id][account] = true;
                 _balances[id][account] = balance;
             }
         }
@@ -292,7 +293,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Returns true if token is in existing id range.
      */
     function _inRange(uint tokenId) private view returns (bool) {
-        return _zeroMinted && tokenId <= _lastRangeTokenId;
+        return isZeroMinted && tokenId <= lastRangeTokenId;
     }
 
     /**
