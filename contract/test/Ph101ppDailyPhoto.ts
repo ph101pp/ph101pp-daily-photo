@@ -18,7 +18,7 @@ export function testPh101ppDailyPhoto() {
     const mutableUri = "mutable_.uri/";
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
-    const [owner, treasury, vault, account1, account2, account3, account4] = await ethers.getSigners();
+    const [owner, treasury, vault, account1, account2, account3, account4, account5, account6, account7, account8] = await ethers.getSigners();
     const latest = await time.latest();
 
     if (latest < nowTimestamp) {
@@ -28,7 +28,7 @@ export function testPh101ppDailyPhoto() {
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto");
     const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
 
-    return { pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4 };
+    return { pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6, account7, account8 };
   }
 
   describe("URI storing / updating", function () {
@@ -206,8 +206,9 @@ export function testPh101ppDailyPhoto() {
     it("should return immutable url for all minted nfts ", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
       await pdp.setPermanentURI(immutableUri, 100);
+      await pdp.setMaxInitialSupply(5);
       const inputs = await pdp.getMintRangeInput(50);
-      await pdp.mintPhotos(...inputs, 5);
+      await pdp.mintPhotos(...inputs);
 
       for (let i = 1; i < 100; i++) {
         if (i > 50) expect(await pdp.uri(i)).to.include(mutableUri);
@@ -218,8 +219,9 @@ export function testPh101ppDailyPhoto() {
     it("should return mutable url for minted nfts after _uriValidUptoTokenId", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
       await pdp.setPermanentURI(immutableUri, 10);
+      await pdp.setMaxInitialSupply(5);
       const inputs = await pdp.getMintRangeInput(50);
-      await pdp.mintPhotos(...inputs, 5);
+      await pdp.mintPhotos(...inputs);
 
       for (let i = 1; i < 50; i++) {
         if (i > 10) expect(await pdp.uri(i)).to.include(mutableUri);
@@ -228,17 +230,81 @@ export function testPh101ppDailyPhoto() {
     });
   });
 
+  describe("Max Initial Supply ", function () {
+
+    it("should fail to get mintRangeInput without max initial supply", async function () {
+      const { pdp } = await loadFixture(deployFixture);
+      await expect(pdp.getMintRangeInput(4)).to.be.rejectedWith("No max initial supply set. Use _setMaxInitialSupply()");
+    });
+    
+    it("Should correctly update max initial supply via setMaxInitialSupply", async function () {
+      const { pdp } = await loadFixture(deployFixture);
+      const initialSupply = 5;
+      const initialSupply2 = 7;
+
+      await expect(pdp["maxInitialSupply()"]()).to.be.revertedWith("No max initial supply set. Use _setMaxInitialSupply()");
+
+      await pdp.setMaxInitialSupply(initialSupply);
+      expect(await pdp["maxInitialSupply()"]()).to.equal(initialSupply);
+      const inputs = await pdp.getMintRangeInput(5);
+      await pdp.mintPhotos(...inputs);
+      for(let i=0; i<inputs[0].length; i++) {
+        expect(await pdp["maxInitialSupply(uint256)"](inputs[0][i])).to.equal(initialSupply);
+      }
+
+      await pdp.setMaxInitialSupply(20);
+      expect(await pdp["maxInitialSupply()"]()).to.equal(20);
+
+      await pdp.setMaxInitialSupply(initialSupply2);
+      expect(await pdp["maxInitialSupply()"]()).to.equal(initialSupply2);
+      const inputs2 = await pdp.getMintRangeInput(5);
+      await pdp.mintPhotos(...inputs2);
+      for(let i=0; i<inputs2[0].length; i++) {
+        expect(await pdp["maxInitialSupply(uint256)"](inputs2[0][i])).to.equal(initialSupply2);
+      }
+
+    });
+
+    it("Should distribute tokens evenly within max supply range", async function () {
+      const { pdp } = await loadFixture(deployFixture);
+
+      const mints = 200;
+      const testSuppliesTo = 9;
+      const acceptedVariance = 0.7;
+
+      for(let i=1; i<=testSuppliesTo; i++) {
+        const maxSupply = i
+        await pdp.setMaxInitialSupply(maxSupply);
+        const inputs = await pdp.getMintRangeInput(mints);
+        const treasuryBalances = inputs[1][0];
+        const balanceDistribution: { [key: number]: number } = {};
+
+        for (let k = 0; k < mints; k++) {
+          expect(treasuryBalances[k]).to.lte(maxSupply)
+
+          balanceDistribution[treasuryBalances[k].toNumber()] = balanceDistribution[treasuryBalances[k].toNumber()] ?? 0;
+          balanceDistribution[treasuryBalances[k].toNumber()]++;
+        }
+        expect(balanceDistribution[0]).to.equal(undefined);
+        for (let k = 1; k < maxSupply; k++) {
+          expect(balanceDistribution[i]).to.be.gte(acceptedVariance * mints / maxSupply);
+        }
+      }
+
+    });
+  })
+
   describe("Mint Photos", function () {
     it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { pdp, vault, treasury } = await loadFixture(deployFixture);
-      const photos = 1000;
+      const photos = 100;
       const maxSupply = 2;
+      await pdp.setMaxInitialSupply(maxSupply);
       const input = await pdp.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
-
-      const tx = await pdp.mintPhotos(...input, maxSupply);
+      const tx = await pdp.mintPhotos(...input);
       const receipt = await tx.wait();;
       const ids = input[0];
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
@@ -253,19 +319,11 @@ export function testPh101ppDailyPhoto() {
         expect(input[1][i]).to.deep.equal(event.args?.[4]);
       }
 
-      const balanceDistribution: { [key: number]: number } = {};
-
       for (let i = 0; i < photos; i++) {
         expect(vaultBalances[i]).to.equal(1);
         expect(vaultBalances[i]).to.equal(input[1][1][i]);
         expect(treasuryBalances[i]).to.equal(input[1][0][i]);
-
-        balanceDistribution[treasuryBalances[i].toNumber()] = balanceDistribution[treasuryBalances[i].toNumber()] ?? 0;
-        balanceDistribution[treasuryBalances[i].toNumber()]++;
-      }
-      expect(balanceDistribution[0]).to.equal(undefined);
-      for (let i = 1; i < maxSupply; i++) {
-        expect(balanceDistribution[i]).to.be.gte(0.8 * photos / maxSupply);
+        expect(treasuryBalances[i]).to.lte(maxSupply);
       }
     });
   })
@@ -292,14 +350,15 @@ export function testPh101ppDailyPhoto() {
 
       const { pdp, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
 
+      await pdp.setMaxInitialSupply(1);
       const input1 = await pdp.getMintRangeInput(5);
-      await pdp.mintPhotos(...input1, 1);
+      await pdp.mintPhotos(...input1);
 
       const newTreasury = account2.address
       await pdp.setInitialHolders(newTreasury, vault.address);
 
       const input2 = await pdp.getMintRangeInput(5);
-      await pdp.mintPhotos(...input2, 1);
+      await pdp.mintPhotos(...input2);
 
       await pdp.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
 
@@ -322,15 +381,16 @@ export function testPh101ppDailyPhoto() {
     it("should claim mint from treasury and burn claim when redeemClaim is called", async function () {
 
       const { pdp, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
+      await pdp.setMaxInitialSupply(1);
 
       const input1 = await pdp.getMintRangeInput(5);
-      await pdp.mintPhotos(...input1, 1);
+      await pdp.mintPhotos(...input1);
 
       const newTreasury = account2.address
       await pdp.setInitialHolders(newTreasury, vault.address);
 
       const input2 = await pdp.getMintRangeInput(5);
-      await pdp.mintPhotos(...input2, 1);
+      await pdp.mintPhotos(...input2);
 
       await pdp.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
 
@@ -354,12 +414,15 @@ export function testPh101ppDailyPhoto() {
       const { pdp, vault, treasury, account1 } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = 5;
+      
+      await pdp.setMaxInitialSupply(maxSupply);
+
       const input = await pdp.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-      await pdp.mintPhotos(...input, maxSupply);
+      await pdp.mintPhotos(...input);
       const ids = input[0];
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
@@ -393,12 +456,13 @@ export function testPh101ppDailyPhoto() {
       const { pdp, vault, treasury, account1 } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = 5;
+      await pdp.setMaxInitialSupply(maxSupply);
       const input = await pdp.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-      await pdp.mintPhotos(...input, maxSupply);
+      await pdp.mintPhotos(...input);
       const ids = input[0];
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
@@ -432,12 +496,13 @@ export function testPh101ppDailyPhoto() {
       const { pdp, vault, treasury } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = 5;
+      await pdp.setMaxInitialSupply(maxSupply);
       const input = await pdp.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-      await pdp.mintPhotos(...input, maxSupply);
+      await pdp.mintPhotos(...input);
       const ids = input[0];
       const vaultBalances = await pdp.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await pdp.balanceOfBatch(treasuryAddresses, ids);
@@ -529,8 +594,9 @@ export function testPh101ppDailyPhoto() {
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, 100, account1.address, account1.address);
       await expect(pdp.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
       await pdp.unpause();
+      await pdp.setMaxInitialSupply(4);
       const mintInput = await pdp.getMintRangeInput(4);
-      await expect(pdp.connect(account1).mintPhotos(...mintInput, 4)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).mintPhotos(...mintInput)).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).pause()).to.be.rejectedWith("AccessControl");
@@ -558,8 +624,9 @@ export function testPh101ppDailyPhoto() {
       await expect(pdp.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
 
       await pdp.grantRole(await pdp.PHOTO_MINTER_ROLE(), account2.address);
+      await pdp.setMaxInitialSupply(4);
       const mintInput = await pdp.getMintRangeInput(4);
-      await expect(pdp.connect(account2).mintPhotos(...mintInput, 4)).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account2).mintPhotos(...mintInput)).to.not.be.rejectedWith("AccessControl");
 
       await pdp.grantRole(await pdp.CLAIM_MINTER_ROLE(), account3.address);
       await expect(pdp.connect(account3).mintClaims(account1.address, 5)).to.not.be.rejectedWith("AccessControl");

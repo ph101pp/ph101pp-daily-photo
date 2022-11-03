@@ -14,7 +14,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         "Invalid input. Use _verifyUpdateInitialHolderRangeInput().";
 
     // used to check validity of updateInitialHolderRangeInput
-    uint256 private _pauseTimestamp;
+    uint private _pauseTimestamp;
 
     /**
      * @dev Return current initial holders
@@ -23,7 +23,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         public
         view
         virtual
-        returns (address[][] memory, uint256[] memory)
+        returns (address[][] memory, uint[] memory)
     {
         return (_initialHolders, _initialHoldersRange);
     }
@@ -34,10 +34,10 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function _updateInitialHoldersRange(
         address[] memory fromAddresses,
         address[] memory toAddresses,
-        uint256[][] memory ids,
-        uint256[][] memory amounts,
+        uint[][] memory ids,
+        uint[][] memory amounts,
         address[][] memory newInitialHolders,
-        uint256[] memory newInitialHoldersRange,
+        uint[] memory newInitialHoldersRange,
         bytes32 inputChecksum
     ) internal virtual whenPaused {
         bytes32 checksum = keccak256(
@@ -59,13 +59,13 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
         address[][] memory localInitialHoders = _initialHolders;
 
-        for(uint256 k = 0; k<localInitialHoders.length; k++) {
-            for(uint256 i=0; i<localInitialHoders[k].length; i++) {
+        for(uint k = 0; k<localInitialHoders.length; k++) {
+            for(uint i=0; i<localInitialHoders[k].length; i++) {
                 delete _initialHoldersMappings[k][localInitialHoders[k][i]];
             }
         }
-        for(uint256 k = 0; k<newInitialHolders.length; k++) {
-            for(uint256 i=0; i<newInitialHolders[k].length; i++) {
+        for(uint k = 0; k<newInitialHolders.length; k++) {
+            for(uint i=0; i<newInitialHolders[k].length; i++) {
                 _initialHoldersMappings[k][newInitialHolders[k][i]] = true;
             }
         }
@@ -75,7 +75,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         
 
         _unpause();
-        for (uint256 i = 0; i < toAddresses.length; i++) {
+        for (uint i = 0; i < toAddresses.length; i++) {
             emit TransferBatch(
                 msg.sender,
                 fromAddresses[i],
@@ -98,10 +98,10 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function verifyUpdateInitialHolderRangeInput(
         address[] memory fromAddresses,
         address[] memory toAddresses,
-        uint256[][] memory ids,
-        uint256[][] memory amounts,
+        uint[][] memory ids,
+        uint[][] memory amounts,
         address[][] memory newInitialHolders,
-        uint256[] memory newInitialHoldersRange
+        uint[] memory newInitialHoldersRange
     ) public view virtual whenPaused returns (bytes32) {
         require(fromAddresses.length == toAddresses.length, "E:01");
         require(fromAddresses.length == ids.length, "E:02");
@@ -112,23 +112,23 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         );
         require(newInitialHoldersRange[0] == 0, "E:05");
 
-        for (uint256 j = 1; j < newInitialHoldersRange.length; j++) {
+        for (uint j = 1; j < newInitialHoldersRange.length; j++) {
             require(
                 newInitialHoldersRange[j] > newInitialHoldersRange[j - 1],
                 "E:06"
             );
         }
 
-        for (uint256 i = 0; i < ids.length; i++) {
+        for (uint i = 0; i < ids.length; i++) {
             address from = fromAddresses[i];
             address to = toAddresses[i];
-            uint256[] memory id = ids[i];
-            uint256[] memory amount = amounts[i];
+            uint[] memory id = ids[i];
+            uint[] memory amount = amounts[i];
             require(id.length == amount.length, "E:07");
 
-            for (uint256 k = 0; k < id.length; k++) {
-                uint256 tokenId = id[k];
-                uint256 balance = amount[k];
+            for (uint k = 0; k < id.length; k++) {
+                uint tokenId = id[k];
+                uint balance = amount[k];
 
                 require(exists(tokenId) == true, "E:11");
                 require(_manualMint[tokenId] == false, "E:12");
@@ -138,7 +138,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
                 require(isInitialHolderOf(from, tokenId), "E:09");
 
-                uint256 newInitialHoldersIndex = _findInRange(
+                uint newInitialHoldersIndex = _findInRange(
                     newInitialHoldersRange,
                     tokenId
                 );

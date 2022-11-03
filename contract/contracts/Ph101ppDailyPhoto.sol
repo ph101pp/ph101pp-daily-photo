@@ -12,22 +12,24 @@ contract Ph101ppDailyPhoto is
     ERC2981,
     AccessControl
 {
-    uint256 public constant START_DATE = 1661990400; // Sept 1, 2022
+    string private constant ERROR_NO_INITIAL_SUPPLY =
+        "No max initial supply set. Use _setMaxInitialSupply()";
+    uint public constant START_DATE = 1661990400; // Sept 1, 2022
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
-    uint256 public constant CLAIM_TOKEN_ID = 0;
+    uint public constant CLAIM_TOKEN_ID = 0;
     string private constant CLAIM_TOKEN = "CLAIM";
 
-    uint256 private constant TREASURY_ID = 0;
-    uint256 private constant VAULT_ID = 1;
+    uint private constant TREASURY_ID = 0;
+    uint private constant VAULT_ID = 1;
 
     string[] private _permanentUris;
     string private _proxyUri;
-    uint256 private _lastPermanentUriValidUpToTokenId;
+    uint private _lastPermanentUriValidUpToTokenId;
 
-    uint256[] private _maxSupplies;
-    uint256[] private _maxSupplyRange;
+    uint[] private _maxSupplies;
+    uint[] private _maxSupplyRange;
 
     constructor(
         string memory newProxyUri,
@@ -47,22 +49,17 @@ contract Ph101ppDailyPhoto is
         mintClaims(treasuryAddress, 10);
     }
 
-    function initialBalanceOf(address account, uint256 tokenId)
+    function initialBalanceOf(address account, uint tokenId)
         public
         view
         override
-        returns (uint256)
+        returns (uint)
     {
         address[] memory addresses = initialHolders(tokenId);
         if (account == addresses[TREASURY_ID]) {
-            // before max supply is set
-            if (_maxSupplyRange.length <= 0) {
-                return 0;
-            }
-            uint256 supplyIndex = _findInRange(_maxSupplyRange, tokenId);
-            uint256 maxSupply = _maxSupplies[supplyIndex];
-            uint256 supply = (uint256(
-                keccak256(abi.encode(tokenId, maxSupply))
+            uint maxSupply = maxInitialSupply(tokenId);
+            uint supply = (uint(
+                keccak256(abi.encode(tokenId, address(this), maxSupply))
             ) % maxSupply) + 1;
 
             return supply;
@@ -73,6 +70,22 @@ contract Ph101ppDailyPhoto is
         }
 
         return 0;
+    }
+
+    function setMaxInitialSupply(uint maxSupply)
+        public
+        onlyRole(PHOTO_MINTER_ROLE)
+    {
+        uint firstId = _zeroMinted ? _lastRangeTokenId + 1 : 0;
+        if (_maxSupplies.length > 0) {
+            uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
+            if (lastId == firstId) {
+                _maxSupplies[_maxSupplies.length - 1] = maxSupply;
+                return;
+            }
+        }
+        _maxSupplyRange.push(firstId);
+        _maxSupplies.push(maxSupply);
     }
 
     function setInitialHolders(address treasury, address vault)
@@ -88,10 +101,10 @@ contract Ph101ppDailyPhoto is
     function updateInitialHoldersRange(
         address[] memory fromAddresses,
         address[] memory toAddresses,
-        uint256[][] memory ids,
-        uint256[][] memory amounts,
+        uint[][] memory ids,
+        uint[][] memory amounts,
         address[][] memory newInitialHolders,
-        uint256[] memory newInitialHoldersRange,
+        uint[] memory newInitialHoldersRange,
         bytes32 inputChecksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         _updateInitialHoldersRange(
@@ -105,7 +118,7 @@ contract Ph101ppDailyPhoto is
         );
     }
 
-    function setPermanentURI(string memory newUri, uint256 validUpToTokenId)
+    function setPermanentURI(string memory newUri, uint validUpToTokenId)
         public
         onlyRole(URI_UPDATER_ROLE)
     {
@@ -125,7 +138,7 @@ contract Ph101ppDailyPhoto is
         _proxyUri = newProxyUri;
     }
 
-    function uri(uint256 tokenId) public view override returns (string memory) {
+    function uri(uint tokenId) public view override returns (string memory) {
         string memory tokenDate;
         string memory currentUri;
         // token...
@@ -134,7 +147,7 @@ contract Ph101ppDailyPhoto is
             tokenDate = CLAIM_TOKEN;
             currentUri = proxyBaseUri();
         } else {
-            (uint256 year, uint256 month, uint256 day) = tokenIdToDate(tokenId);
+            (uint year, uint month, uint day) = tokenIdToDate(tokenId);
 
             tokenDate = string.concat(
                 Strings.toString(year),
@@ -158,6 +171,22 @@ contract Ph101ppDailyPhoto is
         return string.concat(currentUri, tokenDate, ".json");
     }
 
+    /**
+     * @dev Returns max initial supply of a token.
+     */
+    function maxInitialSupply(uint tokenId) public view returns (uint) {
+        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
+        uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
+        return _maxSupplies[supplyIndex];
+    }
+    /**
+     * @dev Returns max initial supply of a token.
+     */
+    function maxInitialSupply() public view returns (uint) {
+        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
+        return _maxSupplies[_maxSupplies.length-1];
+    }
+
     function proxyBaseUri() public view returns (string memory) {
         return _proxyUri;
     }
@@ -170,27 +199,27 @@ contract Ph101ppDailyPhoto is
         return _permanentUris;
     }
 
-    function tokenIdToDate(uint256 tokenId)
+    function tokenIdToDate(uint tokenId)
         public
         pure
         returns (
-            uint256 year,
-            uint256 month,
-            uint256 day
+            uint year,
+            uint month,
+            uint day
         )
     {
         require(tokenId > 0, "No date associated with claims!"); // No date associated with claims!
-        uint256 tokenTimestamp = _timestampFromTokenId(tokenId);
+        uint tokenTimestamp = _timestampFromTokenId(tokenId);
         return _timestampToDate(tokenTimestamp);
     }
 
     function tokenIdFromDate(
-        uint256 year,
-        uint256 month,
-        uint256 day
-    ) public pure returns (uint256 tokenId) {
+        uint year,
+        uint month,
+        uint day
+    ) public pure returns (uint tokenId) {
         require(DateTime.isValidDate(year, month, day), "Invalid date!");
-        uint256 tokenTimestamp = DateTime.timestampFromDate(year, month, day);
+        uint tokenTimestamp = DateTime.timestampFromDate(year, month, day);
         require(
             tokenTimestamp >= START_DATE,
             "Invalid date! Project started September 1, 2022!"
@@ -198,7 +227,7 @@ contract Ph101ppDailyPhoto is
         return _timestampToTokenId(tokenTimestamp);
     }
 
-    function redeemClaim(uint256 tokenId) public {
+    function redeemClaim(uint tokenId) public {
         address[] memory initialHolders = initialHolders(tokenId);
         _burn(msg.sender, CLAIM_TOKEN_ID, 1);
         _safeTransferFrom(
@@ -210,15 +239,18 @@ contract Ph101ppDailyPhoto is
         );
     }
 
-    function redeemClaimBatch(
-        uint256[] memory tokenIds,
-        uint256[] memory amounts
-    ) public {
-        uint256 claimsRequired = amounts[0];
+    function redeemClaimBatch(uint[] memory tokenIds, uint[] memory amounts)
+        public
+    {
+        uint claimsRequired = amounts[0];
         address[] memory initialHolders0 = initialHolders(tokenIds[0]);
         for (uint i = 1; i < amounts.length; i++) {
             claimsRequired += amounts[i];
-            require(initialHolders0[TREASURY_ID] == initialHolders(tokenIds[i])[TREASURY_ID], "Can't batch claim tokens from multiple treasury wallets.");
+            require(
+                initialHolders0[TREASURY_ID] ==
+                    initialHolders(tokenIds[i])[TREASURY_ID],
+                "Can't batch claim tokens from multiple treasury wallets."
+            );
         }
         _burn(msg.sender, CLAIM_TOKEN_ID, claimsRequired);
         _safeBatchTransferFrom(
@@ -230,7 +262,7 @@ contract Ph101ppDailyPhoto is
         );
     }
 
-    function mintClaims(address to, uint256 amount)
+    function mintClaims(address to, uint amount)
         public
         onlyRole(CLAIM_MINTER_ROLE)
     {
@@ -238,14 +270,10 @@ contract Ph101ppDailyPhoto is
     }
 
     function mintPhotos(
-        uint256[] memory ids,
-        uint256[][] memory amounts,
-        bytes32 checkSum,
-        uint256 maxSupply
+        uint[] memory ids,
+        uint[][] memory amounts,
+        bytes32 checkSum
     ) public onlyRole(PHOTO_MINTER_ROLE) {
-        _maxSupplyRange.push(ids[0]);
-        _maxSupplies.push(maxSupply);
-
         _mintRange(ids, amounts, checkSum);
     }
 
@@ -257,14 +285,14 @@ contract Ph101ppDailyPhoto is
     }
 
     function setTokenRoyalty(
-        uint256 tokenId,
+        uint tokenId,
         address receiver,
         uint96 feeNumerator
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 
-    function resetTokenRoyalty(uint256 tokenId)
+    function resetTokenRoyalty(uint tokenId)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
@@ -289,30 +317,30 @@ contract Ph101ppDailyPhoto is
         return super.supportsInterface(interfaceId);
     }
 
-    function _timestampToDate(uint256 timestamp)
+    function _timestampToDate(uint timestamp)
         private
         pure
         returns (
-            uint256 year,
-            uint256 month,
-            uint256 day
+            uint year,
+            uint month,
+            uint day
         )
     {
         return DateTime.timestampToDate(timestamp);
     }
 
-    function _timestampFromTokenId(uint256 tokenId)
+    function _timestampFromTokenId(uint tokenId)
         private
         pure
-        returns (uint256 timestamp)
+        returns (uint timestamp)
     {
         return START_DATE + ((tokenId - 1) * 1 days);
     }
 
-    function _timestampToTokenId(uint256 timestamp)
+    function _timestampToTokenId(uint timestamp)
         private
         pure
-        returns (uint256 tokenId)
+        returns (uint tokenId)
     {
         return ((timestamp - START_DATE) / 1 days) + 1;
     }
