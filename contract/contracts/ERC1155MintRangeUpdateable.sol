@@ -15,6 +15,24 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
     // used to check validity of updateInitialHolderRangeInput
     uint private _pauseTimestamp;
+    uint public lastRangeTokenIdWithLockedInitialHolders;
+    bool public isZeroLocked;
+
+
+    /**
+     * @dev Lock initial holders up to tokenid
+     */
+    function _setLockInitialHoldersUpTo(uint256 tokenId) 
+        internal
+        virtual
+        whenNotPaused
+    {
+        require(tokenId >= lastRangeTokenIdWithLockedInitialHolders);
+        lastRangeTokenIdWithLockedInitialHolders = tokenId;
+        if(!isZeroLocked) {
+            isZeroLocked = true;
+        }
+    }
 
     /**
      * @dev Return current initial holders
@@ -59,20 +77,33 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
         address[][] memory localInitialHoders = _initialHolders;
 
-        for(uint k = 0; k<localInitialHoders.length; k++) {
-            for(uint i=0; i<localInitialHoders[k].length; i++) {
-                delete _initialHoldersMappings[k][localInitialHoders[k][i]];
+        uint lastLockedIndex = _findInRange(
+            _initialHoldersRange,
+            lastRangeTokenIdWithLockedInitialHolders
+        );
+
+        for (uint k = 0; k < localInitialHoders.length; k++) {
+            for (uint i = 0; i < localInitialHoders[k].length; i++) {
+                if (!isZeroLocked || k > lastLockedIndex) {
+                    delete _initialHoldersMappings[k][localInitialHoders[k][i]];
+                } else {
+                    require(
+                        localInitialHoders[k][i] == newInitialHolders[k][i],
+                        "Error: Can't update locked initial holders."
+                    );
+                }
             }
         }
-        for(uint k = 0; k<newInitialHolders.length; k++) {
-            for(uint i=0; i<newInitialHolders[k].length; i++) {
-                _initialHoldersMappings[k][newInitialHolders[k][i]] = true;
+        for (uint k = 0; k < newInitialHolders.length; k++) {
+            for (uint i = 0; i < newInitialHolders[k].length; i++) {
+                if (!isZeroLocked || k > lastLockedIndex) {
+                    _initialHoldersMappings[k][newInitialHolders[k][i]] = true;
+                }
             }
         }
 
         _initialHolders = newInitialHolders;
         _initialHoldersRange = newInitialHoldersRange;
-        
 
         _unpause();
         for (uint i = 0; i < toAddresses.length; i++) {
@@ -129,14 +160,17 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             for (uint k = 0; k < id.length; k++) {
                 uint tokenId = id[k];
                 uint balance = amount[k];
-
+                
                 require(exists(tokenId) == true, "E:11");
                 require(isManualMint[tokenId] == false, "E:12");
                 require(_balances[tokenId][from] == 0, "E:13");
                 require(_balances[tokenId][to] == 0, "E:14");
-                require(balanceOf(from, tokenId) >= balance, "E:08");
 
+                require(balanceOf(from, tokenId) >= balance, "E:08");
                 require(isInitialHolderOf(from, tokenId), "E:09");
+                if(isZeroLocked) {
+                    require(tokenId < lastRangeTokenIdWithLockedInitialHolders, "E:15");
+                }
 
                 uint newInitialHoldersIndex = _findInRange(
                     newInitialHoldersRange,
