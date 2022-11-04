@@ -32,9 +32,13 @@ abstract contract ERC1155MintRange is ERC1155_ {
     mapping(uint => mapping(address => bool)) internal _initialHoldersMappings;
 
     // last tokenId minted via mintRange.
-    uint public lastRangeTokenId;
+    uint public lastRangeTokenIdMinted;
     bool public isZeroMinted;
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Token Balances & Total Supply
+///////////////////////////////////////////////////////////////////////////////
     /**
      * @dev Implement: Return initial token balance for address.
      * This function MUST be pure: Always return the same values for a given input.
@@ -45,61 +49,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
         virtual
         returns (uint);
 
-    /**
-     * @dev Set initial holders. mintRange will distribute tokens to these holders
-     */
-    function _setInitialHolders(address[] memory addresses) internal virtual {
-        _initialHoldersRange.push(isZeroMinted ? lastRangeTokenId + 1 : 0);
-        _initialHolders.push(addresses);
-        for(uint i=0; i<addresses.length; i++) {
-            _initialHoldersMappings[_initialHolders.length-1][addresses[i]] = true;
-        }
-    }
-
-    /**
-     * @dev Lazy-mint a range of new tokenIds to initial holders
-     */
-    function _mintRange(
-        uint[] memory ids,
-        uint[][] memory amounts,
-        bytes32 inputChecksum
-    ) internal virtual {
-        address[] memory addresses = initialHolders();
-
-        bytes32 checksum = keccak256(
-            abi.encode(
-                ids,
-                amounts,
-                addresses,
-                lastRangeTokenId,
-                isZeroMinted,
-                _manualMintsCount
-            )
-        );
-        require(inputChecksum == checksum, ERROR_INVALID_MINT_RANGE_INPUT);
-
-        lastRangeTokenId = ids[ids.length - 1];
-
-        if (isZeroMinted == false) {
-            isZeroMinted = true;
-        }
-        for (uint i = 0; i < addresses.length; i++) {
-            emit TransferBatch(
-                msg.sender,
-                address(0),
-                addresses[i],
-                ids,
-                amounts[i]
-            );
-        }
-    }
-
-    /**
-     * @dev Returns true if tokenId was minted.
-     */
-    function exists(uint tokenId) public view virtual returns (bool) {
-        return _inRange(tokenId) || isManualMint[tokenId] == true;
-    }
 
     /**
      * @dev See {ERC1155-balanceOf}.
@@ -129,41 +78,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
-     * @dev Returns initial holders of a token.
-     */
-    function initialHolders(uint tokenId)
-        public
-        view
-        virtual
-        returns (address[] memory)
-    {
-        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
-        uint index = _findInRange(_initialHoldersRange, tokenId);
-        return _initialHolders[index];
-    }
-
-    /**
-     * @dev Return current initial holders
-     */
-    function initialHolders() public view virtual returns (address[] memory) {
-        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
-        return _initialHolders[_initialHolders.length - 1];
-    }
-
-    /**
-     * @dev Returns true if address is an initial holder of tokenId
-     */
-    function isInitialHolderOf(address account, uint tokenId)
-        public
-        view
-        returns (bool)
-    {
-        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
-        uint index = _findInRange(_initialHoldersRange, tokenId);
-        return _initialHoldersMappings[index][account];
-    }
-
-    /**
      * @dev Total amount of tokens with a given id.
      */
     function totalSupply(uint tokenId)
@@ -187,52 +101,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
 
         // manually minted
         return uint(_totalSupplyDelta[tokenId]);
-    }
-
-    /**
-     * @dev Generate mintRange inputs for x new tokens.
-     */
-    function getMintRangeInput(uint numberOfTokens)
-        public
-        view
-        returns (
-            uint[] memory,
-            uint[][] memory,
-            bytes32
-        )
-    {
-        uint firstId = isZeroMinted ? lastRangeTokenId + 1 : 0;
-        address[] memory holders = initialHolders();
-        uint[] memory ids = new uint[](numberOfTokens);
-        uint[][] memory amounts = new uint[][](holders.length);
-
-        uint newIndex = 0;
-        for (uint i = 0; newIndex < numberOfTokens; i++) {
-            uint newId = firstId + i;
-            if (isManualMint[newId]) {
-                continue;
-            }
-            ids[newIndex] = newId;
-            for (uint b = 0; b < holders.length; b++) {
-                if (newIndex == 0) {
-                    amounts[b] = new uint[](numberOfTokens);
-                }
-                amounts[b][newIndex] = initialBalanceOf(holders[b], newId);
-            }
-            newIndex += 1;
-        }
-        bytes32 checksum = keccak256(
-            abi.encode(
-                ids,
-                amounts,
-                holders,
-                lastRangeTokenId,
-                isZeroMinted,
-                _manualMintsCount
-            )
-        );
-
-        return (ids, amounts, checksum);
     }
     
     /**
@@ -289,11 +157,158 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
     }
 
+///////////////////////////////////////////////////////////////////////////////
+// Intitial Holders
+///////////////////////////////////////////////////////////////////////////////
+    /**
+     * @dev Set initial holders. mintRange will distribute tokens to these holders
+     */
+    function _setInitialHolders(address[] memory addresses) internal virtual {
+        _initialHoldersRange.push(isZeroMinted ? lastRangeTokenIdMinted + 1 : 0);
+        _initialHolders.push(addresses);
+        for(uint i=0; i<addresses.length; i++) {
+            _initialHoldersMappings[_initialHolders.length-1][addresses[i]] = true;
+        }
+    }
+
+    /**
+     * @dev Returns initial holders of a token.
+     */
+    function initialHolders(uint tokenId)
+        public
+        view
+        virtual
+        returns (address[] memory)
+    {
+        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
+        uint index = _findInRange(_initialHoldersRange, tokenId);
+        return _initialHolders[index];
+    }
+
+    /**
+     * @dev Return current initial holders
+     */
+    function initialHolders() public view virtual returns (address[] memory) {
+        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
+        return _initialHolders[_initialHolders.length - 1];
+    }
+
+    /**
+     * @dev Returns true if address is an initial holder of tokenId
+     */
+    function isInitialHolderOf(address account, uint tokenId)
+        public
+        view
+        returns (bool)
+    {
+        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
+        uint index = _findInRange(_initialHoldersRange, tokenId);
+        return _initialHoldersMappings[index][account];
+    }
+
+///////////////////////////////////////////////////////////////////////////////
+// Mint Range
+///////////////////////////////////////////////////////////////////////////////
+    /**
+     * @dev Generate mintRange inputs for x new tokens.
+     */
+    function getMintRangeInput(uint numberOfTokens)
+        public
+        view
+        returns (
+            uint[] memory,
+            uint[][] memory,
+            bytes32
+        )
+    {
+        uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
+        address[] memory holders = initialHolders();
+        uint[] memory ids = new uint[](numberOfTokens);
+        uint[][] memory amounts = new uint[][](holders.length);
+
+        uint newIndex = 0;
+        for (uint i = 0; newIndex < numberOfTokens; i++) {
+            uint newId = firstId + i;
+            if (isManualMint[newId]) {
+                continue;
+            }
+            ids[newIndex] = newId;
+            for (uint b = 0; b < holders.length; b++) {
+                if (newIndex == 0) {
+                    amounts[b] = new uint[](numberOfTokens);
+                }
+                amounts[b][newIndex] = initialBalanceOf(holders[b], newId);
+            }
+            newIndex += 1;
+        }
+        bytes32 checksum = keccak256(
+            abi.encode(
+                ids,
+                amounts,
+                holders,
+                lastRangeTokenIdMinted,
+                isZeroMinted,
+                _manualMintsCount
+            )
+        );
+
+        return (ids, amounts, checksum);
+    }
+
+    /**
+     * @dev Lazy-mint a range of new tokenIds to initial holders
+     */
+    function _mintRange(
+        uint[] memory ids,
+        uint[][] memory amounts,
+        bytes32 inputChecksum
+    ) internal virtual {
+        address[] memory addresses = initialHolders();
+
+        bytes32 checksum = keccak256(
+            abi.encode(
+                ids,
+                amounts,
+                addresses,
+                lastRangeTokenIdMinted,
+                isZeroMinted,
+                _manualMintsCount
+            )
+        );
+        require(inputChecksum == checksum, ERROR_INVALID_MINT_RANGE_INPUT);
+
+        lastRangeTokenIdMinted = ids[ids.length - 1];
+
+        if (isZeroMinted == false) {
+            isZeroMinted = true;
+        }
+        for (uint i = 0; i < addresses.length; i++) {
+            emit TransferBatch(
+                msg.sender,
+                address(0),
+                addresses[i],
+                ids,
+                amounts[i]
+            );
+        }
+    }
+
+    
+///////////////////////////////////////////////////////////////////////////////
+// Uitilities
+///////////////////////////////////////////////////////////////////////////////
+    /**
+     * @dev Returns true if tokenId was minted.
+     */
+    function exists(uint tokenId) public view virtual returns (bool) {
+        return _inRange(tokenId) || isManualMint[tokenId] == true;
+    }
+
     /**
      * @dev Returns true if token is in existing id range.
      */
     function _inRange(uint tokenId) private view returns (bool) {
-        return isZeroMinted && tokenId <= lastRangeTokenId;
+        return isZeroMinted && tokenId <= lastRangeTokenIdMinted;
     }
 
     /**

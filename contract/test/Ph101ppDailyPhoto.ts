@@ -38,20 +38,20 @@ export function testPh101ppDailyPhoto() {
       expect(await pdp.permanentBaseUri()).to.equal(immutableUri);
     });
 
-    it("Should correcly update mutableUri via setProxyURI()", async function () {
+    it("Should correcly update mutableUri via setProxyBaseUri()", async function () {
       const mutableUri2 = "2.mutable.uri";
       const { pdp, mutableUri } = await loadFixture(deployFixture);
       expect(await pdp.proxyBaseUri()).to.equal(mutableUri);
-      await pdp.setProxyURI(mutableUri2);
+      await pdp.setProxyBaseUri(mutableUri2);
       expect(await pdp.proxyBaseUri()).to.equal(mutableUri2);
     });
 
-    it("Should correcly update immutableUri via setPermanentURI() and permanentBaseUriHistory to reflect this.", async function () {
+    it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriHistory to reflect this.", async function () {
       const immutableUri2 = "2.immutable.uri";
       const immutableUri3 = "3.immutable.uri";
       const { pdp, immutableUri } = await loadFixture(deployFixture);
       expect(await pdp.permanentBaseUri()).to.equal(immutableUri);
-      await pdp.setPermanentURI(immutableUri2, 100);
+      await pdp.setPermanentBaseUriUpTo(immutableUri2, 100);
       expect(await pdp.permanentBaseUri()).to.equal(immutableUri2);
 
       const history = await pdp.permanentBaseUriHistory();
@@ -59,7 +59,7 @@ export function testPh101ppDailyPhoto() {
       expect(history[0]).to.equal(immutableUri);
       expect(history[1]).to.equal(immutableUri2);
 
-      await pdp.setPermanentURI(immutableUri3, 101);
+      await pdp.setPermanentBaseUriUpTo(immutableUri3, 101);
 
       const histor2 = await pdp.permanentBaseUriHistory();
       expect(histor2.length).to.equal(3);
@@ -68,13 +68,13 @@ export function testPh101ppDailyPhoto() {
       expect(histor2[2]).to.equal(immutableUri3);
     });
 
-    it("Should require new permanentUri via setPermanentURI() to be valid for more tokenIds than the last one.", async function () {
+    it("Should require new permanentUri via setPermanentBaseUriUpTo() to be valid for more tokenIds than the last one.", async function () {
       const immutableUri2 = "2.immutable.uri";
       const immutableUri3 = "3.immutable.uri";
       const { pdp, owner } = await loadFixture(deployFixture);
-      const tx = await pdp.setPermanentURI(immutableUri2, 100);
-      await expect(pdp.setPermanentURI(immutableUri3, 100)).to.be.revertedWith("Error: TokenId must be larger than lastTokenIdWithValidPermanentUri.");
-      await pdp.setPermanentURI(immutableUri3, 101);
+      const tx = await pdp.setPermanentBaseUriUpTo(immutableUri2, 100);
+      await expect(pdp.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Error: TokenId must be larger than lastTokenIdWithValidPermanentUri.");
+      await pdp.setPermanentBaseUriUpTo(immutableUri3, 101);
     });
   });
 
@@ -196,7 +196,7 @@ export function testPh101ppDailyPhoto() {
 
     it("should return mutable url for all unminted nfts ", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      await pdp.setPermanentURI(immutableUri, 100);
+      await pdp.setPermanentBaseUriUpTo(immutableUri, 100);
 
       for (let i = 1; i < 100; i++) {
         expect(await pdp.uri(i)).to.include(mutableUri);
@@ -205,7 +205,7 @@ export function testPh101ppDailyPhoto() {
 
     it("should return immutable url for all minted nfts ", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      await pdp.setPermanentURI(immutableUri, 100);
+      await pdp.setPermanentBaseUriUpTo(immutableUri, 100);
       await pdp.setMaxInitialSupply(5);
       const inputs = await pdp.getMintRangeInput(50);
       await pdp.mintPhotos(...inputs);
@@ -218,7 +218,7 @@ export function testPh101ppDailyPhoto() {
 
     it("should return mutable url for minted nfts after _uriValidUptoTokenId", async function () {
       const { pdp, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      await pdp.setPermanentURI(immutableUri, 10);
+      await pdp.setPermanentBaseUriUpTo(immutableUri, 10);
       await pdp.setMaxInitialSupply(5);
       const inputs = await pdp.getMintRangeInput(50);
       await pdp.mintPhotos(...inputs);
@@ -236,6 +236,13 @@ export function testPh101ppDailyPhoto() {
       const { pdp } = await loadFixture(deployFixture);
       await expect(pdp.getMintRangeInput(4)).to.be.rejectedWith("No max initial supply set. Use _setMaxInitialSupply()");
     });
+
+    it("should fail to set max initial supply when paused", async function () {
+      const { pdp } = await loadFixture(deployFixture);
+      await pdp.pause();
+      await expect(pdp.setMaxInitialSupply(5)).to.be.rejectedWith("Pausable: paused");
+    });
+    
     
     it("Should correctly update max initial supply via setMaxInitialSupply", async function () {
       const { pdp } = await loadFixture(deployFixture);
@@ -434,6 +441,7 @@ export function testPh101ppDailyPhoto() {
 
       await pdp.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(pdp, 0, Infinity, treasury.address, account1.address);
+
       const tx = await pdp.updateInitialHoldersRange(...updateInitialHoldersInput);
       const receipt = await tx.wait();
 
@@ -601,8 +609,8 @@ export function testPh101ppDailyPhoto() {
       await expect(pdp.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).pause()).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
-      await expect(pdp.connect(account1).setPermanentURI("", 100)).to.be.rejectedWith("AccessControl");
-      await expect(pdp.connect(account1).setProxyURI("")).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account1).setProxyBaseUri("")).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(pdp.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
@@ -632,8 +640,8 @@ export function testPh101ppDailyPhoto() {
       await expect(pdp.connect(account3).mintClaims(account1.address, 5)).to.not.be.rejectedWith("AccessControl");
 
       await pdp.grantRole(await pdp.URI_UPDATER_ROLE(), account4.address);
-      await expect(pdp.connect(account4).setPermanentURI("", 100)).to.not.be.rejectedWith("AccessControl");
-      await expect(pdp.connect(account4).setProxyURI("")).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account4).setPermanentBaseUriUpTo("", 100)).to.not.be.rejectedWith("AccessControl");
+      await expect(pdp.connect(account4).setProxyBaseUri("")).to.not.be.rejectedWith("AccessControl");
     });
 
   });

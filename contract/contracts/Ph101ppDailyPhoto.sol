@@ -26,7 +26,7 @@ contract Ph101ppDailyPhoto is
 
     string[] private _permanentUris;
     string private _proxyUri;
-    uint public lastTokenIdWithPermanentUri;
+    uint public lastRangeTokenIdWithPermanentUri;
 
     uint[] private _maxSupplies;
     uint[] private _maxSupplyRange;
@@ -42,8 +42,8 @@ contract Ph101ppDailyPhoto is
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
 
-        setProxyURI(newProxyUri);
-        setPermanentURI(newPermanentUri, 0);
+        setProxyBaseUri(newProxyUri);
+        setPermanentBaseUriUpTo(newPermanentUri, 0);
         setInitialHolders(treasuryAddress, vaultAddress);
         setDefaultRoyalty(msg.sender, 500);
         mintClaims(treasuryAddress, 10);
@@ -74,9 +74,10 @@ contract Ph101ppDailyPhoto is
 
     function setMaxInitialSupply(uint maxSupply)
         public
+        whenNotPaused
         onlyRole(PHOTO_MINTER_ROLE)
     {
-        uint firstId = isZeroMinted ? lastRangeTokenId + 1 : 0;
+        uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
         if (_maxSupplies.length > 0) {
             uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
             if (lastId == firstId) {
@@ -96,6 +97,16 @@ contract Ph101ppDailyPhoto is
         addresses[0] = treasury;
         addresses[1] = vault;
         _setInitialHolders(addresses);
+    }
+
+    /**
+     * @dev Lock initial holders up to tokenid
+     */
+    function setLockInitialHoldersUpTo(uint256 tokenId) 
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _setLockInitialHoldersUpTo(tokenId);
     }
 
     function updateInitialHoldersRange(
@@ -118,20 +129,20 @@ contract Ph101ppDailyPhoto is
         );
     }
 
-    function setPermanentURI(string memory newUri, uint validUpToTokenId)
+    function setPermanentBaseUriUpTo(string memory newUri, uint validUpToTokenId)
         public
         onlyRole(URI_UPDATER_ROLE)
     {
         require(
-            validUpToTokenId > lastTokenIdWithPermanentUri ||
+            validUpToTokenId > lastRangeTokenIdWithPermanentUri ||
                 _permanentUris.length == 0,
             "Error: TokenId must be larger than lastTokenIdWithValidPermanentUri."
         );
         _permanentUris.push(newUri);
-        lastTokenIdWithPermanentUri = validUpToTokenId;
+        lastRangeTokenIdWithPermanentUri = validUpToTokenId;
     }
 
-    function setProxyURI(string memory newProxyUri)
+    function setProxyBaseUri(string memory newProxyUri)
         public
         onlyRole(URI_UPDATER_ROLE)
     {
@@ -157,7 +168,7 @@ contract Ph101ppDailyPhoto is
                 Strings.toString(day)
             );
 
-            if (exists(tokenId) && lastTokenIdWithPermanentUri >= tokenId) {
+            if (exists(tokenId) && lastRangeTokenIdWithPermanentUri >= tokenId) {
                 // ... uri updated since token -> immutable uri
                 currentUri = permanentBaseUri();
             } else {
@@ -172,7 +183,10 @@ contract Ph101ppDailyPhoto is
     /**
      * @dev Returns max initial supply of a token.
      */
-    function maxInitialSupply(uint tokenId) public view returns (uint) {
+    function maxInitialSupply(uint tokenId) 
+        public 
+        view 
+        returns (uint) {
         require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
         uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
         return _maxSupplies[supplyIndex];

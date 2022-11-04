@@ -30,7 +30,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
   const amounts: number[][] = [];
-  const lastTokenId = await c.lastRangeTokenId();
+  const lastTokenId = await c.lastRangeTokenIdMinted();
 
   const too = to == Infinity ? lastTokenId : to;
 
