@@ -12,12 +12,17 @@ import "./ERC1155MintRangePausable.sol";
 abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     string private constant ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT =
         "Invalid input. Use _verifyUpdateInitialHolderRangeInput().";
-
     // used to check validity of updateInitialHolderRangeInput
     uint private _pauseTimestamp;
+
     uint public lastRangeTokenIdWithLockedInitialHolders;
     bool public isZeroLocked;
 
+
+    function _pause() internal virtual override {
+        _pauseTimestamp = block.timestamp;
+        super._pause();
+    }
 
     /**
      * @dev Lock initial holders up to tokenid
@@ -115,11 +120,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 amounts[i]
             );
         }
-        super._pause();
-    }
-
-    function _pause() internal virtual override {
-        _pauseTimestamp = block.timestamp;
         super._pause();
     }
 

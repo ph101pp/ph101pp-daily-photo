@@ -49,8 +49,12 @@ contract Ph101ppDailyPhoto is
         mintClaims(treasuryAddress, 10);
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // Token Balances
+    ///////////////////////////////////////////////////////////////////////////////
+
     function initialBalanceOf(address account, uint tokenId)
-        public
+        internal
         view
         override
         returns (uint)
@@ -72,82 +76,9 @@ contract Ph101ppDailyPhoto is
         return 0;
     }
 
-    function setMaxInitialSupply(uint maxSupply)
-        public
-        whenNotPaused
-        onlyRole(PHOTO_MINTER_ROLE)
-    {
-        uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
-        if (_maxSupplies.length > 0) {
-            uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
-            if (lastId == firstId) {
-                _maxSupplies[_maxSupplies.length - 1] = maxSupply;
-                return;
-            }
-        }
-        _maxSupplyRange.push(firstId);
-        _maxSupplies.push(maxSupply);
-    }
-
-    function setInitialHolders(address treasury, address vault)
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
-        address[] memory addresses = new address[](2);
-        addresses[0] = treasury;
-        addresses[1] = vault;
-        _setInitialHolders(addresses);
-    }
-
-    /**
-     * @dev Lock initial holders up to tokenid
-     */
-    function setLockInitialHoldersUpTo(uint256 tokenId) 
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
-        _setLockInitialHoldersUpTo(tokenId);
-    }
-
-    function updateInitialHoldersRange(
-        address[] memory fromAddresses,
-        address[] memory toAddresses,
-        uint[][] memory ids,
-        uint[][] memory amounts,
-        address[][] memory newInitialHolders,
-        uint[] memory newInitialHoldersRange,
-        bytes32 inputChecksum
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _updateInitialHoldersRange(
-            fromAddresses,
-            toAddresses,
-            ids,
-            amounts,
-            newInitialHolders,
-            newInitialHoldersRange,
-            inputChecksum
-        );
-    }
-
-    function setPermanentBaseUriUpTo(string memory newUri, uint validUpToTokenId)
-        public
-        onlyRole(URI_UPDATER_ROLE)
-    {
-        require(
-            validUpToTokenId > lastRangeTokenIdWithPermanentUri ||
-                _permanentUris.length == 0,
-            "Error: TokenId must be larger than lastTokenIdWithValidPermanentUri."
-        );
-        _permanentUris.push(newUri);
-        lastRangeTokenIdWithPermanentUri = validUpToTokenId;
-    }
-
-    function setProxyBaseUri(string memory newProxyUri)
-        public
-        onlyRole(URI_UPDATER_ROLE)
-    {
-        _proxyUri = newProxyUri;
-    }
+    ///////////////////////////////////////////////////////////////////////////////
+    // Uris
+    ///////////////////////////////////////////////////////////////////////////////
 
     function uri(uint tokenId) public view override returns (string memory) {
         string memory tokenDate;
@@ -168,7 +99,9 @@ contract Ph101ppDailyPhoto is
                 Strings.toString(day)
             );
 
-            if (exists(tokenId) && lastRangeTokenIdWithPermanentUri >= tokenId) {
+            if (
+                exists(tokenId) && lastRangeTokenIdWithPermanentUri >= tokenId
+            ) {
                 // ... uri updated since token -> immutable uri
                 currentUri = permanentBaseUri();
             } else {
@@ -178,26 +111,6 @@ contract Ph101ppDailyPhoto is
         }
 
         return string.concat(currentUri, tokenDate, ".json");
-    }
-
-    /**
-     * @dev Returns max initial supply of a token.
-     */
-    function maxInitialSupply(uint tokenId) 
-        public 
-        view 
-        returns (uint) {
-        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
-        uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
-        return _maxSupplies[supplyIndex];
-    }
-
-    /**
-     * @dev Returns max initial supply of a token.
-     */
-    function maxInitialSupply() public view returns (uint) {
-        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
-        return _maxSupplies[_maxSupplies.length - 1];
     }
 
     function proxyBaseUri() public view returns (string memory) {
@@ -212,32 +125,36 @@ contract Ph101ppDailyPhoto is
         return _permanentUris;
     }
 
-    function tokenIdToDate(uint tokenId)
-        public
-        pure
-        returns (
-            uint year,
-            uint month,
-            uint day
-        )
-    {
-        require(tokenId > 0, "No date associated with claims!"); // No date associated with claims!
-        uint tokenTimestamp = _timestampFromTokenId(tokenId);
-        return _timestampToDate(tokenTimestamp);
+    function setPermanentBaseUriUpTo(
+        string memory newUri,
+        uint validUpToTokenId
+    ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
+        require(
+            validUpToTokenId > lastRangeTokenIdWithPermanentUri ||
+                _permanentUris.length == 0,
+            "Error: TokenId must be larger than lastTokenIdWithValidPermanentUri."
+        );
+        _permanentUris.push(newUri);
+        lastRangeTokenIdWithPermanentUri = validUpToTokenId;
     }
 
-    function tokenIdFromDate(
-        uint year,
-        uint month,
-        uint day
-    ) public pure returns (uint tokenId) {
-        require(DateTime.isValidDate(year, month, day), "Invalid date!");
-        uint tokenTimestamp = DateTime.timestampFromDate(year, month, day);
-        require(
-            tokenTimestamp >= START_DATE,
-            "Invalid date! Project started September 1, 2022!"
-        );
-        return _timestampToTokenId(tokenTimestamp);
+    function setProxyBaseUri(string memory newProxyUri)
+        public
+        whenNotPaused
+        onlyRole(URI_UPDATER_ROLE)
+    {
+        _proxyUri = newProxyUri;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Claims
+    ///////////////////////////////////////////////////////////////////////////////
+
+    function mintClaims(address to, uint amount)
+        public
+        onlyRole(CLAIM_MINTER_ROLE)
+    {
+        _mint(to, CLAIM_TOKEN_ID, amount, "");
     }
 
     function redeemClaim(uint tokenId) public {
@@ -275,12 +192,9 @@ contract Ph101ppDailyPhoto is
         );
     }
 
-    function mintClaims(address to, uint amount)
-        public
-        onlyRole(CLAIM_MINTER_ROLE)
-    {
-        _mint(to, CLAIM_TOKEN_ID, amount, "");
-    }
+    ///////////////////////////////////////////////////////////////////////////////
+    // Mint Photos
+    ///////////////////////////////////////////////////////////////////////////////
 
     function mintPhotos(
         uint[] memory ids,
@@ -290,8 +204,95 @@ contract Ph101ppDailyPhoto is
         _mintRange(ids, amounts, checkSum);
     }
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // Initial Supply
+    ///////////////////////////////////////////////////////////////////////////////
+
+    function setMaxInitialSupply(uint maxSupply)
+        public
+        whenNotPaused
+        onlyRole(PHOTO_MINTER_ROLE)
+    {
+        uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
+        if (_maxSupplies.length > 0) {
+            uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
+            if (lastId == firstId) {
+                _maxSupplies[_maxSupplies.length - 1] = maxSupply;
+                return;
+            }
+        }
+        _maxSupplyRange.push(firstId);
+        _maxSupplies.push(maxSupply);
+    }
+
+    /**
+     * @dev Returns max initial supply of a token.
+     */
+    function maxInitialSupply(uint tokenId) public view returns (uint) {
+        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
+        uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
+        return _maxSupplies[supplyIndex];
+    }
+
+    /**
+     * @dev Returns max initial supply of a token.
+     */
+    function maxInitialSupply() public view returns (uint) {
+        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
+        return _maxSupplies[_maxSupplies.length - 1];
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Initial Holders
+    ///////////////////////////////////////////////////////////////////////////////
+
+    function setInitialHolders(address treasury, address vault)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        address[] memory addresses = new address[](2);
+        addresses[0] = treasury;
+        addresses[1] = vault;
+        _setInitialHolders(addresses);
+    }
+
+    /**
+     * @dev Lock initial holders up to tokenid
+     */
+    function setLockInitialHoldersUpTo(uint256 tokenId)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _setLockInitialHoldersUpTo(tokenId);
+    }
+
+    function updateInitialHoldersRange(
+        address[] memory fromAddresses,
+        address[] memory toAddresses,
+        uint[][] memory ids,
+        uint[][] memory amounts,
+        address[][] memory newInitialHolders,
+        uint[] memory newInitialHoldersRange,
+        bytes32 inputChecksum
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _updateInitialHoldersRange(
+            fromAddresses,
+            toAddresses,
+            ids,
+            amounts,
+            newInitialHolders,
+            newInitialHoldersRange,
+            inputChecksum
+        );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Royalties
+    ///////////////////////////////////////////////////////////////////////////////
+
     function setDefaultRoyalty(address receiver, uint96 feeNumerator)
         public
+        whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _setDefaultRoyalty(receiver, feeNumerator);
@@ -301,16 +302,21 @@ contract Ph101ppDailyPhoto is
         uint tokenId,
         address receiver,
         uint96 feeNumerator
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 
     function resetTokenRoyalty(uint tokenId)
         public
+        whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _resetTokenRoyalty(tokenId);
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Pausable
+    ///////////////////////////////////////////////////////////////////////////////
 
     function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
         _pause();
@@ -320,14 +326,35 @@ contract Ph101ppDailyPhoto is
         _unpause();
     }
 
-    // The following functions are overrides required by Solidity.
-    function supportsInterface(bytes4 interfaceId)
+    ///////////////////////////////////////////////////////////////////////////////
+    // Token ID < > Date helpers
+    ///////////////////////////////////////////////////////////////////////////////
+    function tokenIdToDate(uint tokenId)
         public
-        view
-        override(AccessControl, ERC1155_, ERC2981)
-        returns (bool)
+        pure
+        returns (
+            uint year,
+            uint month,
+            uint day
+        )
     {
-        return super.supportsInterface(interfaceId);
+        require(tokenId > 0, "No date associated with claims!"); // No date associated with claims!
+        uint tokenTimestamp = _timestampFromTokenId(tokenId);
+        return _timestampToDate(tokenTimestamp);
+    }
+
+    function tokenIdFromDate(
+        uint year,
+        uint month,
+        uint day
+    ) public pure returns (uint tokenId) {
+        require(DateTime.isValidDate(year, month, day), "Invalid date!");
+        uint tokenTimestamp = DateTime.timestampFromDate(year, month, day);
+        require(
+            tokenTimestamp >= START_DATE,
+            "Invalid date! Project started September 1, 2022!"
+        );
+        return _timestampToTokenId(tokenTimestamp);
     }
 
     function _timestampToDate(uint timestamp)
@@ -356,5 +383,19 @@ contract Ph101ppDailyPhoto is
         returns (uint tokenId)
     {
         return ((timestamp - START_DATE) / 1 days) + 1;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Interface
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // The following functions are overrides required by Solidity.
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(AccessControl, ERC1155_, ERC2981)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

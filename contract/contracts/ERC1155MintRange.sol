@@ -44,7 +44,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * This function MUST be pure: Always return the same values for a given input.
      */
     function initialBalanceOf(address account, uint tokenId)
-        public
+        internal
         view
         virtual
         returns (uint);

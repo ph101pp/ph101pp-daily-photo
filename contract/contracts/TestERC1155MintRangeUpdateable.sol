@@ -8,7 +8,7 @@ contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
     constructor() ERC1155_("") {}
 
     function initialBalanceOf(address, uint256 tokenId)
-        public
+        internal
         pure
         override
         returns (uint256)

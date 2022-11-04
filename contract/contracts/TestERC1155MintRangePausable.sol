@@ -7,7 +7,7 @@ contract TestERC1155MintRangePausable is ERC1155MintRangePausable {
     constructor() ERC1155_("") {}
 
     function initialBalanceOf(address, uint256 tokenId)
-        public
+        internal
         pure
         override
         returns (uint256)
