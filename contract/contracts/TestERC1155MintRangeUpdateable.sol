@@ -2,7 +2,6 @@
 pragma solidity ^0.8.12;
 
 import "./ERC1155MintRangeUpdateable.sol";
-import "hardhat/console.sol";
 
 contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
     constructor() ERC1155_("") {}
@@ -25,6 +24,13 @@ contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
 
     function setInitialHolders(address[] memory addresses) public {
         _setInitialHolders(addresses);
+    }
+
+    /**
+     * @dev Lock initial holders up to tokenid
+     */
+    function setLockInitialHoldersUpTo(uint256 tokenId) public {
+        _setLockInitialHoldersUpTo(tokenId);
     }
 
     function updateInitialHoldersRange(

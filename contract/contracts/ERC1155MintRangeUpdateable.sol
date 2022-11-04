@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 
 import "./ERC1155MintRange.sol";
 import "./ERC1155MintRangePausable.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -12,12 +13,13 @@ import "./ERC1155MintRangePausable.sol";
 abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     string private constant ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT =
         "Invalid input. Use _verifyUpdateInitialHolderRangeInput().";
+    string private constant ERROR_CANT_UPDATE_LOCKED_HOLDERS =
+        "Error: Can't update locked initial holders.";
     // used to check validity of updateInitialHolderRangeInput
     uint private _pauseTimestamp;
 
-    uint public lastRangeTokenIdWithLockedInitialHolders;
+    uint256 public lastRangeTokenIdWithLockedInitialHolders;
     bool public isZeroLocked;
-
 
     function _pause() internal virtual override {
         _pauseTimestamp = block.timestamp;
@@ -27,14 +29,21 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     /**
      * @dev Lock initial holders up to tokenid
      */
-    function _setLockInitialHoldersUpTo(uint256 tokenId) 
+    function _setLockInitialHoldersUpTo(uint256 tokenId)
         internal
         virtual
         whenNotPaused
     {
-        require(tokenId >= lastRangeTokenIdWithLockedInitialHolders);
+        require(
+            tokenId > lastRangeTokenIdWithLockedInitialHolders,
+            "Error: Tokens already locked"
+        );
+        require(
+            isZeroMinted && tokenId <= lastRangeTokenIdMinted,
+            "Error: Can't lock initial holders of unminted tokens."
+        );
         lastRangeTokenIdWithLockedInitialHolders = tokenId;
-        if(!isZeroLocked) {
+        if (!isZeroLocked) {
             isZeroLocked = true;
         }
     }
@@ -86,7 +95,15 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             _initialHoldersRange,
             lastRangeTokenIdWithLockedInitialHolders
         );
+        uint newLastLockedIndex = _findInRange(
+            newInitialHoldersRange,
+            lastRangeTokenIdWithLockedInitialHolders
+        );
 
+        require(
+            newLastLockedIndex == lastLockedIndex,
+            ERROR_CANT_UPDATE_LOCKED_HOLDERS
+        );
         for (uint k = 0; k < localInitialHoders.length; k++) {
             for (uint i = 0; i < localInitialHoders[k].length; i++) {
                 if (!isZeroLocked || k > lastLockedIndex) {
@@ -94,7 +111,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 } else {
                     require(
                         localInitialHoders[k][i] == newInitialHolders[k][i],
-                        "Error: Can't update locked initial holders."
+                        ERROR_CANT_UPDATE_LOCKED_HOLDERS
                     );
                 }
             }
@@ -160,7 +177,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             for (uint k = 0; k < id.length; k++) {
                 uint tokenId = id[k];
                 uint balance = amount[k];
-                
+
                 require(exists(tokenId) == true, "E:11");
                 require(isManualMint[tokenId] == false, "E:12");
                 require(_balances[tokenId][from] == 0, "E:13");
@@ -168,8 +185,9 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
                 require(balanceOf(from, tokenId) >= balance, "E:08");
                 require(isInitialHolderOf(from, tokenId), "E:09");
+
                 if(isZeroLocked) {
-                    require(tokenId < lastRangeTokenIdWithLockedInitialHolders, "E:15");
+                    require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "E:15");
                 }
 
                 uint newInitialHoldersIndex = _findInRange(
