@@ -401,7 +401,7 @@ export function testERC1155MintRangeUpdateable(contractName: string) {
 
   });
 
-  describe.only("Lock initial holders", function() {
+  describe("Lock initial holders", function() {
     it("should fail to lock initial holders of unminted tokens or if tokens are already locked", async function(){
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
 

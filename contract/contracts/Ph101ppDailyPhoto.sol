@@ -30,6 +30,7 @@ contract Ph101ppDailyPhoto is
 
     uint[] private _maxSupplies;
     uint[] private _maxSupplyRange;
+    bool public isInitialHoldersRangeUpdatePermanentlyDisabled;
 
     constructor(
         string memory newProxyUri,
@@ -275,6 +276,7 @@ contract Ph101ppDailyPhoto is
         uint[] memory newInitialHoldersRange,
         bytes32 inputChecksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
         _updateInitialHoldersRange(
             fromAddresses,
             toAddresses,
@@ -284,6 +286,13 @@ contract Ph101ppDailyPhoto is
             newInitialHoldersRange,
             inputChecksum
         );
+    }
+
+    function permanentlyDisableInitialHoldersRangeUpdate()
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        isInitialHoldersRangeUpdatePermanentlyDisabled = true;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
