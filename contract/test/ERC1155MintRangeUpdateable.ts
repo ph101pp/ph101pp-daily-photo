@@ -436,7 +436,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
       await expect(_getUpdateInitialHoldersRangeInput(c, 5, 5, newInitialHolders)).to.not.be.rejected;
     });
 
-    it("should fail to update initialHolders of locked range", async function () {
+    it.skip("should fail to update initialHolders of locked range", async function () {
       // to test this comment-out the E:15 check in verifyUpdateInitialHolderRangeInput;
       const { c, account1, account2, account3, account4} = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address];
