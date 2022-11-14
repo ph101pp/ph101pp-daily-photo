@@ -4,23 +4,14 @@ import { ethers } from "hardhat";
 import _getUpdateInitialHoldersRangeInput from "../scripts/_getUpdateInitialHoldersRangeInput";
 import { testERC1155MintRange } from "./ERC1155MintRange";
 import { TestERC1155MintRangePausable } from "../typechain-types";
+import { deployFixture, Fixture } from "./fixture";
 
 describe("ERC1155MintRangePausable", function () {
-  testERC1155MintRange("TestERC1155MintRangePausable");
-  testERC1155MintRangePausable("TestERC1155MintRangePausable");
+  testERC1155MintRange(deployFixture("TestERC1155MintRange"));
+  testERC1155MintRangePausable(deployFixture("TestERC1155MintRangePausable"));
 });
 
-export function testERC1155MintRangePausable(contractName: string) {
-
-  async function deployFixture() {
-    // Contracts are deplodyed using the first signer/account by default
-    const [owner, account1, account2, account3, account4, account5, account6, account7, account8] = await ethers.getSigners();
-
-    const C = await ethers.getContractFactory(contractName);
-    const c = await C.deploy() as TestERC1155MintRangePausable;
-
-    return { c, owner, account1, account2, account3, account4, account5, account6, account7, account8 };
-  }
+export function testERC1155MintRangePausable(deployFixture: ()=>Promise<Fixture<TestERC1155MintRangePausable>>) {
 
   describe("Pausable (when paused)", function () {
     it("should fail to mintRange()", async function () {

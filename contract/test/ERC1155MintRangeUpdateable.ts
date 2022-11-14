@@ -5,30 +5,20 @@ import _getUpdateInitialHoldersRangeInput from "../scripts/_getUpdateInitialHold
 import { testERC1155MintRange } from "./ERC1155MintRange";
 import { testERC1155MintRangePausable } from "./ERC1155MintRangePausable";
 import { TestERC1155MintRangeUpdateable, Ph101ppDailyPhoto } from "../typechain-types";
-
+import { deployFixture, Fixture } from "./fixture";
 
 
 describe("TestERC1155MintRangeUpdateable", function () {
-  testERC1155MintRange("TestERC1155MintRangeUpdateable");
-  testERC1155MintRangePausable("TestERC1155MintRangeUpdateable");
-  testERC1155MintRangeUpdateable("TestERC1155MintRangeUpdateable");
+  testERC1155MintRange(deployFixture("TestERC1155MintRange"));
+  testERC1155MintRangePausable(deployFixture("TestERC1155MintRangePausable"));
+  testERC1155MintRangeUpdateable(deployFixture("TestERC1155MintRangeUpdateable"));
 });
 
-export function testERC1155MintRangeUpdateable(contractName: string) {
-
-  async function deployFixture() {
-    // Contracts are deplodyed using the first signer/account by default
-    const [owner, account1, account2, account3, account4, account5, account6, account7, account8] = await ethers.getSigners();
-
-    const C = await ethers.getContractFactory(contractName);
-    const c = await C.deploy() as TestERC1155MintRangeUpdateable;
-
-    return { c, owner, account1, account2, account3, account4, account5, account6, account7, account8 };
-  }
+export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixture<TestERC1155MintRangeUpdateable>>) {
 
   describe("verifyUpdateInitialHoldersRangeInput", function () {
 
-    it("should return a hash when successfull", async function () {
+    it.only("should return a hash when successfull", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
@@ -431,10 +421,13 @@ export function testERC1155MintRangeUpdateable(contractName: string) {
     it("should fail to create update initialHolders input of locked range", async function () {
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address];
+      const initialHolders2 = [account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      const mintIntput = await c.getMintRangeInput(5);
-      const ids = mintIntput[0];
+      const mintIntput = await c.getMintRangeInput(3);
       await c.mintRange(...mintIntput);
+      await c.setInitialHolders(initialHolders2);
+      const mintIntput2 = await c.getMintRangeInput(2);
+      await c.mintRange(...mintIntput2);
       await c.setLockInitialHoldersUpTo(4);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
@@ -443,13 +436,17 @@ export function testERC1155MintRangeUpdateable(contractName: string) {
       await expect(_getUpdateInitialHoldersRangeInput(c, 5, 5, newInitialHolders)).to.not.be.rejected;
     });
 
-    it.skip("should fail to update initialHolders of locked range", async function () {
+    it("should fail to update initialHolders of locked range", async function () {
       // to test this comment-out the E:15 check in verifyUpdateInitialHolderRangeInput;
-      const { c, account1, account2, account3} = await loadFixture(deployFixture);
+      const { c, account1, account2, account3, account4} = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address];
+      const initialHolders2 = [account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      const mintIntput = await c.getMintRangeInput(5);
+      const mintIntput = await c.getMintRangeInput(3);
       await c.mintRange(...mintIntput);
+      await c.setInitialHolders(initialHolders2);
+      const mintIntput2 = await c.getMintRangeInput(2);
+      await c.mintRange(...mintIntput2);
       await c.setLockInitialHoldersUpTo(4);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
