@@ -35,10 +35,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
     uint public lastRangeTokenIdMinted;
     bool public isZeroMinted;
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Token Balances & Total Supply
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // Token Balances & Total Supply
+    ///////////////////////////////////////////////////////////////////////////////
     /**
      * @dev Implement: Return initial token balance for address.
      * This function MUST be pure: Always return the same values for a given input.
@@ -48,7 +47,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
         view
         virtual
         returns (uint);
-
 
     /**
      * @dev See {ERC1155-balanceOf}.
@@ -78,14 +76,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
-     * @dev Total amount of tokens with a given id.
+     * @dev Total amount of tokens of a given id.
      */
-    function totalSupply(uint tokenId)
-        public
-        view
-        virtual
-        returns (uint)
-    {
+    function totalSupply(uint tokenId) public view virtual returns (uint) {
         // Pre initialization
         if (_inRange(tokenId) && !isManualMint[tokenId]) {
             uint initialTotalSupplySum = 0;
@@ -96,13 +89,16 @@ abstract contract ERC1155MintRange is ERC1155_ {
                     tokenId
                 );
             }
-            return uint(int256(initialTotalSupplySum) + _totalSupplyDelta[tokenId]);
+            return
+                uint(
+                    int256(initialTotalSupplySum) + _totalSupplyDelta[tokenId]
+                );
         }
 
         // manually minted
         return uint(_totalSupplyDelta[tokenId]);
     }
-    
+
     /**
      * @dev See {ERC1155-_beforeTokenTransfer}.
      */
@@ -157,17 +153,21 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
     }
 
-///////////////////////////////////////////////////////////////////////////////
-// Intitial Holders
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // Intitial Holders
+    ///////////////////////////////////////////////////////////////////////////////
     /**
      * @dev Set initial holders. mintRange will distribute tokens to these holders
      */
     function _setInitialHolders(address[] memory addresses) internal virtual {
-        _initialHoldersRange.push(isZeroMinted ? lastRangeTokenIdMinted + 1 : 0);
+        _initialHoldersRange.push(
+            isZeroMinted ? lastRangeTokenIdMinted + 1 : 0
+        );
         _initialHolders.push(addresses);
-        for(uint i=0; i<addresses.length; i++) {
-            _initialHoldersMappings[_initialHolders.length-1][addresses[i]] = true;
+        for (uint i = 0; i < addresses.length; i++) {
+            _initialHoldersMappings[_initialHolders.length - 1][
+                addresses[i]
+            ] = true;
         }
     }
 
@@ -206,9 +206,16 @@ abstract contract ERC1155MintRange is ERC1155_ {
         return _initialHoldersMappings[index][account];
     }
 
-///////////////////////////////////////////////////////////////////////////////
-// Mint Range
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // Mint Range
+    ///////////////////////////////////////////////////////////////////////////////
+    /**
+     * @dev Implement: May be overwritten to add custom values to checksum test.
+     */
+    function _customMintRangeChecksum() internal view virtual returns (bytes32) {
+        return 0x00;
+    }
+
     /**
      * @dev Generate mintRange inputs for x new tokens.
      */
@@ -248,7 +255,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 holders,
                 lastRangeTokenIdMinted,
                 isZeroMinted,
-                _manualMintsCount
+                _manualMintsCount,
+                _customMintRangeChecksum()
             )
         );
 
@@ -272,7 +280,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 addresses,
                 lastRangeTokenIdMinted,
                 isZeroMinted,
-                _manualMintsCount
+                _manualMintsCount,
+                _customMintRangeChecksum()
             )
         );
         require(inputChecksum == checksum, ERROR_INVALID_MINT_RANGE_INPUT);
@@ -293,10 +302,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
     }
 
-    
-///////////////////////////////////////////////////////////////////////////////
-// Uitilities
-///////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    // Uitilities
+    ///////////////////////////////////////////////////////////////////////////////
     /**
      * @dev Returns true if tokenId was minted.
      */

@@ -61,6 +61,13 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     }
 
     /**
+     * @dev Implement: May be overwritten to add custom values to checksum test.
+     */
+    function _customUpdateInitialHoldersRangeChecksum() internal view virtual returns (bytes32) {
+        return 0x00;
+    }
+
+    /**
      * @dev Update initial holders for a range of ids.
      */
     function _updateInitialHoldersRange(
@@ -81,7 +88,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 newInitialHolders,
                 newInitialHoldersRange,
                 _pauseTimestamp,
-                paused()
+                paused(),
+                _customUpdateInitialHoldersRangeChecksum()
             )
         );
         require(
@@ -218,7 +226,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     newInitialHolders,
                     newInitialHoldersRange,
                     _pauseTimestamp,
-                    paused()
+                    paused(),
+                    _customUpdateInitialHoldersRangeChecksum()
                 )
             );
     }

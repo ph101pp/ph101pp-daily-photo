@@ -194,7 +194,7 @@ contract Ph101ppDailyPhoto is
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // Mint Photos
+    // Mint Photos (Mint Range)
     ///////////////////////////////////////////////////////////////////////////////
 
     function mintPhotos(
@@ -203,6 +203,10 @@ contract Ph101ppDailyPhoto is
         bytes32 checkSum
     ) public onlyRole(PHOTO_MINTER_ROLE) {
         _mintRange(ids, amounts, checkSum);
+    }
+
+    function _customMintRangeChecksum() internal view override returns (bytes32) {
+        return keccak256(abi.encode(_maxSupplies));
     }
 
     ///////////////////////////////////////////////////////////////////////////////

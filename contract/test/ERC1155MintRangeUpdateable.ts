@@ -18,7 +18,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
 
   describe("verifyUpdateInitialHoldersRangeInput", function () {
 
-    it.only("should return a hash when successfull", async function () {
+    it("should return a hash when successfull", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);

@@ -16,7 +16,7 @@ type FixturePDP = {
   mutableUri: string,
   immutableUri: string,
 }
-describe.only("Ph101ppDailyPhoto", function () {
+describe("Ph101ppDailyPhoto", function () {
   testPh101ppDailyPhoto(deployFixture("Ph101ppDailyPhoto"));
 });
 
@@ -255,6 +255,17 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.setMaxInitialSupply(5)).to.be.rejectedWith("Pausable: paused");
     });
 
+    it("Should invalidate mintRangeInput when maxInitialSupply is set", async function () {
+      const { c } = await loadFixture(deployFixture);
+      const initialSupply = 5;
+      const initialSupply2 = 7;
+
+      await c.setMaxInitialSupply(initialSupply);
+      expect(await c["maxInitialSupply()"]()).to.equal(initialSupply);
+      const inputs = await c.getMintRangeInput(5);
+      await c.setMaxInitialSupply(initialSupply2);
+      await expect(c.mintPhotos(...inputs)).to.be.revertedWith("Invalid input. Use getMintRangeInput()");
+    });
 
     it("Should correctly update max initial supply via setMaxInitialSupply", async function () {
       const { c } = await loadFixture(deployFixture);
