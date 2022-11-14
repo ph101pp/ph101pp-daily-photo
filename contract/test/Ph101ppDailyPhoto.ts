@@ -202,8 +202,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
       const tokenId = 0;
-      const { c, mutableUri } = await loadFixture(deployFixture);
-      expect(await c.uri(tokenId)).to.equal(mutableUri + "CLAIM.json");
+      const { c, immutableUri } = await loadFixture(deployFixture);
+      expect(await c.uri(tokenId)).to.equal(immutableUri + "CLAIM.json");
     });
 
     it("should return mutable url for all unminted nfts ", async function () {

@@ -88,7 +88,7 @@ contract Ph101ppDailyPhoto is
         if (tokenId == CLAIM_TOKEN_ID) {
             // ... is claim -> return claim
             tokenDate = CLAIM_TOKEN;
-            currentUri = proxyBaseUri();
+            currentUri = permanentBaseUri();
         } else {
             (uint year, uint month, uint day) = tokenIdToDate(tokenId);
 
