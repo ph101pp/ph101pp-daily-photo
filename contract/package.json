@@ -4,7 +4,7 @@
     "test-gas": "REPORT_GAS=true npx hardhat test",
     "test-fast": "TS_NODE_TYPE_CHECK=false npx hardhat test",
     "deploy-test": "npx hardhat run scripts/deploy.ts",
-    "deploy-goerli": "npm run test; npx hardhat run scripts/deploy.ts --network goerli",
+    "deploy-goerli": "npm run test && npx hardhat run scripts/deploy.ts --network goerli",
     "interact-test": "npx hardhat run scripts/interact.ts",
     "interact-goerli": "npx hardhat run scripts/interact.ts --network goerli",
     "verify-abi-goerli": "npx hardhat verify --network goerli --constructor-args ./scripts/deployArguments.js"

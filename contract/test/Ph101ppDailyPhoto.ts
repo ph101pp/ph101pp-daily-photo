@@ -246,7 +246,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should fail to get mintRangeInput without max initial supply", async function () {
       const { c } = await loadFixture(deployFixture);
-      await expect(c.getMintRangeInput(4)).to.be.rejectedWith("No max initial supply set. Use _setMaxInitialSupply()");
+      await expect(c.getMintRangeInput(4)).to.be.rejectedWith("No max initial supply set. Use setMaxInitialSupply()");
     });
 
     it("should fail to set max initial supply when paused", async function () {
@@ -272,7 +272,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const initialSupply = 5;
       const initialSupply2 = 7;
 
-      await expect(c["maxInitialSupply()"]()).to.be.revertedWith("No max initial supply set. Use _setMaxInitialSupply()");
+      await expect(c["maxInitialSupply()"]()).to.be.revertedWith("No max initial supply set. Use setMaxInitialSupply()");
 
       await c.setMaxInitialSupply(initialSupply);
       expect(await c["maxInitialSupply()"]()).to.equal(initialSupply);
