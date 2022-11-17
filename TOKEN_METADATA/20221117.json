@@ -1,0 +1,65 @@
+{
+  "description": "This photo was taken on Thursday, November 17, 2022.",
+  "image": "https://arweave.net/h84usgjkPP50GFKifpX3Dgvf4xFGi3AMVM-Cw61u8tg",
+  "image_url": "https://arweave.net/h84usgjkPP50GFKifpX3Dgvf4xFGi3AMVM-Cw61u8tg",
+  "name": "Thursday, November 17, 2022",
+  "created_by": "Philipp Adrian",
+  "external_url": "https://daily-photo.ph101pp.xyz/20221117",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "sfd"
+    },
+    {
+      "trait_type": "Country",
+      "value": "asdf"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "undefined undefined"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "undefinedmm 1/0s ƒ/undefined ISOundefined"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Photo"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1668654000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 11
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 17
+    }
+  ],
+  "image_details": {
+    "size": 7227767,
+    "type": "image/jpeg",
+    "width": 3000,
+    "height": 2000,
+    "sha256": "8b1a93d4ae514211449936dd5248c7d57ac61fe0a2dd934996d2064428b11887"
+  }
+}
