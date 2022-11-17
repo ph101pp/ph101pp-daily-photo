@@ -1,5 +1,9 @@
 {
   "manifest": "arweave/paths",
   "version": "0.1.0",
-  "paths": {}
+  "paths": {
+    "20221117.json": {
+      "id": "xaHopH6rAYNBB_CqgKPP6hJ5EqXOTHcVLRI48bFmL48"
+    }
+  }
 }
