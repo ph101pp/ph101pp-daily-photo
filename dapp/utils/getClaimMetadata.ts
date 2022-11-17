@@ -16,14 +16,14 @@ export default function getClaimMetadata(): MetadataType {
         "value": "Claim"
       },
     ],
-    "image": "https://arweave.net/X4LbCHKXFENNjfvxrRl_YmXq7-X7_a0LK1kxz7kR6LQ",
-    "image_url": "https://arweave.net/X4LbCHKXFENNjfvxrRl_YmXq7-X7_a0LK1kxz7kR6LQ",
+    "image": "https://arweave.net/mTCnJgbuqyHsTp3yZRC-X9xx7hij9XZ11BZc5ksqkQQ",
+    "image_url": "https://arweave.net/mTCnJgbuqyHsTp3yZRC-X9xx7hij9XZ11BZc5ksqkQQ",
     "image_details": {
-      "size": 7239642,
+      "size": 7159141,
       "type": "image/jpeg",
       "width": 3000,
       "height": 2000,
-      "sha256": "fdaa31384d3ea0caa45a73372a152fa7674f6fd7f5a071a1e48beb1c6a2099ba"
+      "sha256": "b253a99a1a998b24a692bbc5f9e0cd3270e7b308d59b607dce300ca8ab6b3505"
     }
   });
 }

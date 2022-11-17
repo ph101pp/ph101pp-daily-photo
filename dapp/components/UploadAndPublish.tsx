@@ -45,30 +45,31 @@ const UploadAndPublish = () => {
     const [tokenTx, executeTokenTx] = await uploadMetadata(JSON.stringify(tokenMetadata), "application/json");
     const newManifest = {
       ...manifest,
-      paths: {
-        ...manifest.paths,
-        [`${tokenId}.json`]: {
-          id: tokenTx
-        }
-      }
+      // paths: {
+      //   ...manifest.paths,
+      //   [`${tokenId}.json`]: {
+      //     id: tokenTx
+      //   }
+      // }
     };
 
     const [manifestTx, executeManifestTx] = await uploadManifest(JSON.stringify(newManifest), "application/x.arweave-manifest+json");
 
     console.log("optimistic", { imageTx, tokenTx, manifestTx });
+    const finalManifestTx = await executeManifestTx()
 
-    const [finalImageTx, finalTokenTx, finalManifestTx] = await Promise.all([
-      executeImageTx(),
-      executeTokenTx(),
-      executeManifestTx()
-    ]);
-
+    // const [finalImageTx, finalTokenTx, finalManifestTx] = await Promise.all([
+    //   executeImageTx(),
+    //   executeTokenTx(),
+    //   executeManifestTx()
+    // ]);
+    return;
     console.log("final", {
       imageTx: finalImageTx,
       tokenTx: finalTokenTx,
       manifestTx: finalManifestTx
     });
-
+    return;
     const commitData: CommitPostDataType = {
       message: `Update Manifest: ${tokenMetadata.name}`,
       manifest: JSON.stringify(newManifest, null, 2),

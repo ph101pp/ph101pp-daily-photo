@@ -17,13 +17,13 @@
       "value": "No"
     }
   ],
-  "image": "https://arweave.net/S4OFT7mPFp55SISQGNnJrJBaQ2yHezZFCDj7v_d8n8c",
-  "image_url": "https://arweave.net/S4OFT7mPFp55SISQGNnJrJBaQ2yHezZFCDj7v_d8n8c",
-  "image_details":{
-    "size":7108402,
-    "type":"image/jpeg",
-    "width":3000,
-    "height":2000,
-    "sha256":"5705984596ad2f71814de257d500fbd83150361ca1171cf61e68eaf4d210a3e0"
+  "image": "https://arweave.net/mTCnJgbuqyHsTp3yZRC-X9xx7hij9XZ11BZc5ksqkQQ",
+  "image_url": "https://arweave.net/mTCnJgbuqyHsTp3yZRC-X9xx7hij9XZ11BZc5ksqkQQ",
+  "image_details": {
+    "size": 7159141,
+    "type": "image/jpeg",
+    "width": 3000,
+    "height": 2000,
+    "sha256": "b253a99a1a998b24a692bbc5f9e0cd3270e7b308d59b607dce300ca8ab6b3505"
   }
 }

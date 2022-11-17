@@ -9,6 +9,7 @@ const photosAddress5 = "0xd92d5acC92751588EE82265226640f0B79B49ecE";
 const photosAddress6 = "0x7860a667A3a84B8643981DF1dFa98Fa458D3CC73";
 const photosAddress7 = "0x443D022e06ed1Ed8e8e29FaF65bB8D4c01842814";
 const photosAddress8 = "0x44A549A3FaB9de863F495eb141c8a0Ef8F5782D5";
+const photosAddress9 = "0x0d500E1c85abeA744D99B50708E12ADA2202726b";
 
 async function main() {
   const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress8);
