@@ -13,7 +13,7 @@ contract Ph101ppDailyPhoto is
     AccessControl
 {
     string private constant ERROR_NO_INITIAL_SUPPLY =
-        "No max initial supply set. Use _setMaxInitialSupply()";
+        "No max initial supply set. Use setMaxInitialSupply()";
     uint public constant START_DATE = 1661990400; // Sept 1, 2022
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");

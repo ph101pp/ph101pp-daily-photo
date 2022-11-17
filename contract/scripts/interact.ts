@@ -10,15 +10,17 @@ const photosAddress6 = "0x7860a667A3a84B8643981DF1dFa98Fa458D3CC73";
 const photosAddress7 = "0x443D022e06ed1Ed8e8e29FaF65bB8D4c01842814";
 const photosAddress8 = "0x44A549A3FaB9de863F495eb141c8a0Ef8F5782D5";
 const photosAddress9 = "0x0d500E1c85abeA744D99B50708E12ADA2202726b";
+const photosAddress10 = "0x5433c0e7616848Ac8ba043dF4a8B4C62cF747171";
 
 async function main() {
-  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress8);
+  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress10);
   
   
   // const tx = await pdp.setPermanentBaseUriUpTo("https://arweave.net/1a-HDKflsjG2_b3jAuMYTrQyB13BNarkz0WZdCEBj0E/", 1);
   // const tx = await pdp.setMutableURI("https://ph101pp-daily-photo.vercel.app/api/proxy/");
   
-  await pdp.setMaxInitialSupply(2);
+  const supplyTx = await pdp.setMaxInitialSupply(2);
+  await supplyTx.wait();
   const input = await pdp.getMintRangeInput(122);
   const tx = await pdp.mintPhotos(...input);
   const receipt = await tx.wait();
