@@ -6,13 +6,13 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./DateTime.sol";
-import "./DisableableOperatorFilterer.sol";
+import "./OpenseaOperatorFilterer.sol";
 
 contract Ph101ppDailyPhoto is
     ERC1155MintRangeUpdateable,
     ERC2981,
     AccessControl,
-    DisableableOperatorFilterer
+    OpenseaOperatorFilterer
 {
     string private constant ERROR_NO_INITIAL_SUPPLY =
         "No max initial supply set. Use setMaxInitialSupply()";
@@ -34,7 +34,7 @@ contract Ph101ppDailyPhoto is
     uint[] private _maxSupplyRange;
     bool public isInitialHoldersRangeUpdatePermanentlyDisabled;
 
-    address public owner;
+    address private _owner;
 
     constructor(
         string memory newProxyUri,
@@ -46,7 +46,8 @@ contract Ph101ppDailyPhoto is
         _grantRole(CLAIM_MINTER_ROLE, msg.sender);
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
-        
+        _registerToOpenseaOperatorFilterRegistry(true);
+
         setOwner(msg.sender);
         setProxyBaseUri(newProxyUri);
         setPermanentBaseUriUpTo(newPermanentUri, 0);
@@ -210,7 +211,12 @@ contract Ph101ppDailyPhoto is
         _mintRange(ids, amounts, checkSum);
     }
 
-    function _customMintRangeChecksum() internal view override returns (bytes32) {
+    function _customMintRangeChecksum()
+        internal
+        view
+        override
+        returns (bytes32)
+    {
         return keccak256(abi.encode(_maxSupplies));
     }
 
@@ -407,18 +413,37 @@ contract Ph101ppDailyPhoto is
     // Opensea Operator Filterer
     ///////////////////////////////////////////////////////////////////////////////
 
+    function owner() public view override returns (address) {
+        return _owner;
+    }
+
     /**
      * @dev Set new owner. This address will be returned by owner().
      * Can be used to make updates to the OperatorFilterRegistry on behalf of this contract.
      */
-    function setOwner(address _owner)
+    function setOwner(address newOwner) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _owner = newOwner;
+    }
+
+    function setOperatorFilterRegistry(address _operatorFilterRegistry)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        owner = _owner;
+        _setOperatorFilterRegistry(_operatorFilterRegistry);
     }
 
-    function setApprovalForAll(address operator, bool approved) public override onlyAllowedOperatorApproval(operator) {
+    function setIsOperatorFilterDisabled(bool _isOperatorFilterDisabled)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _setIsOperatorFilterDisabled(_isOperatorFilterDisabled);
+    }
+
+    function setApprovalForAll(address operator, bool approved)
+        public
+        override
+        onlyAllowedOperatorApproval(operator)
+    {
         super.setApprovalForAll(operator, approved);
     }
 

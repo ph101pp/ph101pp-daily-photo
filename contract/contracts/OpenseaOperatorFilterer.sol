@@ -2,71 +2,64 @@
 pragma solidity ^0.8.13;
 
 import {IOperatorFilterRegistry} from "./reference/operator-filter-registry-main/src/IOperatorFilterRegistry.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
- * @title  OperatorFilterer
- * @notice Abstract contract whose constructor automatically registers and optionally subscribes to or copies another
- *         registrant's entries in the OperatorFilterRegistry.
+ * @title  OpenseaOperatorFilterer
  * @dev    This smart contract is meant to be inherited by token contracts so they can use the following:
  *         - `onlyAllowedOperator` modifier for `transferFrom` and `safeTransferFrom` methods.
  *         - `onlyAllowedOperatorApproval` modifier for `approve` and `setApprovalForAll` methods.
- * @notice DisableableOperatorFilterer adds setDisableOperatorFilterer && isOperatorFilterDisabled
+ *         - `_setOperatorFilterRegistry to update the registry contract to check against
+ *         - `_setIsOperatorFilterDisabled` to enable/disable registry checks
+ *         - `_registerToOpenseaOperatorFilterRegistry` to register a contract to openseas registry.
  */
-abstract contract DisableableOperatorFilterer is AccessControl {
+abstract contract OpenseaOperatorFilterer {
     error OperatorNotAllowed(address operator);
 
     bool public isOperatorFilterDisabled;
-    // Default: OpenSea's OperatorFilterRegistry contract
+
+    // Default: OpenSea OperatorFilterRegistry contract
     address public operatorFilterRegistry =
         0x000000000000AAeB6D7670E522A718067333cd4E;
+    // OpenSea Curated Subscription Address
+    address constant openseaSubscriptionAddress =
+        0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6;
 
-    // constructor() {
-    //     // Default: Subscribe to OpenSea Curated Subscription Address
-    //     IOperatorFilterRegistry(operatorFilterRegistry).registerAndSubscribe(
-    //         address(this),
-    //         address(0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6)
-    //     );
-    // }
-    constructor(address subscriptionOrRegistrantToCopy, bool subscribe) {
-        // If an inheriting token contract is deployed to a network without the registry deployed, the modifier
-        // will not revert, but the contract will need to be registered with the registry once it is deployed in
-        // order for the modifier to filter addresses.
-        if (operatorFilterRegistry.code.length > 0) {
-            if (subscribe) {
-                IOperatorFilterRegistry(operatorFilterRegistry)
-                    .registerAndSubscribe(
-                        address(this),
-                        subscriptionOrRegistrantToCopy
-                    );
-            } else {
-                if (subscriptionOrRegistrantToCopy != address(0)) {
-                    IOperatorFilterRegistry(operatorFilterRegistry)
-                        .registerAndCopyEntries(
-                            address(this),
-                            subscriptionOrRegistrantToCopy
-                        );
-                } else {
-                    IOperatorFilterRegistry(operatorFilterRegistry).register(
-                        address(this)
-                    );
-                }
-            }
+    // required as authority to make updates to OperatorFilterRegistry for this contract.
+    function owner() public virtual returns (address);
+
+    // Register contract with OperatorFilterRegistry 
+    // and copy / subscribe to OpenSea Curated Subscription 
+    // Currently (Nov 22) this makes sense for mostly everyone.
+    function _registerToOpenseaOperatorFilterRegistry(bool subscribe)
+        internal
+        virtual
+    {
+        if (subscribe) {
+            IOperatorFilterRegistry(operatorFilterRegistry)
+                .registerAndSubscribe(
+                    address(this),
+                    openseaSubscriptionAddress
+                );
+        } else {
+            IOperatorFilterRegistry(operatorFilterRegistry)
+                .registerAndCopyEntries(
+                    address(this),
+                    openseaSubscriptionAddress
+                );
         }
     }
 
-    function setOperatorFilterRegistry(address _operatorFilterRegistry)
-        public
+    // Enables updating registry contract address
+    function _setOperatorFilterRegistry(address _operatorFilterRegistry)
+        internal
         virtual
-        onlyRole(DEFAULT_ADMIN_ROLE)
     {
         operatorFilterRegistry = _operatorFilterRegistry;
     }
 
-    function setIsOperatorFilterDisabled(bool _isOperatorFilterDisabled)
-        public
+    function _setIsOperatorFilterDisabled(bool _isOperatorFilterDisabled)
+        internal
         virtual
-        onlyRole(DEFAULT_ADMIN_ROLE)
     {
         isOperatorFilterDisabled = _isOperatorFilterDisabled;
     }
