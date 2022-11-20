@@ -17,10 +17,10 @@ type FixturePDP = {
   immutableUri: string,
 }
 describe("Ph101ppDailyPhoto", function () {
-  testPh101ppDailyPhoto(deployFixture("Ph101ppDailyPhoto"));
+  testPh101ppDailyPhoto(deployFixture());
 });
 
-function deployFixture<T>(contractName: string): () => Promise<Fixture<T> & FixturePDP> {
+function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
   const mutableUri = "mutable_.uri/";
   const immutableUri = "immutable.uri/";
   
@@ -32,8 +32,13 @@ function deployFixture<T>(contractName: string): () => Promise<Fixture<T> & Fixt
     if (latest < nowTimestamp) {
       await time.increaseTo(nowTimestamp);
     }
-
-    const PDP = await ethers.getContractFactory(contractName);
+    const DT = await ethers.getContractFactory("DateTime");
+    const dt = await DT.deploy();
+    const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
+      libraries: {
+        "DateTime": dt.address
+      }
+    });
     const c = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address) as T;
 
     return { c, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6, account7, account8 };

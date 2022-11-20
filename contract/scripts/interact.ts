@@ -11,9 +11,10 @@ const photosAddress7 = "0x443D022e06ed1Ed8e8e29FaF65bB8D4c01842814";
 const photosAddress8 = "0x44A549A3FaB9de863F495eb141c8a0Ef8F5782D5";
 const photosAddress9 = "0x0d500E1c85abeA744D99B50708E12ADA2202726b";
 const photosAddress10 = "0x5433c0e7616848Ac8ba043dF4a8B4C62cF747171";
+const photosAddress11 = "0x9f2dD4Be989E5C806a3eEC34f8c26929fb6Cc4B0";
 
 async function main() {
-  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress10);
+  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress11);
   
   
   // const tx = await pdp.setPermanentBaseUriUpTo("https://arweave.net/1a-HDKflsjG2_b3jAuMYTrQyB13BNarkz0WZdCEBj0E/", 1);

@@ -94,17 +94,17 @@ library DateTime {
         }
     }
 
-    function timestampFromDate(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 timestamp) {
+    function timestampFromDate(uint256 year, uint256 month, uint256 day) external pure returns (uint256 timestamp) {
         timestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY;
     }
 
-    function timestampToDate(uint256 timestamp) internal pure returns (uint256 year, uint256 month, uint256 day) {
+    function timestampToDate(uint256 timestamp) external pure returns (uint256 year, uint256 month, uint256 day) {
         unchecked {
             (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
         }
     }
 
-    function isValidDate(uint256 year, uint256 month, uint256 day) internal pure returns (bool valid) {
+    function isValidDate(uint256 year, uint256 month, uint256 day) external pure returns (bool valid) {
         if (year >= 1970 && month > 0 && month <= 12) {
             uint256 daysInMonth = _getDaysInMonth(year, month);
             if (day > 0 && day <= daysInMonth) {

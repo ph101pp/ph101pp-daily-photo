@@ -5,9 +5,11 @@ import "hardhat-gas-reporter";
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+const gasGoerliGwei = 5;
+
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.12",
+    version: "0.8.13",
     settings: {
       optimizer: {
         enabled: true,
@@ -16,9 +18,16 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    hardhat: {
+      forking: {
+        url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
+        blockNumber: 16006577
+      }
+    },
     goerli: {
       url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_API_KEY}`,
-      accounts: [`${process.env.GOERLI_PRIVATE_KEY}`]
+      accounts: [`${process.env.GOERLI_PRIVATE_KEY}`],
+      gasPrice: gasGoerliGwei * 1000000000
     }
   },
   gasReporter: {
