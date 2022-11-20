@@ -307,7 +307,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("Should distribute tokens evenly within max supply range", async function () {
       const { c } = await loadFixture(deployFixture);
 
-      const mints = 200;
+      const mints = 500;
       const testSuppliesTo = 9;
       const acceptedVariance = 0.7;
 
