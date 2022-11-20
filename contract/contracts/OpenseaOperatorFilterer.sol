@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {IOperatorFilterRegistry} from "./reference/operator-filter-registry-main/src/IOperatorFilterRegistry.sol";
+import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFilterRegistry.sol";
 
 /**
  * @title  OpenseaOperatorFilterer

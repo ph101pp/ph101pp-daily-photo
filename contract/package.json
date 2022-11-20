@@ -16,5 +16,8 @@
     "dotenv": "^16.0.2",
     "hardhat": "^2.11.1",
     "hardhat-gas-reporter": "^1.0.9"
+  },
+  "dependencies": {
+    "operator-filter-registry": "^1.2.1"
   }
 }
