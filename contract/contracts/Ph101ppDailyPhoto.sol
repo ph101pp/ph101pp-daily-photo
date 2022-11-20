@@ -454,7 +454,7 @@ contract Ph101ppDailyPhoto is
         uint[] memory ids,
         uint[] memory amounts,
         bytes memory data
-    ) internal virtual override onlyAllowedOperator(operator) {
+    ) internal virtual override onlyAllowedOperator(operator, from) {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 

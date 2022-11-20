@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFilterRegistry.sol";
-
+import "hardhat/console.sol";
 /**
  * @title  OpenseaOperatorFilterer
  * @dev    This smart contract is meant to be inherited by token contracts so they can use the following:
@@ -64,7 +64,7 @@ abstract contract OpenseaOperatorFilterer {
         isOperatorFilterDisabled = _isOperatorFilterDisabled;
     }
 
-    modifier onlyAllowedOperator(address from) virtual {
+    modifier onlyAllowedOperator(address operator, address from) virtual {
         // Check registry code length to facilitate testing in environments without a deployed registry.
         if (
             !isOperatorFilterDisabled && operatorFilterRegistry.code.length > 0
@@ -72,15 +72,15 @@ abstract contract OpenseaOperatorFilterer {
             // Allow spending tokens from addresses with balance
             // Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
             // from an EOA.
-            if (from == msg.sender) {
+            if (from == operator) {
                 _;
                 return;
             }
             if (
                 !IOperatorFilterRegistry(operatorFilterRegistry)
-                    .isOperatorAllowed(address(this), msg.sender)
+                    .isOperatorAllowed(address(this), operator)
             ) {
-                revert OperatorNotAllowed(msg.sender);
+                revert OperatorNotAllowed(operator);
             }
         }
         _;

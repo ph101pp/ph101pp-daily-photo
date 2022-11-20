@@ -3,14 +3,14 @@ import { EtherscanConfig } from "@nomiclabs/hardhat-etherscan/dist/src/types";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 import getPh101ppDailyPhotoUpdateInitialHoldersRangeInput from "../scripts/getPh101ppDailyPhotoUpdateInitialHoldersRangeInput";
-import { Ph101ppDailyPhoto } from "../typechain-types";
-import { testERC1155MintRangeUpdateable } from "./ERC1155MintRangeUpdateable";
+import { Ph101ppDailyPhoto, TestOperatorFilterRegistry } from "../typechain-types";
 import { Fixture, SignerWithAddress } from "./fixture";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const nowTimestamp = Math.ceil(Date.now() / 1000) + SECONDS_PER_DAY * 3;
 
 type FixturePDP = {
+  ofr: TestOperatorFilterRegistry,
   treasury: SignerWithAddress,
   vault: SignerWithAddress,
   mutableUri: string,
@@ -32,6 +32,10 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
     if (latest < nowTimestamp) {
       await time.increaseTo(nowTimestamp);
     }
+
+    const OperatorFilterRegistry = await ethers.getContractFactory("TestOperatorFilterRegistry")
+    const ofr = await OperatorFilterRegistry.attach("0x000000000000AAeB6D7670E522A718067333cd4E")
+
     const DT = await ethers.getContractFactory("DateTime");
     const dt = await DT.deploy();
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
@@ -41,7 +45,7 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
     });
     const c = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address) as T;
 
-    return { c, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6, account7, account8 };
+    return { c, ofr, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6, account7, account8 };
   }
 }
 
@@ -648,6 +652,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.unpause();
       await c.setMaxInitialSupply(4);
       const mintInput = await c.getMintRangeInput(4);
+      await expect(c.connect(account1).setOwner(account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).mintPhotos(...mintInput)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
@@ -668,6 +673,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
       await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
       await c.unpause();
+      await expect(c.connect(account1).setOwner(account1.address)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
@@ -686,6 +692,45 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.grantRole(await c.URI_UPDATER_ROLE(), account4.address);
       await expect(c.connect(account4).setPermanentBaseUriUpTo("", 100)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account4).setProxyBaseUri("")).to.not.be.rejectedWith("AccessControl");
+    });
+
+    it("should be possible to update owner via setOwner", async function () {
+      const { c, owner, account1, account2, account3, account4 } = await loadFixture(deployFixture);
+      expect(await c.owner()).to.equal(owner.address);
+      await c.setOwner(account1.address);
+      expect(await c.owner()).to.equal(account1.address);
+    })
+  });
+
+  describe("Operator Filter Registry", function () {
+
+    it("should correctly register contract with Operator Filter Registry and subscribe to opensea", async function () {
+      const { c, ofr } = await loadFixture(deployFixture);
+      
+      expect(await ofr.isRegistered(c.address)).to.be.true;
+      expect(await ofr.subscriptionOf(c.address)).to.equal("0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
+
+    });
+
+    it("should prevent filtered operator to transfer tokens", async function () {
+      const { c, ofr, treasury, account1, account2 } = await loadFixture(deployFixture);
+      
+      const subscribedFilteredOperators = await ofr.filteredOperators(c.address);
+      await ofr.unsubscribe(c.address, true);
+      const unsubscribedfilteredOperators = await ofr.filteredOperators(c.address);
+
+      expect(unsubscribedfilteredOperators).to.be.deep.equal(subscribedFilteredOperators);
+
+      // set approve operator
+      await c.connect(treasury).setApprovalForAll(account1.address, true);
+      await expect(c.connect(treasury).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.rejected;
+      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.rejected;
+
+      // filter operator
+      await ofr.updateOperator(c.address, account1.address, true);
+      expect(await ofr.filteredOperators(c.address)).to.include(account1.address);
+
+      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
     });
 
   });
