@@ -5,10 +5,12 @@ import { ContractTransaction } from "ethers";
 const interations = 100;
 async function cost(tx: Promise<ContractTransaction>): Promise<number> {
   const receipt = await (await tx).wait();
-  return receipt.cumulativeGasUsed.toNumber() / 100;
+  return receipt.cumulativeGasUsed.toNumber() / interations;
 }
 
 describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
+  console.log("ITERATIONS", interations);
+  
   async function deployFixture() {
     const mutableUri = "mutable_.uri/";
     const immutableUri = "immutable.uri/";
@@ -18,7 +20,14 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     const ERC = await ethers.getContractFactory("TestERC1155");
     const erc = await ERC.deploy();
 
-    const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto");
+    const DT = await ethers.getContractFactory("DateTime");
+    const dt = await DT.deploy();
+
+    const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
+      libraries: {
+        DateTime: dt.address
+      }
+    });
     const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
 
     const C1 = await ethers.getContractFactory("TestERC1155MintRange");
@@ -58,15 +67,15 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
       report.mint.TestERC1155 += await cost(erc.mint(account1.address, i, 10, []));
       report.mint.TestERC1155MintRange += await cost(c1.mint(account1.address, i, 10, []));
       report.mint.TestERC1155MintRangeUpdateable += await cost(c2.mint(account1.address, i, 10, []));
+      report.mint.Ph101ppDailyPhoto += await cost(pdp.mintClaims(account1.address, 1));
     }
-    report.mint.Ph101ppDailyPhoto += await cost(pdp.mintClaims(account1.address, 1))*100;
 
     for (let i = 0; i < interations; i++) {
       report.safeTransferFrom.TestERC1155 += await cost(erc.connect(account1).safeTransferFrom(account1.address, account2.address, i, 10, []));
       report.safeTransferFrom.TestERC1155MintRange += await cost(c1.connect(account1).safeTransferFrom(account1.address, account2.address, i, 10, []));
       report.safeTransferFrom.TestERC1155MintRangeUpdateable += await cost(c2.connect(account1).safeTransferFrom(account1.address, account2.address, i, 10, []));
+      report.safeTransferFrom.Ph101ppDailyPhoto += await cost(pdp.connect(account1).safeTransferFrom(account1.address, account2.address, 0, 1, []));
     }
-    report.safeTransferFrom.Ph101ppDailyPhoto += await cost(pdp.connect(account1).safeTransferFrom(account1.address, account2.address, 0, 1, []))*100;
 
     for (let i = 0; i < interations; i++) {
       report.burn.TestERC1155 += await cost(erc.connect(account2).burn(account2.address, i, 10));
@@ -150,6 +159,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
   it("mintRange() transfer() transfer()", async function () {
     const { erc, c1, c2, pdp, treasury, account1, account2 } = await loadFixture(deployFixture);
 
+    await pdp.setMaxInitialSupply(1);
     await c1.setInitialHolders([account1.address]);
     await c2.setInitialHolders([account1.address]);
 
@@ -158,7 +168,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     const input2 = await c2.getMintRangeInput(100);
     await c2.mintRange(...input2);
     const input3 = await pdp.getMintRangeInput(100);
-    await pdp.mintPhotos(...input3, 1);
+    await pdp.mintPhotos(...input3);
 
     for (let i = 0; i < interations; i++) {
       erc.mint(account1.address, i, 1, []);
