@@ -305,6 +305,7 @@ contract Ph101ppDailyPhoto is
 
     function permanentlyDisableInitialHoldersRangeUpdate()
         public
+        whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         isInitialHoldersRangeUpdatePermanentlyDisabled = true;
@@ -421,12 +422,13 @@ contract Ph101ppDailyPhoto is
      * @dev Set new owner. This address will be returned by owner().
      * Can be used to make updates to the OperatorFilterRegistry on behalf of this contract.
      */
-    function setOwner(address newOwner) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setOwner(address newOwner) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _owner = newOwner;
     }
 
     function setOperatorFilterRegistry(address _operatorFilterRegistry)
         public
+        whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _setOperatorFilterRegistry(_operatorFilterRegistry);
@@ -434,6 +436,7 @@ contract Ph101ppDailyPhoto is
 
     function setIsOperatorFilterDisabled(bool _isOperatorFilterDisabled)
         public
+        whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _setIsOperatorFilterDisabled(_isOperatorFilterDisabled);
@@ -442,6 +445,7 @@ contract Ph101ppDailyPhoto is
     function setApprovalForAll(address operator, bool approved)
         public
         override
+        whenNotPaused
         onlyAllowedOperatorApproval(operator)
     {
         super.setApprovalForAll(operator, approved);

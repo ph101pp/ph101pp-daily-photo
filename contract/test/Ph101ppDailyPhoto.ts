@@ -652,7 +652,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.unpause();
       await c.setMaxInitialSupply(4);
       const mintInput = await c.getMintRangeInput(4);
-      await expect(c.connect(account1).setOwner(account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).mintPhotos(...mintInput)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
@@ -663,6 +662,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setIsOperatorFilterDisabled(true)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setMaxInitialSupply(2)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setOwner(account1.address)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("AccessControl");
     });
 
     it("should execute access guarded functions with special role", async function () {
@@ -673,17 +678,25 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
       await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
       await c.unpause();
-      await expect(c.connect(account1).setOwner(account1.address)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.not.be.rejectedWith("AccessControl");
+      
       await expect(c.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
+      
       await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
-
+      
+      await expect(c.connect(account1).setOwner(account1.address)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setIsOperatorFilterDisabled(true)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.not.be.rejectedWith("AccessControl");
+      
       await c.grantRole(await c.PHOTO_MINTER_ROLE(), account2.address);
       await c.setMaxInitialSupply(4);
       const mintInput = await c.getMintRangeInput(4);
+      await expect(c.connect(account2).setMaxInitialSupply(2)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account2).mintPhotos(...mintInput)).to.not.be.rejectedWith("AccessControl");
 
       await c.grantRole(await c.CLAIM_MINTER_ROLE(), account3.address);
@@ -692,6 +705,38 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.grantRole(await c.URI_UPDATER_ROLE(), account4.address);
       await expect(c.connect(account4).setPermanentBaseUriUpTo("", 100)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account4).setProxyBaseUri("")).to.not.be.rejectedWith("AccessControl");
+    });
+
+    it("should fail execute non-view functions when paused", async function () {
+      const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
+      await c.setMaxInitialSupply(4);
+      const mintInput = await c.getMintRangeInput(4);
+
+      await c.pause();      
+      await expect(c.setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("paused");
+      await expect(c.setLockInitialHoldersUpTo(0)).to.be.rejectedWith("paused");
+      await expect(c.permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("paused");
+      
+      await expect(c.pause()).to.be.rejectedWith("paused");
+      
+      await expect(c.setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("paused");
+      await expect(c.setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("paused");
+      await expect(c.resetTokenRoyalty(1)).to.be.rejectedWith("paused");
+      
+      await expect(c.setOwner(account1.address)).to.be.rejectedWith("paused");
+      await expect(c.setIsOperatorFilterDisabled(true)).to.be.rejectedWith("paused");
+      await expect(c.setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("paused");
+      await expect(c.setApprovalForAll(account1.address, true)).to.be.rejectedWith("paused");
+      
+      await expect(c.setMaxInitialSupply(2)).to.be.rejectedWith("paused");
+      await expect(c.mintPhotos(...mintInput)).to.be.rejectedWith("paused");
+
+      await expect(c.mintClaims(account1.address, 5)).to.be.rejectedWith("paused");
+      await expect(c.redeemClaim(5)).to.be.rejectedWith("paused");
+      await expect(c.redeemClaimBatch([2],[5])).to.be.rejectedWith("paused");
+
+      await expect(c.setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("paused");
+      await expect(c.setProxyBaseUri("")).to.be.rejectedWith("paused");
     });
 
     it("should be possible to update owner via setOwner", async function () {
