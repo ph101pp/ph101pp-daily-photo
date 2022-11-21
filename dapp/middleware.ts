@@ -29,7 +29,7 @@ export default withAuth(
     callbacks: {
       authorized({ req, token }) {
         const path: string = req.nextUrl.pathname;
-        return true || (
+        return (
           !path.startsWith("/api/") || // close all api routes
           path.startsWith("/api/proxy/") || // except for the proxy 
           token?.email === "hello@philippadrian.com" // or if logged in.
