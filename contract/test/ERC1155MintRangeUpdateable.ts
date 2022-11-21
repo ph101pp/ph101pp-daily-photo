@@ -9,8 +9,8 @@ import { deployFixture, Fixture } from "./fixture";
 
 
 describe("TestERC1155MintRangeUpdateable", function () {
-  testERC1155MintRange(deployFixture("TestERC1155MintRange"));
-  testERC1155MintRangePausable(deployFixture("TestERC1155MintRangePausable"));
+  testERC1155MintRange(deployFixture("TestERC1155MintRangeUpdateable"));
+  testERC1155MintRangePausable(deployFixture("TestERC1155MintRangeUpdateable"));
   testERC1155MintRangeUpdateable(deployFixture("TestERC1155MintRangeUpdateable"));
 });
 

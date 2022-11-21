@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFilterRegistry.sol";
-import "hardhat/console.sol";
+
 /**
  * @title  OpenseaOperatorFilterer
  * @dev    This smart contract is meant to be inherited by token contracts so they can use the following:

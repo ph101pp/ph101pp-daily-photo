@@ -7,7 +7,7 @@ import { TestERC1155MintRangePausable } from "../typechain-types";
 import { deployFixture, Fixture } from "./fixture";
 
 describe("ERC1155MintRangePausable", function () {
-  testERC1155MintRange(deployFixture("TestERC1155MintRange"));
+  testERC1155MintRange(deployFixture("TestERC1155MintRangePausable"));
   testERC1155MintRangePausable(deployFixture("TestERC1155MintRangePausable"));
 });
 
