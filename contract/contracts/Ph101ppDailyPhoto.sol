@@ -456,15 +456,24 @@ contract Ph101ppDailyPhoto is
         super.setApprovalForAll(operator, approved);
     }
 
-    function _beforeTokenTransfer(
-        address operator,
+    function safeTransferFrom(
         address from,
         address to,
-        uint[] memory ids,
-        uint[] memory amounts,
+        uint256 tokenId,
+        uint256 amount,
         bytes memory data
-    ) internal virtual override onlyAllowedOperator(operator, from) {
-        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    ) public override onlyAllowedOperator(from) {
+        super.safeTransferFrom(from, to, tokenId, amount, data);
+    }
+
+    function safeBatchTransferFrom(
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) public override onlyAllowedOperator(from) {
+        super.safeBatchTransferFrom(from, to, ids, amounts, data);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

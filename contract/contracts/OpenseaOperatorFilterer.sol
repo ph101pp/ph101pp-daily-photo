@@ -28,8 +28,8 @@ abstract contract OpenseaOperatorFilterer {
     // required as authority to make updates to OperatorFilterRegistry for this contract.
     function owner() public virtual returns (address);
 
-    // Register contract with OperatorFilterRegistry 
-    // and copy / subscribe to OpenSea Curated Subscription 
+    // Register contract with OperatorFilterRegistry
+    // and copy / subscribe to OpenSea Curated Subscription
     // Currently (Nov 22) this makes sense for mostly everyone.
     function _registerToOpenseaOperatorFilterRegistry(bool subscribe)
         internal
@@ -77,20 +77,20 @@ abstract contract OpenseaOperatorFilterer {
     modifier onlyAllowedOperator(address from) virtual {
         // Check registry code length to facilitate testing in environments without a deployed registry.
         if (
-            !isOperatorFilterDisabled  // && operatorFilterRegistry.code.length > 0
+            !isOperatorFilterDisabled // && operatorFilterRegistry.code.length > 0
         ) {
             // Allow spending tokens from addresses with balance
             // Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
             // from an EOA.
-            if (from == operator) {
+            if (from == msg.sender) {
                 _;
                 return;
             }
             if (
                 !IOperatorFilterRegistry(operatorFilterRegistry)
-                    .isOperatorAllowed(address(this), operator)
+                    .isOperatorAllowed(address(this), msg.sender)
             ) {
-                revert OperatorNotAllowed(operator);
+                revert OperatorNotAllowed(msg.sender);
             }
         }
         _;
@@ -99,7 +99,7 @@ abstract contract OpenseaOperatorFilterer {
     modifier onlyAllowedOperatorApproval(address operator) virtual {
         // Check registry code length to facilitate testing in environments without a deployed registry.
         if (
-            !isOperatorFilterDisabled  // && operatorFilterRegistry.code.length > 0
+            !isOperatorFilterDisabled // && operatorFilterRegistry.code.length > 0
         ) {
             if (
                 !IOperatorFilterRegistry(operatorFilterRegistry)
