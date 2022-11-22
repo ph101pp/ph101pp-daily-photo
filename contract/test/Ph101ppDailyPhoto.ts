@@ -23,7 +23,7 @@ describe("Ph101ppDailyPhoto", function () {
 function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
   const mutableUri = "mutable_.uri/";
   const immutableUri = "immutable.uri/";
-  
+
   return async function fixture() {
     // Contracts are deplodyed using the first signer/account by default
     const [owner, treasury, vault, account1, account2, account3, account4, account5, account6, account7, account8] = await ethers.getSigners();
@@ -43,7 +43,7 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
         "DateTime": dt.address
       }
     });
-    const c = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address) as T;
+    const c = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]) as T;
 
     return { c, ofr, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6, account7, account8 };
   }
@@ -681,18 +681,18 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.not.be.rejectedWith("AccessControl");
-      
+
       await expect(c.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
-      
+
       await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
-      
+
       await expect(c.connect(account1).setOwner(account1.address)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setIsOperatorFilterDisabled(true)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.not.be.rejectedWith("AccessControl");
-      
+
       await c.grantRole(await c.PHOTO_MINTER_ROLE(), account2.address);
       await c.setMaxInitialSupply(4);
       const mintInput = await c.getMintRangeInput(4);
@@ -712,28 +712,28 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setMaxInitialSupply(4);
       const mintInput = await c.getMintRangeInput(4);
 
-      await c.pause();      
+      await c.pause();
       await expect(c.setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("paused");
       await expect(c.setLockInitialHoldersUpTo(0)).to.be.rejectedWith("paused");
       await expect(c.permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("paused");
-      
+
       await expect(c.pause()).to.be.rejectedWith("paused");
-      
+
       await expect(c.setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("paused");
       await expect(c.setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("paused");
       await expect(c.resetTokenRoyalty(1)).to.be.rejectedWith("paused");
-      
+
       await expect(c.setOwner(account1.address)).to.be.rejectedWith("paused");
       await expect(c.setIsOperatorFilterDisabled(true)).to.be.rejectedWith("paused");
       await expect(c.setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("paused");
       await expect(c.setApprovalForAll(account1.address, true)).to.be.rejectedWith("paused");
-      
+
       await expect(c.setMaxInitialSupply(2)).to.be.rejectedWith("paused");
       await expect(c.mintPhotos(...mintInput)).to.be.rejectedWith("paused");
 
       await expect(c.mintClaims(account1.address, 5)).to.be.rejectedWith("paused");
       await expect(c.redeemClaim(5)).to.be.rejectedWith("paused");
-      await expect(c.redeemClaimBatch([2],[5])).to.be.rejectedWith("paused");
+      await expect(c.redeemClaimBatch([2], [5])).to.be.rejectedWith("paused");
 
       await expect(c.setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("paused");
       await expect(c.setProxyBaseUri("")).to.be.rejectedWith("paused");
@@ -751,7 +751,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should correctly register contract with Operator Filter Registry and subscribe to opensea", async function () {
       const { c, ofr } = await loadFixture(deployFixture);
-      
+
       expect(await ofr.isRegistered(c.address)).to.be.true;
       expect(await ofr.subscriptionOf(c.address)).to.equal("0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
 
@@ -759,7 +759,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should prevent filtered operator to transfer tokens", async function () {
       const { c, ofr, treasury, account1, account2 } = await loadFixture(deployFixture);
-      
+
       const subscribedFilteredOperators = await ofr.filteredOperators(c.address);
       await ofr.unsubscribe(c.address, true);
       const unsubscribedfilteredOperators = await ofr.filteredOperators(c.address);

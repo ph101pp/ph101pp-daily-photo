@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-const deployArguments = require("./deployArguments") as [string, string, string, string];
+const deployArguments = require("./deployArguments") as [string, string, [string, string]];
 
 async function main() {
 

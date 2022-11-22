@@ -5,7 +5,10 @@ import "./ERC1155MintRange.sol";
 import "hardhat/console.sol";
 
 contract TestERC1155MintRange is ERC1155MintRange {
-    constructor() ERC1155_("") {}
+    constructor(address[] memory initialHolders)
+        ERC1155_("")
+        ERC1155MintRange(initialHolders)
+    {}
 
     function initialBalanceOf(address, uint256 tokenId)
         internal

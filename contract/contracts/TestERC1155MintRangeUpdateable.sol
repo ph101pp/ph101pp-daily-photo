@@ -4,7 +4,10 @@ pragma solidity ^0.8.12;
 import "./ERC1155MintRangeUpdateable.sol";
 
 contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
-    constructor() ERC1155_("") {}
+    constructor(address[] memory initialHolders)
+        ERC1155_("")
+        ERC1155MintRange(initialHolders)
+    {}
 
     function initialBalanceOf(address, uint256 tokenId)
         internal

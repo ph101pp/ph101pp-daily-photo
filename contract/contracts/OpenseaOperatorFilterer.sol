@@ -67,7 +67,7 @@ abstract contract OpenseaOperatorFilterer {
     modifier onlyAllowedOperator(address operator, address from) virtual {
         // Check registry code length to facilitate testing in environments without a deployed registry.
         if (
-            !isOperatorFilterDisabled && operatorFilterRegistry.code.length > 0
+            !isOperatorFilterDisabled  // && operatorFilterRegistry.code.length > 0
         ) {
             // Allow spending tokens from addresses with balance
             // Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
@@ -89,7 +89,7 @@ abstract contract OpenseaOperatorFilterer {
     modifier onlyAllowedOperatorApproval(address operator) virtual {
         // Check registry code length to facilitate testing in environments without a deployed registry.
         if (
-            !isOperatorFilterDisabled && operatorFilterRegistry.code.length > 0
+            !isOperatorFilterDisabled  // && operatorFilterRegistry.code.length > 0
         ) {
             if (
                 !IOperatorFilterRegistry(operatorFilterRegistry)

@@ -12,8 +12,6 @@ import "./ERC1155_.sol";
 abstract contract ERC1155MintRange is ERC1155_ {
     string private constant ERROR_INVALID_MINT_RANGE_INPUT =
         "Invalid input. Use getMintRangeInput()";
-    string private constant ERROR_NO_INITIAL_HOLDERS =
-        "No initial holders set. Use _setInitialHolders()";
 
     // Mapping from token ID to balancesInitialzed flag
     mapping(uint => mapping(address => bool)) public isBalanceInitialized;
@@ -34,6 +32,14 @@ abstract contract ERC1155MintRange is ERC1155_ {
     // last tokenId minted via mintRange.
     uint public lastRangeTokenIdMinted;
     bool public isZeroMinted;
+
+    constructor(address[] memory initialInitialHolders) {
+        _initialHoldersRange.push(0);
+        _initialHolders.push(initialInitialHolders);
+        for (uint i = 0; i < initialInitialHolders.length; i++) {
+            _initialHoldersMappings[0][initialInitialHolders[i]] = true;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Token Balances & Total Supply
@@ -160,14 +166,24 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Set initial holders. mintRange will distribute tokens to these holders
      */
     function _setInitialHolders(address[] memory addresses) internal virtual {
-        _initialHoldersRange.push(
-            isZeroMinted ? lastRangeTokenIdMinted + 1 : 0
-        );
-        _initialHolders.push(addresses);
+        uint256 firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
+        uint256 lastIndex = _initialHolders.length-1;
+        uint256 lastId = _initialHoldersRange[lastIndex];
+        if (lastId == firstId) {
+            address[] memory prevInitialHolders = _initialHolders[lastId];
+            _initialHolders[lastId] = addresses;
+            for (uint i = 0; i < prevInitialHolders.length; i++) {
+                delete _initialHoldersMappings[lastIndex][
+                    prevInitialHolders[i]
+                ];
+            }
+        } else {
+            _initialHoldersRange.push(firstId);
+            _initialHolders.push(addresses);
+            lastIndex = lastIndex+1;
+        }
         for (uint i = 0; i < addresses.length; i++) {
-            _initialHoldersMappings[_initialHolders.length - 1][
-                addresses[i]
-            ] = true;
+            _initialHoldersMappings[lastIndex][addresses[i]] = true;
         }
     }
 
@@ -180,7 +196,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
         virtual
         returns (address[] memory)
     {
-        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
         uint index = _findInRange(_initialHoldersRange, tokenId);
         return _initialHolders[index];
     }
@@ -189,7 +204,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Return current initial holders
      */
     function initialHolders() public view virtual returns (address[] memory) {
-        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
         return _initialHolders[_initialHolders.length - 1];
     }
 
@@ -201,7 +215,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
         view
         returns (bool)
     {
-        require(_initialHolders.length > 0, ERROR_NO_INITIAL_HOLDERS);
         uint index = _findInRange(_initialHoldersRange, tokenId);
         return _initialHoldersMappings[index][account];
     }
@@ -212,7 +225,12 @@ abstract contract ERC1155MintRange is ERC1155_ {
     /**
      * @dev Implement: May be overwritten to add custom values to checksum test.
      */
-    function _customMintRangeChecksum() internal view virtual returns (bytes32) {
+    function _customMintRangeChecksum()
+        internal
+        view
+        virtual
+        returns (bytes32)
+    {
         return 0x00;
     }
 

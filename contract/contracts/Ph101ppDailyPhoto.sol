@@ -39,21 +39,23 @@ contract Ph101ppDailyPhoto is
     constructor(
         string memory newProxyUri,
         string memory newPermanentUri,
-        address treasuryAddress,
-        address vaultAddress
-    ) ERC1155_("") {
+        address[] memory initialHolders
+    ) ERC1155_("") ERC1155MintRange(initialHolders) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(CLAIM_MINTER_ROLE, msg.sender);
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
         _registerToOpenseaOperatorFilterRegistry(true);
 
+        // set initial max supply to 2;
+        _maxSupplyRange.push(0);
+        _maxSupplies.push(2);
+
         setOwner(msg.sender);
         setProxyBaseUri(newProxyUri);
         setPermanentBaseUriUpTo(newPermanentUri, 0);
-        setInitialHolders(treasuryAddress, vaultAddress);
         setDefaultRoyalty(msg.sender, 500);
-        mintClaims(treasuryAddress, 10);
+        mintClaims(initialHolders[TREASURY_ID], 10);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -183,11 +185,6 @@ contract Ph101ppDailyPhoto is
         address[] memory initialHolders0 = initialHolders(tokenIds[0]);
         for (uint i = 1; i < amounts.length; i++) {
             claimsRequired += amounts[i];
-            require(
-                initialHolders0[TREASURY_ID] ==
-                    initialHolders(tokenIds[i])[TREASURY_ID],
-                "Can't batch claim tokens from multiple treasury wallets."
-            );
         }
         _burn(msg.sender, CLAIM_TOKEN_ID, claimsRequired);
         _safeBatchTransferFrom(
@@ -229,13 +226,11 @@ contract Ph101ppDailyPhoto is
         whenNotPaused
         onlyRole(PHOTO_MINTER_ROLE)
     {
-        uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
-        if (_maxSupplies.length > 0) {
-            uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
-            if (lastId == firstId) {
-                _maxSupplies[_maxSupplies.length - 1] = maxSupply;
-                return;
-            }
+        uint firstId = lastRangeTokenIdMinted + 1;
+        uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
+        if (lastId == firstId) {
+            _maxSupplies[_maxSupplies.length - 1] = maxSupply;
+            return;
         }
         _maxSupplyRange.push(firstId);
         _maxSupplies.push(maxSupply);
@@ -245,7 +240,6 @@ contract Ph101ppDailyPhoto is
      * @dev Returns max initial supply of a token.
      */
     function maxInitialSupply(uint tokenId) public view returns (uint) {
-        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
         uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
         return _maxSupplies[supplyIndex];
     }
@@ -254,7 +248,6 @@ contract Ph101ppDailyPhoto is
      * @dev Returns max initial supply of a token.
      */
     function maxInitialSupply() public view returns (uint) {
-        require(_maxSupplies.length > 0, ERROR_NO_INITIAL_SUPPLY);
         return _maxSupplies[_maxSupplies.length - 1];
     }
 
@@ -422,7 +415,11 @@ contract Ph101ppDailyPhoto is
      * @dev Set new owner. This address will be returned by owner().
      * Can be used to make updates to the OperatorFilterRegistry on behalf of this contract.
      */
-    function setOwner(address newOwner) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setOwner(address newOwner)
+        public
+        whenNotPaused
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
         _owner = newOwner;
     }
 

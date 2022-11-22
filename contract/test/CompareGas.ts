@@ -28,13 +28,13 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
         DateTime: dt.address
       }
     });
-    const pdp = await PDP.deploy(mutableUri, immutableUri, treasury.address, vault.address);
+    const pdp = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]);
 
     const C1 = await ethers.getContractFactory("TestERC1155MintRange");
-    const c1 = await C1.deploy();
+    const c1 = await C1.deploy([]);
 
     const C2 = await ethers.getContractFactory("TestERC1155MintRangeUpdateable");
-    const c2 = await C2.deploy();
+    const c2 = await C2.deploy([]);
 
 
     return { erc, c1, c2, pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4 };
