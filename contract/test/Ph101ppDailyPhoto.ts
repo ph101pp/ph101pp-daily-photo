@@ -750,7 +750,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     });
 
-    it("should prevent filtered operator to transfer tokens", async function () {
+    it("should prevent filtered operator to transfer tokens (+ disable / disablePermanently)", async function () {
       const { c, ofr, treasury, account1, account2 } = await loadFixture(deployFixture);
 
       const subscribedFilteredOperators = await ofr.filteredOperators(c.address);
@@ -769,6 +769,18 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await ofr.filteredOperators(c.address)).to.include(account1.address);
 
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
+
+      // disable operator filter
+      await c.setIsOperatorFilterDisabled(true);
+      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
+      await c.setIsOperatorFilterDisabled(false);
+      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
+
+      // permanently disable operator filter
+      await c.permanentlyDisableOperatorFilter();
+      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
+      await expect(c.setIsOperatorFilterDisabled(false)).to.be.revertedWith("Operator filter permanently disabled");
+      
     });
 
   });

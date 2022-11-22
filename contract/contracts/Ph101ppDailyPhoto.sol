@@ -439,12 +439,12 @@ contract Ph101ppDailyPhoto is
         _setIsOperatorFilterDisabled(_isOperatorFilterDisabled);
     }
 
-    function disabledOperatorFilterPermanently()
+    function permanentlyDisableOperatorFilter()
         public
         whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        _disabledOperatorFilterPermanently();
+        _permanentlyDisableOperatorFilter();
     }
 
     function setApprovalForAll(address operator, bool approved)
