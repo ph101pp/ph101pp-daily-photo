@@ -439,6 +439,14 @@ contract Ph101ppDailyPhoto is
         _setIsOperatorFilterDisabled(_isOperatorFilterDisabled);
     }
 
+    function disabledOperatorFilterPermanently()
+        public
+        whenNotPaused
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _disabledOperatorFilterPermanently();
+    }
+
     function setApprovalForAll(address operator, bool approved)
         public
         override

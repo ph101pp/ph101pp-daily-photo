@@ -16,6 +16,7 @@ abstract contract OpenseaOperatorFilterer {
     error OperatorNotAllowed(address operator);
 
     bool public isOperatorFilterDisabled;
+    bool public isOperatorFilterPermanentlyDisabled;
 
     // Default: OpenSea OperatorFilterRegistry contract
     address public operatorFilterRegistry =
@@ -61,10 +62,19 @@ abstract contract OpenseaOperatorFilterer {
         internal
         virtual
     {
+        require(!isOperatorFilterPermanentlyDisabled, "Operator filter permanently disabled");
         isOperatorFilterDisabled = _isOperatorFilterDisabled;
     }
 
-    modifier onlyAllowedOperator(address operator, address from) virtual {
+    function _disabledOperatorFilterPermanently()
+        internal
+        virtual
+    {
+        isOperatorFilterPermanentlyDisabled = true;
+        isOperatorFilterDisabled = true;
+    }
+
+    modifier onlyAllowedOperator(address from) virtual {
         // Check registry code length to facilitate testing in environments without a deployed registry.
         if (
             !isOperatorFilterDisabled  // && operatorFilterRegistry.code.length > 0
