@@ -253,11 +253,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
   describe("Max Initial Supply ", function () {
 
-    it("should fail to get mintRangeInput without max initial supply", async function () {
-      const { c } = await loadFixture(deployFixture);
-      await expect(c.getMintRangeInput(4)).to.be.rejectedWith("No max initial supply set. Use setMaxInitialSupply()");
-    });
-
     it("should fail to set max initial supply when paused", async function () {
       const { c } = await loadFixture(deployFixture);
       await c.pause();
@@ -280,8 +275,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const { c } = await loadFixture(deployFixture);
       const initialSupply = 5;
       const initialSupply2 = 7;
-
-      await expect(c["maxInitialSupply()"]()).to.be.revertedWith("No max initial supply set. Use setMaxInitialSupply()");
 
       await c.setMaxInitialSupply(initialSupply);
       expect(await c["maxInitialSupply()"]()).to.equal(initialSupply);
@@ -406,7 +399,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).redeemClaimBatch([8, 9, 7], [1, 1, 1])).to.be.rejected;
       await expect(c.connect(account1).redeemClaimBatch([8], [1, 1])).to.be.rejected;
       await expect(c.connect(account1).redeemClaimBatch([8, 9], [1])).to.be.rejected;
-      await expect(c.connect(account1).redeemClaimBatch([8, 2], [1, 1])).to.be.rejectedWith("Can't batch claim tokens from multiple treasury wallets.");
+      await expect(c.connect(account1).redeemClaimBatch([8, 2], [1, 1])).to.be.rejected;
       await c.connect(account1).redeemClaimBatch([4, 2], [1, 1]);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(0);

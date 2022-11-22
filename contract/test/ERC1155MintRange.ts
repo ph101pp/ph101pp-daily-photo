@@ -13,13 +13,6 @@ describe("ERC1155MintRange", function () {
 export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1155MintRange>>) {
 
   describe("getRangeMintInput", function () {
-    it("Should fail if no initialHolders are set", async function () {
-      const { c } = await loadFixture(deployFixture);
-
-      await expect(
-        c.getMintRangeInput(10)
-      ).to.revertedWith("No initial holders set. Use _setInitialHolders()");
-    });
 
     it("Should return correctly formatted input params", async function () {
       const newTokens = 10;
@@ -283,8 +276,6 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       const initialHolders2 = [account5.address, account6.address, account7.address, account8.address];
-
-      await expect(c["initialHolders()"]()).to.be.revertedWith("No initial holders set. Use _setInitialHolders()");
 
       await c.setInitialHolders(initialHolders);
 
