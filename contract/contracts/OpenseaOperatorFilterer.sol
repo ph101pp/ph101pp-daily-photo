@@ -16,7 +16,6 @@ import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFil
 abstract contract OpenseaOperatorFilterer {
     error OperatorNotAllowed(address operator);
 
-    bool public isOperatorFilterDisabled;
     bool public isOperatorFilterPermanentlyDisabled;
 
     // Default: OpenSea OperatorFilterRegistry contract
@@ -51,64 +50,46 @@ abstract contract OpenseaOperatorFilterer {
         }
     }
 
-    // Enables updating registry contract address
+    // Enables updating registry contract address 
+    // (requires manual registering / unregistring with Registry)
     function _setOperatorFilterRegistry(address _operatorFilterRegistry)
         internal
         virtual
     {
+        require(!isOperatorFilterPermanentlyDisabled, "Permanently disabled");
         operatorFilterRegistry = _operatorFilterRegistry;
     }
 
-    function _setIsOperatorFilterDisabled(bool _isOperatorFilterDisabled)
-        internal
-        virtual
-    {
-        require(!isOperatorFilterPermanentlyDisabled, "Operator filter permanently disabled");
-        isOperatorFilterDisabled = _isOperatorFilterDisabled;
+    function _permanentlyDisableOperatorFilter() internal virtual {
+        isOperatorFilterPermanentlyDisabled = true;
+        operatorFilterRegistry = address(0);
     }
 
-    function _permanentlyDisableOperatorFilter()
-        internal
-        virtual
-    {
-        isOperatorFilterPermanentlyDisabled = true;
-        isOperatorFilterDisabled = true;
+    function _isOperatorAllowed(address operator) private view {
+        // Check registry code length to facilitate testing in environments without a deployed registry.
+        if (
+            operatorFilterRegistry != address(0) && // && operatorFilterRegistry.code.length > 0
+            !IOperatorFilterRegistry(operatorFilterRegistry).isOperatorAllowed(
+                address(this),
+                operator
+            )
+        ) {
+            revert OperatorNotAllowed(operator);
+        }
     }
 
     modifier onlyAllowedOperator(address from) virtual {
-        // Check registry code length to facilitate testing in environments without a deployed registry.
-        if (
-            !isOperatorFilterDisabled // && operatorFilterRegistry.code.length > 0
-        ) {
-            // Allow spending tokens from addresses with balance
-            // Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
-            // from an EOA.
-            if (from == msg.sender) {
-                _;
-                return;
-            }
-            if (
-                !IOperatorFilterRegistry(operatorFilterRegistry)
-                    .isOperatorAllowed(address(this), msg.sender)
-            ) {
-                revert OperatorNotAllowed(msg.sender);
-            }
+        // Allow spending tokens from addresses with balance
+        // Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
+        // from an EOA.
+        if (from != msg.sender) {
+            _isOperatorAllowed(msg.sender);
         }
         _;
     }
 
     modifier onlyAllowedOperatorApproval(address operator) virtual {
-        // Check registry code length to facilitate testing in environments without a deployed registry.
-        if (
-            !isOperatorFilterDisabled // && operatorFilterRegistry.code.length > 0
-        ) {
-            if (
-                !IOperatorFilterRegistry(operatorFilterRegistry)
-                    .isOperatorAllowed(address(this), operator)
-            ) {
-                revert OperatorNotAllowed(operator);
-            }
-        }
+        _isOperatorAllowed(operator);
         _;
     }
 }
