@@ -30,7 +30,7 @@ contract Ph101ppDailyPhoto is
     string private _proxyUri;
     uint public lastRangeTokenIdWithPermanentUri;
 
-    uint[] private _maxSupplies;
+    uint[][] private _maxSupplies;
     uint[] private _maxSupplyRange;
     bool public isInitialHoldersRangeUpdatePermanentlyDisabled;
 
@@ -49,7 +49,7 @@ contract Ph101ppDailyPhoto is
 
         // set initial max supply to 2;
         _maxSupplyRange.push(0);
-        _maxSupplies.push(2);
+        _maxSupplies.push([2, 3]);
 
         setOwner(msg.sender);
         setProxyBaseUri(newProxyUri);
@@ -70,10 +70,11 @@ contract Ph101ppDailyPhoto is
     {
         address[] memory addresses = initialHolders(tokenId);
         if (account == addresses[TREASURY_ID]) {
-            uint maxSupply = maxInitialSupply(tokenId);
+            uint[] memory _initialSupply = initialSupply(tokenId);
             uint supply = (uint(
-                keccak256(abi.encode(tokenId, address(this), maxSupply))
-            ) % maxSupply) + 1;
+                keccak256(abi.encode(tokenId, address(this), _initialSupply))
+            ) % (_initialSupply[1] - _initialSupply[0] + 1)) +
+                _initialSupply[0];
 
             return supply;
         }
@@ -221,7 +222,7 @@ contract Ph101ppDailyPhoto is
     // Initial Supply
     ///////////////////////////////////////////////////////////////////////////////
 
-    function setMaxInitialSupply(uint maxSupply)
+    function setInitialSupply(uint[] memory maxSupply)
         public
         whenNotPaused
         onlyRole(PHOTO_MINTER_ROLE)
@@ -239,7 +240,7 @@ contract Ph101ppDailyPhoto is
     /**
      * @dev Returns max initial supply of a token.
      */
-    function maxInitialSupply(uint tokenId) public view returns (uint) {
+    function initialSupply(uint tokenId) public view returns (uint[] memory) {
         uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
         return _maxSupplies[supplyIndex];
     }
@@ -247,7 +248,7 @@ contract Ph101ppDailyPhoto is
     /**
      * @dev Returns max initial supply of a token.
      */
-    function maxInitialSupply() public view returns (uint) {
+    function initialSupply() public view returns (uint[] memory) {
         return _maxSupplies[_maxSupplies.length - 1];
     }
 
@@ -430,15 +431,7 @@ contract Ph101ppDailyPhoto is
     {
         _setOperatorFilterRegistry(_operatorFilterRegistry);
     }
-
-    function setIsOperatorFilterDisabled(bool _isOperatorFilterDisabled)
-        public
-        whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
-        _setIsOperatorFilterDisabled(_isOperatorFilterDisabled);
-    }
-
+    
     function permanentlyDisableOperatorFilter()
         public
         whenNotPaused

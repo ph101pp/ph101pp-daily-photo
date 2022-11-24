@@ -40,7 +40,7 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
     const dt = await DT.deploy();
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
       libraries: {
-        "DateTime": dt.address
+        "DateTime": dt.address // test: "0x947cc35992e6723de50bf704828a01fd2d5d6641" //dt.address
       }
     });
     const c = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]) as T;
@@ -227,7 +227,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should return immutable url for all minted nfts ", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
       await c.setPermanentBaseUriUpTo(immutableUri, 100);
-      await c.setMaxInitialSupply(5);
+      await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await c.mintPhotos(...inputs);
 
@@ -240,7 +240,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should return mutable url for minted nfts after _uriValidUptoTokenId", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
       await c.setPermanentBaseUriUpTo(immutableUri, 10);
-      await c.setMaxInitialSupply(5);
+      await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await c.mintPhotos(...inputs);
 
@@ -251,75 +251,96 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
   });
 
-  describe("Max Initial Supply ", function () {
+  describe("Initial Supply ", function () {
 
     it("should fail to set max initial supply when paused", async function () {
       const { c } = await loadFixture(deployFixture);
       await c.pause();
-      await expect(c.setMaxInitialSupply(5)).to.be.rejectedWith("Pausable: paused");
+      await expect(c.setInitialSupply([1, 5])).to.be.rejectedWith("Pausable: paused");
     });
 
     it("Should invalidate mintRangeInput when maxInitialSupply is set", async function () {
       const { c } = await loadFixture(deployFixture);
-      const initialSupply = 5;
-      const initialSupply2 = 7;
+      const initialSupply = [1, 5];
+      const initialSupply2 = [1, 7];
 
-      await c.setMaxInitialSupply(initialSupply);
-      expect(await c["maxInitialSupply()"]()).to.equal(initialSupply);
+      await c.setInitialSupply(initialSupply);
+      let cIS = await c["initialSupply()"]();
+      expect(cIS[0].eq(initialSupply[0]));
+      expect(cIS[1].eq(initialSupply[1]));
+
       const inputs = await c.getMintRangeInput(5);
-      await c.setMaxInitialSupply(initialSupply2);
+      await c.setInitialSupply(initialSupply2);
       await expect(c.mintPhotos(...inputs)).to.be.revertedWith("Invalid input. Use getMintRangeInput()");
     });
 
-    it("Should correctly update max initial supply via setMaxInitialSupply", async function () {
+    it("Should correctly update initial supply via setInitialSupply", async function () {
       const { c } = await loadFixture(deployFixture);
-      const initialSupply = 5;
-      const initialSupply2 = 7;
+      const initialSupply = [1, 5];
+      const initialSupply2 = [1, 7];
+      const initialSupply3 = [1, 20];
 
-      await c.setMaxInitialSupply(initialSupply);
-      expect(await c["maxInitialSupply()"]()).to.equal(initialSupply);
+      await c.setInitialSupply(initialSupply);
+
+      let cIS = await c["initialSupply()"]();
+      expect(cIS[0].eq(initialSupply[0]));
+      expect(cIS[1].eq(initialSupply[1]));
+
       const inputs = await c.getMintRangeInput(5);
       await c.mintPhotos(...inputs);
+
       for (let i = 0; i < inputs[0].length; i++) {
-        expect(await c["maxInitialSupply(uint256)"](inputs[0][i])).to.equal(initialSupply);
+        cIS = await c["initialSupply(uint256)"](inputs[0][i]);
+        expect(cIS[0].eq(initialSupply[0]));
+        expect(cIS[1].eq(initialSupply[1]));
       }
 
-      await c.setMaxInitialSupply(20);
-      expect(await c["maxInitialSupply()"]()).to.equal(20);
+      await c.setInitialSupply(initialSupply3);
+      cIS = await c["initialSupply()"]();
+      expect(cIS[0].eq(initialSupply3[0]));
+      expect(cIS[1].eq(initialSupply3[1]));
 
-      await c.setMaxInitialSupply(initialSupply2);
-      expect(await c["maxInitialSupply()"]()).to.equal(initialSupply2);
+      await c.setInitialSupply(initialSupply2);
+
+      cIS = await c["initialSupply()"]();
+      expect(cIS[0].eq(initialSupply2[0]));
+      expect(cIS[1].eq(initialSupply2[1]));
+
       const inputs2 = await c.getMintRangeInput(5);
       await c.mintPhotos(...inputs2);
       for (let i = 0; i < inputs2[0].length; i++) {
-        expect(await c["maxInitialSupply(uint256)"](inputs2[0][i])).to.equal(initialSupply2);
+        cIS = await c["initialSupply(uint256)"](inputs2[0][i]);
+        expect(cIS[0].eq(initialSupply2[0]));
+        expect(cIS[1].eq(initialSupply2[1]));
       }
 
     });
 
-    it("Should distribute tokens evenly within max supply range", async function () {
+    it("Should distribute tokens evenly within min/max supply range", async function () {
       const { c } = await loadFixture(deployFixture);
 
       const mints = 500;
-      const testSuppliesTo = 9;
+      const testSuppliesTo = 8;
       const acceptedVariance = 0.7;
 
       for (let i = 1; i <= testSuppliesTo; i++) {
-        const maxSupply = i
-        await c.setMaxInitialSupply(maxSupply);
+        const supply = [10, 10 + i];
+        await c.setInitialSupply(supply);
         const inputs = await c.getMintRangeInput(mints);
         const treasuryBalances = inputs[1][0];
         const balanceDistribution: { [key: number]: number } = {};
 
         for (let k = 0; k < mints; k++) {
-          expect(treasuryBalances[k]).to.lte(maxSupply)
+          expect(treasuryBalances[k]).to.lte(supply[1])
+          expect(treasuryBalances[k]).to.gte(supply[0])
 
           balanceDistribution[treasuryBalances[k].toNumber()] = balanceDistribution[treasuryBalances[k].toNumber()] ?? 0;
           balanceDistribution[treasuryBalances[k].toNumber()]++;
         }
         expect(balanceDistribution[0]).to.equal(undefined);
-        for (let k = 1; k < maxSupply; k++) {
-          expect(balanceDistribution[i]).to.be.gte(acceptedVariance * mints / maxSupply);
+
+        for (let k = supply[0]; k < supply[1]; k++) {
+          expect(balanceDistribution[k]).to.be.gte(acceptedVariance * mints / (supply[1] - supply[0] + 1));
         }
       }
 
@@ -330,8 +351,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { c, vault, treasury } = await loadFixture(deployFixture);
       const photos = 100;
-      const maxSupply = 2;
-      await c.setMaxInitialSupply(maxSupply);
+      const maxSupply = [1, 2];
+      await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
@@ -355,7 +376,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
         expect(vaultBalances[i]).to.equal(1);
         expect(vaultBalances[i]).to.equal(input[1][1][i]);
         expect(treasuryBalances[i]).to.equal(input[1][0][i]);
-        expect(treasuryBalances[i]).to.lte(maxSupply);
+        expect(treasuryBalances[i]).to.lte(maxSupply[1]);
+        expect(treasuryBalances[i]).to.gte(maxSupply[0]);
       }
     });
   })
@@ -382,7 +404,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       const { c, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
 
-      await c.setMaxInitialSupply(1);
+      await c.setInitialSupply([1, 1]);
       const input1 = await c.getMintRangeInput(5);
       await c.mintPhotos(...input1);
 
@@ -413,7 +435,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should claim mint from treasury and burn claim when redeemClaim is called", async function () {
 
       const { c, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
-      await c.setMaxInitialSupply(1);
+      await c.setInitialSupply([1, 1]);
 
       const input1 = await c.getMintRangeInput(5);
       await c.mintPhotos(...input1);
@@ -445,9 +467,9 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should correcly update vault address only", async function () {
       const { c, vault, treasury, account1 } = await loadFixture(deployFixture);
       const photos = 10;
-      const maxSupply = 5;
+      const maxSupply = [1, 5];
 
-      await c.setMaxInitialSupply(maxSupply);
+      await c.setInitialSupply(maxSupply);
 
       const input = await c.getMintRangeInput(photos);
 
@@ -488,8 +510,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should correcly update treasury address only", async function () {
       const { c, vault, treasury, account1 } = await loadFixture(deployFixture);
       const photos = 10;
-      const maxSupply = 5;
-      await c.setMaxInitialSupply(maxSupply);
+      const maxSupply = [1, 5];
+      await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
@@ -528,8 +550,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should correcly swap treasury and vault addresses", async function () {
       const { c, vault, treasury } = await loadFixture(deployFixture);
       const photos = 10;
-      const maxSupply = 5;
-      await c.setMaxInitialSupply(maxSupply);
+      const maxSupply = [1, 5];
+      await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);
 
       const vaultAddresses = new Array(photos).fill(vault.address);
@@ -562,9 +584,9 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should fail to updated initialHolders if isInitialHoldersRangeUpdatePermanentlyDisabled", async function () {
       const { c, vault, treasury } = await loadFixture(deployFixture);
       const photos = 10;
-      const maxSupply = 5;
+      const maxSupply = [1, 5];
 
-      await c.setMaxInitialSupply(maxSupply);
+      await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);
       await c.mintPhotos(...input);
       await c.permanentlyDisableInitialHoldersRangeUpdate();
@@ -643,7 +665,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
       await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
       await c.unpause();
-      await c.setMaxInitialSupply(4);
+      await c.setInitialSupply([1, 4]);
       const mintInput = await c.getMintRangeInput(4);
       await expect(c.connect(account1).mintPhotos(...mintInput)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
@@ -655,10 +677,9 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setIsOperatorFilterDisabled(true)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setMaxInitialSupply(2)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setInitialSupply([1, 2])).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setOwner(account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("AccessControl");
     });
@@ -683,13 +704,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
 
       await expect(c.connect(account1).setOwner(account1.address)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setIsOperatorFilterDisabled(true)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.not.be.rejectedWith("AccessControl");
 
       await c.grantRole(await c.PHOTO_MINTER_ROLE(), account2.address);
-      await c.setMaxInitialSupply(4);
+      await c.setInitialSupply([1, 4]);
       const mintInput = await c.getMintRangeInput(4);
-      await expect(c.connect(account2).setMaxInitialSupply(2)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account2).setInitialSupply([1, 2])).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account2).mintPhotos(...mintInput)).to.not.be.rejectedWith("AccessControl");
 
       await c.grantRole(await c.CLAIM_MINTER_ROLE(), account3.address);
@@ -702,7 +722,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should fail execute non-view functions when paused", async function () {
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
-      await c.setMaxInitialSupply(4);
+      await c.setInitialSupply([1, 4]);
       const mintInput = await c.getMintRangeInput(4);
 
       await c.pause();
@@ -717,11 +737,10 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.resetTokenRoyalty(1)).to.be.rejectedWith("paused");
 
       await expect(c.setOwner(account1.address)).to.be.rejectedWith("paused");
-      await expect(c.setIsOperatorFilterDisabled(true)).to.be.rejectedWith("paused");
       await expect(c.setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("paused");
       await expect(c.setApprovalForAll(account1.address, true)).to.be.rejectedWith("paused");
 
-      await expect(c.setMaxInitialSupply(2)).to.be.rejectedWith("paused");
+      await expect(c.setInitialSupply([1, 2])).to.be.rejectedWith("paused");
       await expect(c.mintPhotos(...mintInput)).to.be.rejectedWith("paused");
 
       await expect(c.mintClaims(account1.address, 5)).to.be.rejectedWith("paused");
@@ -747,6 +766,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       expect(await ofr.isRegistered(c.address)).to.be.true;
       expect(await ofr.subscriptionOf(c.address)).to.equal("0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
+      expect(await c.operatorFilterRegistry()).to.equal("0x000000000000AAeB6D7670E522A718067333cd4E");
 
     });
 
@@ -756,7 +776,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const subscribedFilteredOperators = await ofr.filteredOperators(c.address);
       await ofr.unsubscribe(c.address, true);
       const unsubscribedfilteredOperators = await ofr.filteredOperators(c.address);
-
       expect(unsubscribedfilteredOperators).to.be.deep.equal(subscribedFilteredOperators);
 
       // set approve operator
@@ -770,17 +789,16 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
 
-      // disable operator filter
-      await c.setIsOperatorFilterDisabled(true);
+      // disable operator filter by setting operator filter to address();
+      await c.setOperatorFilterRegistry(ethers.constants.AddressZero);
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
-      await c.setIsOperatorFilterDisabled(false);
+      await c.setOperatorFilterRegistry("0x000000000000AAeB6D7670E522A718067333cd4E");
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
 
       // permanently disable operator filter
       await c.permanentlyDisableOperatorFilter();
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
-      await expect(c.setIsOperatorFilterDisabled(false)).to.be.revertedWith("Operator filter permanently disabled");
-      
+      await expect(c.setOperatorFilterRegistry(ethers.constants.AddressZero)).to.be.revertedWith("Permanently disabled");
     });
 
   });
