@@ -21,17 +21,17 @@ contract Ph101ppDailyPhoto is
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
     bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
     uint public constant CLAIM_TOKEN_ID = 0;
-    string private constant CLAIM_TOKEN = "CLAIM";
+    string private constant _CLAIM_TOKEN = "CLAIM";
 
     uint private constant TREASURY_ID = 0;
     uint private constant VAULT_ID = 1;
 
+    uint[][] private _initialSupplies;
+    uint[] private _initialSupplyRange;
     string[] private _permanentUris;
     string private _proxyUri;
-    uint public lastRangeTokenIdWithPermanentUri;
 
-    uint[][] private _maxSupplies;
-    uint[] private _maxSupplyRange;
+    uint public lastRangeTokenIdWithPermanentUri;
     bool public isInitialHoldersRangeUpdatePermanentlyDisabled;
 
     address private _owner;
@@ -47,14 +47,14 @@ contract Ph101ppDailyPhoto is
         _grantRole(URI_UPDATER_ROLE, msg.sender);
         _registerToOpenseaOperatorFilterRegistry(true);
 
-        // set initial max supply to 2;
-        _maxSupplyRange.push(0);
-        _maxSupplies.push([2, 3]);
+        // set initial max supply to 2-3;
+        _initialSupplyRange.push(0);
+        _initialSupplies.push([2, 3]);
 
-        setOwner(msg.sender);
-        setProxyBaseUri(newProxyUri);
-        setPermanentBaseUriUpTo(newPermanentUri, 0);
-        setDefaultRoyalty(msg.sender, 500);
+        _permanentUris.push(newPermanentUri);
+        _proxyUri = newProxyUri;
+        _owner = msg.sender;
+        _setDefaultRoyalty(msg.sender, 500);
         mintClaims(initialHolders[TREASURY_ID], 10);
     }
 
@@ -96,7 +96,7 @@ contract Ph101ppDailyPhoto is
         // token...
         if (tokenId == CLAIM_TOKEN_ID) {
             // ... is claim -> return claim
-            tokenDate = CLAIM_TOKEN;
+            tokenDate = _CLAIM_TOKEN;
             currentUri = permanentBaseUri();
         } else {
             (uint year, uint month, uint day) = tokenIdToDate(tokenId);
@@ -140,8 +140,7 @@ contract Ph101ppDailyPhoto is
         uint validUpToTokenId
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
         require(
-            validUpToTokenId > lastRangeTokenIdWithPermanentUri ||
-                _permanentUris.length == 0,
+            validUpToTokenId > lastRangeTokenIdWithPermanentUri,
             "Error: TokenId must be larger than lastTokenIdWithValidPermanentUri."
         );
         _permanentUris.push(newUri);
@@ -215,41 +214,42 @@ contract Ph101ppDailyPhoto is
         override
         returns (bytes32)
     {
-        return keccak256(abi.encode(_maxSupplies));
+        return keccak256(abi.encode(_initialSupplies));
     }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Initial Supply
     ///////////////////////////////////////////////////////////////////////////////
 
-    function setInitialSupply(uint[] memory maxSupply)
+    function setInitialSupply(uint[] memory newInitialSupply)
         public
         whenNotPaused
         onlyRole(PHOTO_MINTER_ROLE)
     {
+        require(newInitialSupply.length == 2 && newInitialSupply[0] <= newInitialSupply[1]);
         uint firstId = lastRangeTokenIdMinted + 1;
-        uint lastId = _maxSupplyRange[_maxSupplyRange.length - 1];
+        uint lastId = _initialSupplyRange[_initialSupplyRange.length - 1];
         if (lastId == firstId) {
-            _maxSupplies[_maxSupplies.length - 1] = maxSupply;
+            _initialSupplies[_initialSupplies.length - 1] = newInitialSupply;
             return;
         }
-        _maxSupplyRange.push(firstId);
-        _maxSupplies.push(maxSupply);
+        _initialSupplyRange.push(firstId);
+        _initialSupplies.push(newInitialSupply);
     }
 
     /**
      * @dev Returns max initial supply of a token.
      */
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
-        uint supplyIndex = _findInRange(_maxSupplyRange, tokenId);
-        return _maxSupplies[supplyIndex];
+        uint supplyIndex = _findInRange(_initialSupplyRange, tokenId);
+        return _initialSupplies[supplyIndex];
     }
 
     /**
      * @dev Returns max initial supply of a token.
      */
     function initialSupply() public view returns (uint[] memory) {
-        return _maxSupplies[_maxSupplies.length - 1];
+        return _initialSupplies[_initialSupplies.length - 1];
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -431,7 +431,7 @@ contract Ph101ppDailyPhoto is
     {
         _setOperatorFilterRegistry(_operatorFilterRegistry);
     }
-    
+
     function permanentlyDisableOperatorFilter()
         public
         whenNotPaused

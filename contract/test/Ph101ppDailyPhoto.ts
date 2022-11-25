@@ -259,6 +259,13 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.setInitialSupply([1, 5])).to.be.rejectedWith("Pausable: paused");
     });
 
+    it("should fail to set initial supply with incorrect inputs", async function () {
+      const { c } = await loadFixture(deployFixture);
+      await expect(c.setInitialSupply([1])).to.be.rejected;
+      await expect(c.setInitialSupply([1, 5, 6])).to.be.rejected;
+      await expect(c.setInitialSupply([5, 1])).to.be.rejected;
+    });
+
     it("Should invalidate mintRangeInput when maxInitialSupply is set", async function () {
       const { c } = await loadFixture(deployFixture);
       const initialSupply = [1, 5];
