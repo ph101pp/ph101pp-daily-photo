@@ -10,18 +10,21 @@ export default async function handler(
 ) {
   const query = req.query.tokenId;
 
-  if (query === "CLAIM.json") {
-    res.setHeader("Cache-Control", `s-maxage=${60 * 60 * 24}, stale-while-revalidate=59`);
+  if (query === "CLAIM-0.json") {
+    res.setHeader("Cache-Control", `s-maxage=${60 * 60 * 48}, stale-while-revalidate=59`);
     return res.json(getClaimMetadata())
   }
 
-  if (typeof query !== "string" || query.length !== 13) {
+  if (typeof query !== "string") {
     return res.status(404).end();
   }
 
-  const [date, ext] = query.split(".");
+  const [token, ext] = query.split(".");
+  const [date, indexStr] = token.split("-");
+  const index = parseInt(indexStr);
+  
 
-  if (ext !== "json" || !isValidDate(date)) {
+  if (ext !== "json" || !isValidDate(date) || isNaN(index)) {
     return res.status(404).end();
   }
 
@@ -34,5 +37,5 @@ export default async function handler(
       return arweaveResult.json()
     })
     .then(res.json)
-    .catch(() => res.json(getFutureMetadata(date)));
+    .catch(() => res.json(getFutureMetadata(date, index)));
 }
