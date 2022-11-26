@@ -8,6 +8,7 @@ export default function getTokenMetadata({
   country,
   camera,
   settings,
+  project,
   image_details,
   imageTx
 }:{
@@ -40,6 +41,10 @@ export default function getTokenMetadata({
       {
         "trait_type": "Type",
         "value": "Photo"
+      },
+      {
+        "trait_type": "Project",
+        "value": project
       },
       ...baseMetadata.attributes,
     ],

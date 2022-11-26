@@ -62,6 +62,7 @@ function MetadataForm() {
           defaultValues={defaultInput}
           onSuccess={data => {
             setInput({
+              project: data.project,
               settings: data.settings,
               camera: data.camera,
               description: data.description,
@@ -75,6 +76,7 @@ function MetadataForm() {
           <RenderFormElement name="place" label="Place" required={true} />
           <RenderFormElement name="country" label="Country" required={true} />
           <RenderFormElement name="description" label="Description" required={true} disabled={true} />
+          <RenderFormElement name="project" label="Project" required={true} disabled={true} />
           <RenderFormElement name="camera" label="Camera" required={true} disabled={true} />
           <RenderFormElement name="settings" label="Settings" required={true} disabled={true} />
           <Box
