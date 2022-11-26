@@ -20,7 +20,7 @@ async function main() {
   // const tx = await pdp.setPermanentBaseUriUpTo("https://arweave.net/1a-HDKflsjG2_b3jAuMYTrQyB13BNarkz0WZdCEBj0E/", 1);
   // const tx = await pdp.setMutableURI("https://ph101pp-daily-photo.vercel.app/api/proxy/");
   
-  const supplyTx = await pdp.setMaxInitialSupply(2);
+  const supplyTx = await pdp.setInitialSupply([1,2]);
   await supplyTx.wait();
   const input = await pdp.getMintRangeInput(122);
   const tx = await pdp.mintPhotos(...input);

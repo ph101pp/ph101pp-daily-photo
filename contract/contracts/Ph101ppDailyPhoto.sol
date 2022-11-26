@@ -62,12 +62,10 @@ contract Ph101ppDailyPhoto is
     // Token Balances
     ///////////////////////////////////////////////////////////////////////////////
 
-    function initialBalanceOf(address account, uint tokenId)
-        internal
-        view
-        override
-        returns (uint)
-    {
+    function initialBalanceOf(
+        address account,
+        uint tokenId
+    ) internal view override returns (uint) {
         address[] memory addresses = initialHolders(tokenId);
         if (account == addresses[TREASURY_ID]) {
             uint[] memory _initialSupply = initialSupply(tokenId);
@@ -120,7 +118,14 @@ contract Ph101ppDailyPhoto is
             }
         }
 
-        return string.concat(currentUri, tokenDate, ".json");
+        return
+            string.concat(
+                currentUri,
+                tokenDate,
+                "-",
+                Strings.toString(tokenId),
+                ".json"
+            );
     }
 
     function proxyBaseUri() public view returns (string memory) {
@@ -147,11 +152,9 @@ contract Ph101ppDailyPhoto is
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
     }
 
-    function setProxyBaseUri(string memory newProxyUri)
-        public
-        whenNotPaused
-        onlyRole(URI_UPDATER_ROLE)
-    {
+    function setProxyBaseUri(
+        string memory newProxyUri
+    ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
         _proxyUri = newProxyUri;
     }
 
@@ -159,10 +162,10 @@ contract Ph101ppDailyPhoto is
     // Claims
     ///////////////////////////////////////////////////////////////////////////////
 
-    function mintClaims(address to, uint amount)
-        public
-        onlyRole(CLAIM_MINTER_ROLE)
-    {
+    function mintClaims(
+        address to,
+        uint amount
+    ) public onlyRole(CLAIM_MINTER_ROLE) {
         _mint(to, CLAIM_TOKEN_ID, amount, "");
     }
 
@@ -178,9 +181,10 @@ contract Ph101ppDailyPhoto is
         );
     }
 
-    function redeemClaimBatch(uint[] memory tokenIds, uint[] memory amounts)
-        public
-    {
+    function redeemClaimBatch(
+        uint[] memory tokenIds,
+        uint[] memory amounts
+    ) public {
         uint claimsRequired = amounts[0];
         address[] memory initialHolders0 = initialHolders(tokenIds[0]);
         for (uint i = 1; i < amounts.length; i++) {
@@ -221,12 +225,13 @@ contract Ph101ppDailyPhoto is
     // Initial Supply
     ///////////////////////////////////////////////////////////////////////////////
 
-    function setInitialSupply(uint[] memory newInitialSupply)
-        public
-        whenNotPaused
-        onlyRole(PHOTO_MINTER_ROLE)
-    {
-        require(newInitialSupply.length == 2 && newInitialSupply[0] <= newInitialSupply[1]);
+    function setInitialSupply(
+        uint[] memory newInitialSupply
+    ) public whenNotPaused onlyRole(PHOTO_MINTER_ROLE) {
+        require(
+            newInitialSupply.length == 2 &&
+                newInitialSupply[0] <= newInitialSupply[1]
+        );
         uint firstId = lastRangeTokenIdMinted + 1;
         uint lastId = _initialSupplyRange[_initialSupplyRange.length - 1];
         if (lastId == firstId) {
@@ -256,10 +261,10 @@ contract Ph101ppDailyPhoto is
     // Initial Holders
     ///////////////////////////////////////////////////////////////////////////////
 
-    function setInitialHolders(address treasury, address vault)
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setInitialHolders(
+        address treasury,
+        address vault
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         address[] memory addresses = new address[](2);
         addresses[0] = treasury;
         addresses[1] = vault;
@@ -269,10 +274,9 @@ contract Ph101ppDailyPhoto is
     /**
      * @dev Lock initial holders up to tokenid
      */
-    function setLockInitialHoldersUpTo(uint256 tokenId)
-        public
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setLockInitialHoldersUpTo(
+        uint256 tokenId
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         _setLockInitialHoldersUpTo(tokenId);
     }
 
@@ -309,11 +313,10 @@ contract Ph101ppDailyPhoto is
     // Royalties
     ///////////////////////////////////////////////////////////////////////////////
 
-    function setDefaultRoyalty(address receiver, uint96 feeNumerator)
-        public
-        whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setDefaultRoyalty(
+        address receiver,
+        uint96 feeNumerator
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _setDefaultRoyalty(receiver, feeNumerator);
     }
 
@@ -325,11 +328,9 @@ contract Ph101ppDailyPhoto is
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 
-    function resetTokenRoyalty(uint tokenId)
-        public
-        whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function resetTokenRoyalty(
+        uint tokenId
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _resetTokenRoyalty(tokenId);
     }
 
@@ -348,15 +349,9 @@ contract Ph101ppDailyPhoto is
     ///////////////////////////////////////////////////////////////////////////////
     // Token ID < > Date helpers
     ///////////////////////////////////////////////////////////////////////////////
-    function tokenIdToDate(uint tokenId)
-        public
-        pure
-        returns (
-            uint year,
-            uint month,
-            uint day
-        )
-    {
+    function tokenIdToDate(
+        uint tokenId
+    ) public pure returns (uint year, uint month, uint day) {
         require(tokenId > 0, "No date associated with claims!"); // No date associated with claims!
         uint tokenTimestamp = _timestampFromTokenId(tokenId);
         return _timestampToDate(tokenTimestamp);
@@ -376,31 +371,21 @@ contract Ph101ppDailyPhoto is
         return _timestampToTokenId(tokenTimestamp);
     }
 
-    function _timestampToDate(uint timestamp)
-        private
-        pure
-        returns (
-            uint year,
-            uint month,
-            uint day
-        )
-    {
+    function _timestampToDate(
+        uint timestamp
+    ) private pure returns (uint year, uint month, uint day) {
         return DateTime.timestampToDate(timestamp);
     }
 
-    function _timestampFromTokenId(uint tokenId)
-        private
-        pure
-        returns (uint timestamp)
-    {
+    function _timestampFromTokenId(
+        uint tokenId
+    ) private pure returns (uint timestamp) {
         return START_DATE + ((tokenId - 1) * 1 days);
     }
 
-    function _timestampToTokenId(uint timestamp)
-        private
-        pure
-        returns (uint tokenId)
-    {
+    function _timestampToTokenId(
+        uint timestamp
+    ) private pure returns (uint tokenId) {
         return ((timestamp - START_DATE) / 1 days) + 1;
     }
 
@@ -416,19 +401,15 @@ contract Ph101ppDailyPhoto is
      * @dev Set new owner. This address will be returned by owner().
      * Can be used to make updates to the OperatorFilterRegistry on behalf of this contract.
      */
-    function setOwner(address newOwner)
-        public
-        whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setOwner(
+        address newOwner
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _owner = newOwner;
     }
 
-    function setOperatorFilterRegistry(address _operatorFilterRegistry)
-        public
-        whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
+    function setOperatorFilterRegistry(
+        address _operatorFilterRegistry
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _setOperatorFilterRegistry(_operatorFilterRegistry);
     }
 
@@ -440,12 +421,10 @@ contract Ph101ppDailyPhoto is
         _permanentlyDisableOperatorFilter();
     }
 
-    function setApprovalForAll(address operator, bool approved)
-        public
-        override
-        whenNotPaused
-        onlyAllowedOperatorApproval(operator)
-    {
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) public override whenNotPaused onlyAllowedOperatorApproval(operator) {
         super.setApprovalForAll(operator, approved);
     }
 
@@ -474,12 +453,9 @@ contract Ph101ppDailyPhoto is
     ///////////////////////////////////////////////////////////////////////////////
 
     // The following functions are overrides required by Solidity.
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(AccessControl, ERC1155_, ERC2981)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(AccessControl, ERC1155_, ERC2981) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
