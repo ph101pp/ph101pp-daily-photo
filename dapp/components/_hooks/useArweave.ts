@@ -75,7 +75,7 @@ function useArweave(
         //   status: transactionStatus?.status,
         //   confirmations: transactionStatus?.confirmed?.number_of_confirmations ?? 0
         // })
-      } while (!transactionStatus?.confirmed || transactionStatus.confirmed.number_of_confirmations < 5);
+      } while (!transactionStatus?.confirmed || transactionStatus.confirmed.number_of_confirmations < 3);
     }
 
     async function execute(): Promise<string> {

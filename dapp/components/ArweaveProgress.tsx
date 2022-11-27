@@ -88,12 +88,12 @@ const ArweaveProgress = ({ statusAtomName, label }: { statusAtomName: string, la
                 <Box sx={{ width: '100%', mr: 1 }}>
                   <LinearProgress
                     variant="determinate"
-                    value={status.transactionStatus.confirmations * 100 / Math.max(status.transactionStatus.confirmations, 5)}
+                    value={status.transactionStatus.confirmations * 100 / Math.max(status.transactionStatus.confirmations, 3)}
                   />
                 </Box>
                 <Box sx={{ minWidth: "50px" }}>
                   <Typography variant="body2" color="text.secondary">{
-                    `${status.transactionStatus.confirmations} / ${Math.max(status.transactionStatus.confirmations, 5)}`
+                    `${status.transactionStatus.confirmations} / ${Math.max(status.transactionStatus.confirmations, 3)}`
                   }</Typography>
                 </Box>
               </Box>
