@@ -40,7 +40,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
   const timestamp = Math.round(date.getTime() / 1000);
 
   return {
-    "name": formattedDate,
+    "name": `${tokenIndex.padStart(5, "0")} ${formattedDate}`,
     "created_by": "Philipp Adrian",
     "external_url": `https://daily-photo.ph101pp.xyz/${tokenDate}-${tokenIndex}`,
     "attributes": [
