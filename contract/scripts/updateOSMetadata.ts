@@ -1,5 +1,5 @@
 
-const range = [10, 122];
+const range = [0, 122];
 const contract = "0x4Ad20a44489a92dd36d89B4596c17C43efE88b57";
 const baseURI = "https://testnets-api.opensea.io";
 // const baseURI = "https://api.opensea.io";
