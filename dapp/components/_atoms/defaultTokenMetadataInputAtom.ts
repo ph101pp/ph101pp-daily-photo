@@ -58,11 +58,12 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     const exposureTime = parseFloat(image.exif.ExposureTime);
     const shutterSpeed = exposureTime >= 1 ? `${exposureTime}` : `1/${getShutterspeed(exposureTime)}`;
     const autoSettings = `${image.exif.FocalLength}mm ${shutterSpeed}s ƒ/${image.exif.FNumber} ISO${image.exif.ISOSpeedRatings}`;
+    const formatedDate = baseMetadata.name.split("–")[1].trimStart();
     return {
       tokenId: 1,
       settings: autoSettings,
       camera: autoCamera,
-      description: `This moment was captured on ${baseMetadata.name}.`,
+      description: `This moment was captured on ${formatedDate}.`,
       project: "None",
       place: "",
       country: "",

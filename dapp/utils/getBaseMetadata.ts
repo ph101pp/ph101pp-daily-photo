@@ -39,11 +39,11 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
 
   const date = new Date(year, month, day);
   const weekday = weekdays[date.getUTCDay()]
-  const formattedDate = `${weekday}, ${monthsShort[month]} ${day}, ${year}`;
+  const formattedDate = `${weekday}, ${months[month]} ${day}, ${year}`;
   const timestamp = Math.round(date.getTime() / 1000);
 
   return {
-    "name": `#${tokenIndex.padStart(4, "0")} - ${formattedDate}`,
+    "name": `#${tokenIndex.padStart(4, "0")} – ${formattedDate}`,
     "created_by": "Philipp Adrian",
     "external_url": `https://daily-photo.ph101pp.xyz/${tokenDate}-${tokenIndex}`,
     "attributes": [
