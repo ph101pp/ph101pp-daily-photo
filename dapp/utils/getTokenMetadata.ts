@@ -10,12 +10,14 @@ export default function getTokenMetadata({
   settings,
   project,
   image_details,
-  imageTx
+  imageTx,
+  tokenIndex
 }:{
   dateString: string,
-  imageTx:string
+  imageTx:string,
+  tokenIndex: string
 } & TokenMetadataInputType): MetadataType {
-  const baseMetadata = getBaseMetadata(dateString);
+  const baseMetadata = getBaseMetadata(dateString, tokenIndex);
   return {
     "description": `${description}`,
     "image": `https://arweave.net/${imageTx}`,

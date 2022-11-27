@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import contract from "../../../../contract/artifacts/contracts/Ph101ppDailyPhoto.sol/Ph101ppDailyPhoto.json";
 
 const wallet = ethers.Wallet.createRandom();
-const alchemyProvider = new ethers.providers.AlchemyProvider("goerli", process.env.GOERLI_ALCHEMY_API_KEY!);
+const alchemyProvider = new ethers.providers.AnkrProvider("goerli");
 const signer = new ethers.Wallet(wallet.privateKey, alchemyProvider);
 const Ph101ppDailyPhoto = new ethers.Contract(process.env.GOERLI_CONTRACT_ADDRESS!, contract.abi, signer);
 
@@ -13,21 +13,22 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const tokenId = req.query.tokenId;
+  const tokenDate = req.query.tokenDate;
 
-  if (typeof tokenId !== "string" || tokenId.length !== 8) {
+  if (typeof tokenDate !== "string" || tokenDate.length !== 8) {
     return res.status(404).end();
   }
 
-  if (!isValidDate(tokenId)) {
+  if (!isValidDate(tokenDate)) {
     return res.status(404).end();
   }
 
-  const year = parseInt(tokenId.slice(0, 4));
-  const month = parseInt(tokenId.slice(4, 6));
-  const day = parseInt(tokenId.slice(6, 8));
+  const year = parseInt(tokenDate.slice(0, 4));
+  const month = parseInt(tokenDate.slice(4, 6));
+  const day = parseInt(tokenDate.slice(6, 8));
 
   const tokenIndex = await Ph101ppDailyPhoto.tokenIdFromDate(year, month, day);
-
+  
+  res.setHeader("Cache-Control",`s-maxage=${60*60*24*31}`); // max cache
   res.json(tokenIndex.toNumber());
 }

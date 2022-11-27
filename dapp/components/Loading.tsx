@@ -5,7 +5,12 @@ import { useRecoilValue } from "recoil";
 
 const Loading = () => {
   const tokenId = useRecoilValue(tokenIdAtom);
-  const baseMetadata = tokenId ? getBaseMetadata(tokenId) : null;
+  let baseMetadata = null;
+
+  if(tokenId) {
+    const [tokenDate, tokenIndex] = tokenId.split("-");
+    baseMetadata = getBaseMetadata(tokenDate, tokenIndex);
+  }
 
 
   return (<>

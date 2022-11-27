@@ -29,10 +29,10 @@ export type MetadataType = {
   }
 } & BaseMetadataType;
 
-export default function getBaseMetadata(dateString: string): BaseMetadataType {
-  const year = parseInt(dateString.slice(0, 4));
-  const month = parseInt(dateString.slice(4, 6)) - 1;
-  const day = parseInt(dateString.slice(6, 8));
+export default function getBaseMetadata(tokenDate: string, tokenIndex: string): BaseMetadataType {
+  const year = parseInt(tokenDate.slice(0, 4));
+  const month = parseInt(tokenDate.slice(4, 6)) - 1;
+  const day = parseInt(tokenDate.slice(6, 8));
 
   const date = new Date(year, month, day);
   const weekday = weekdays[date.getUTCDay()]
@@ -42,11 +42,15 @@ export default function getBaseMetadata(dateString: string): BaseMetadataType {
   return {
     "name": formattedDate,
     "created_by": "Philipp Adrian",
-    "external_url": `https://daily-photo.ph101pp.xyz/${dateString}`,
+    "external_url": `https://daily-photo.ph101pp.xyz/${tokenDate}-${tokenIndex}`,
     "attributes": [
       {
         "trait_type": "Artist",
         "value": "Ph101pp"
+      },
+      {
+        "trait_type": "Photo #",
+        "value": parseInt(tokenIndex)
       },
       {
         "display_type": "date",

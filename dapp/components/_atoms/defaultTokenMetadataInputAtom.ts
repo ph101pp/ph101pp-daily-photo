@@ -42,7 +42,7 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     const image = get(imageAtom);
     const userMetadataInput = get(tokenMetadataInputAtom);
     const tokenId = get(tokenIdAtom);
-
+    console.log(tokenId);
     if(userMetadataInput) {
       return userMetadataInput;
     }
@@ -50,14 +50,16 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     if (!image || !tokenId) {
       return null;
     }
+    const [tokenDate, tokenIndex] = tokenId.split("-");
     const imageDimensions = await getImageDimensions(image.dataURL);
     const sha = await sha256(image.dataURL);
-    const baseMetadata = getBaseMetadata(tokenId);
+    const baseMetadata = getBaseMetadata(tokenDate, tokenIndex);
     const autoCamera = `${image.exif.Make} ${image.exif.Model}`
     const exposureTime = parseFloat(image.exif.ExposureTime);
     const shutterSpeed = exposureTime >= 1 ? `${exposureTime}` : `1/${getShutterspeed(exposureTime)}`;
     const autoSettings = `${image.exif.FocalLength}mm ${shutterSpeed}s ƒ/${image.exif.FNumber} ISO${image.exif.ISOSpeedRatings}`;
     return {
+      tokenId: 1,
       settings: autoSettings,
       camera: autoCamera,
       description: `This moment was observed on ${baseMetadata.name}.`,

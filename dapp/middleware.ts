@@ -2,23 +2,53 @@ import { withAuth } from "next-auth/middleware"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isValidDate } from "./utils/isValidDate";
+import { ethers } from "ethers";
 
-function middleware(request: NextRequest) {
+async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
-  const query = url.pathname.slice(1);
-  const [date] = query.split(".");
 
   if (
-    !url.pathname.startsWith("/api/") &&
-    !url.pathname.startsWith("/_next") &&
-    !url.pathname.startsWith("/claim") &&
-    !isValidDate(date)
+    url.pathname.startsWith("/api") ||
+    url.pathname.startsWith("/_next") ||
+    url.pathname.startsWith("/claim")
   ) {
+    return;
+  }
+
+  const query = url.pathname.slice(1);
+  const [token] = query.split(".");
+  const [dateStr, idStr] = token.split("-");
+
+  let dateInt = parseInt(dateStr);
+  let idInt = parseInt(idStr);
+
+  let date = dateStr;
+  let id = idStr;
+  // id received
+  if (dateInt < 20220901 && !isNaN(dateInt) && isNaN(idInt)) {
+    // console.log("A");
+    id = dateStr;
+    date = await (await fetch(`${url.origin}/api/tokenDate/${id}`)).json();
+  }
+  else if (!isValidDate(date) && isNaN(idInt)) {
+    // console.log("B");
+
     const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    url.pathname = `/${now.getFullYear()}${month <= 9 ? "0" : ""}${month}${day <= 9 ? "0" : ""}${day}`
-    return NextResponse.redirect(url)
+    const yearTemp = now.getFullYear();
+    const monthTemp = now.getMonth() + 1;
+    const dayTemp = now.getDate();
+    date = `${yearTemp}${monthTemp <= 9 ? "0" : ""}${monthTemp}${dayTemp <= 9 ? "0" : ""}${dayTemp}`
+    id = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
+  } else if(isNaN(idInt)) {
+    // console.log("C");
+    id = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
+  }
+
+  const fullToken = `${date}-${id}`;
+
+  if (fullToken !== query) {
+    url.pathname = `/${fullToken}`
+    return NextResponse.redirect(url);
   }
 }
 
@@ -33,7 +63,7 @@ export default withAuth(
           !path.startsWith("/api/") || // close all api routes
           path.startsWith("/api/proxy/") || // except for the proxy 
           token?.email === "hello@philippadrian.com" // or if logged in.
-          ); 
+        );
       },
     },
   }

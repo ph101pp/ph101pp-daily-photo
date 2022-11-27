@@ -26,8 +26,8 @@ function App() {
   if(!tokenId) {
     return null;
   }
-  
-  const futureTokenData = getFutureMetadata(tokenId);
+  const [tokenDate, tokenIndex] = tokenId.split("-");
+  const futureTokenData = getFutureMetadata(tokenDate, tokenIndex);
 
   if(tokenData) {
     return <ExistingToken tokenMetadata = { tokenData }  />

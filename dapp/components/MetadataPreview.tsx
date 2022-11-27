@@ -12,10 +12,13 @@ const MetadataPreview = () => {
     return null;
   }
 
+  const [tokenDate, tokenIndex] = tokenId.split("-");
+
   const metadata = getTokenMetadata({
     ...metadataInput,
-    dateString: tokenId,
+    dateString: tokenDate,
     imageTx: "TBD",
+    tokenIndex
   });
   return (
     <Accordion defaultExpanded={true}>

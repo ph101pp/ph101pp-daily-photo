@@ -1,7 +1,7 @@
 import getBaseMetadata, { MetadataType } from "./getBaseMetadata";
 
-export default function getFutureMetadata(dateString: string): MetadataType {
-  const baseMetadata = getBaseMetadata(dateString);
+export default function getFutureMetadata(dateString: string, tokenIndex:string): MetadataType {
+  const baseMetadata = getBaseMetadata(dateString, tokenIndex);
   const formattedDate = baseMetadata.name;
   return {
     ...baseMetadata,

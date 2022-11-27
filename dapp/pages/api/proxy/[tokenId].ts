@@ -20,11 +20,10 @@ export default async function handler(
   }
 
   const [token, ext] = query.split(".");
-  const [date, indexStr] = token.split("-");
-  const index = parseInt(indexStr);
+  const [tokenDate, tokenIndex] = token.split("-");
   
 
-  if (ext !== "json" || !isValidDate(date) || isNaN(index)) {
+  if (ext !== "json" || !isValidDate(tokenDate) || isNaN(parseInt(tokenIndex))) {
     return res.status(404).end();
   }
 
@@ -37,5 +36,5 @@ export default async function handler(
       return arweaveResult.json()
     })
     .then(res.json)
-    .catch(() => res.json(getFutureMetadata(date, index)));
+    .catch(() => res.json(getFutureMetadata(tokenDate, tokenIndex)));
 }
