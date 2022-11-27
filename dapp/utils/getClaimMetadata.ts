@@ -2,7 +2,7 @@ import { MetadataType } from "./getBaseMetadata";
 
 export default function getClaimMetadata(): MetadataType {
   return ({
-    "name": "Claim - Daily Photo",
+    "name": "Claim - One Daily Photo",
     "created_by": "Ph101pp",
     "external_url": "https://daily-photo.ph101pp.xyz/CLAIM-0",
     "description": "This claim is redeemable for one photo from the Ph101pp Daily Photo collection.",
