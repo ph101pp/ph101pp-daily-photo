@@ -62,7 +62,7 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
       tokenId: 1,
       settings: autoSettings,
       camera: autoCamera,
-      description: `This moment was observed on ${baseMetadata.name}.`,
+      description: `This moment was captured on ${baseMetadata.name}.`,
       project: "None",
       place: "",
       country: "",
