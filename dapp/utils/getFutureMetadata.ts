@@ -1,6 +1,6 @@
 import getBaseMetadata, { MetadataType } from "./getBaseMetadata";
 
-export default function getFutureMetadata(dateString: string, tokenIndex:string): MetadataType {
+export default function getFutureMetadata(dateString: string, tokenIndex: string): MetadataType {
   const baseMetadata = getBaseMetadata(dateString, tokenIndex);
   const formattedDate = baseMetadata.name;
   return {
@@ -13,14 +13,14 @@ export default function getFutureMetadata(dateString: string, tokenIndex:string)
       ...baseMetadata.attributes
     ],
     "description": `This photo will be taken on ${formattedDate}.`,
-    "image": "https://arweave.net/h84usgjkPP50GFKifpX3Dgvf4xFGi3AMVM-Cw61u8tg",
-    "image_url": "https://arweave.net/h84usgjkPP50GFKifpX3Dgvf4xFGi3AMVM-Cw61u8tg",
+    "image": "https://arweave.net/Tm6hxGnIE-eEMwNyvOEb1NdZMAPBeSQ-HrME1haIOxA",
+    "image_url": "https://arweave.net/Tm6hxGnIE-eEMwNyvOEb1NdZMAPBeSQ-HrME1haIOxA",
     "image_details": {
-      "size": 7227767,
+      "size": 3070599,
       "type": "image/jpeg",
       "width": 3000,
       "height": 2000,
-      "sha256": "8b1a93d4ae514211449936dd5248c7d57ac61fe0a2dd934996d2064428b11887"
+      "sha256": "88c84df0192ae34918b03631d49eba04cd03eb1c7f9866a4f77519c1fe97dc3e"
     }
   }
 }

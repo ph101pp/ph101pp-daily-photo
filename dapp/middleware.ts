@@ -10,7 +10,7 @@ async function middleware(request: NextRequest) {
   if (
     url.pathname.startsWith("/api") ||
     url.pathname.startsWith("/_next") ||
-    url.pathname.startsWith("/claim")
+    url.pathname.startsWith("/CLAIM-0")
   ) {
     return;
   }
@@ -60,6 +60,7 @@ export default withAuth(
       authorized({ req, token }) {
         const path: string = req.nextUrl.pathname;
         return (
+          !path.startsWith("/CLAIM-0") || // close claim-0 route
           !path.startsWith("/api/") || // close all api routes
           path.startsWith("/api/proxy/") || // except for the proxy 
           token?.email === "hello@philippadrian.com" // or if logged in.

@@ -31,6 +31,7 @@ const UploadAndPublish = () => {
   if (!tokenId || !metadataInput || !image || !manifest) {
     return null;
   }
+  const [tokenDate, tokenIndex] = tokenId.split("-");
 
   const uploadData = async () => {
     setInProgress(true);
@@ -39,7 +40,8 @@ const UploadAndPublish = () => {
     const [imageTx, executeImageTx] = await uploadImage(data, "image/jpeg");
     const tokenMetadata = getTokenMetadata({
       ...metadataInput,
-      dateString: tokenId,
+      dateString: tokenDate,
+      tokenIndex: tokenIndex,
       imageTx
     });
     const [tokenTx, executeTokenTx] = await uploadMetadata(JSON.stringify(tokenMetadata), "application/json");

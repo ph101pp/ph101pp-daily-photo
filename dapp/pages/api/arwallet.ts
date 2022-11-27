@@ -14,10 +14,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if(req.method !== 'POST') {
-    return res.redirect("/_next/404");
+    return res.status(404).end();
   }
   if(!process.env.ARWALLET) {
-    return res.status(404).end("Not Found.");
+    return res.status(404).end();
   }
 
   res.setHeader("Cache-Control", "no-cache")
