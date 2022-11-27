@@ -2,7 +2,6 @@ import { withAuth } from "next-auth/middleware"
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isValidDate } from "./utils/isValidDate";
-import { ethers } from "ethers";
 
 async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()

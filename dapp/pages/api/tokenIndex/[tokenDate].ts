@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { isValidDate } from "../../../utils/isValidDate";
 import { ethers } from "ethers";
-import contract from "../../../../contract/artifacts/contracts/Ph101ppDailyPhoto.sol/Ph101ppDailyPhoto.json";
+import contract from "../../../utils/Ph101ppDailyPhoto.json";
 
 const wallet = ethers.Wallet.createRandom();
 const alchemyProvider = new ethers.providers.AnkrProvider("goerli");
@@ -28,7 +28,7 @@ export default async function handler(
   const day = parseInt(tokenDate.slice(6, 8));
 
   const tokenIndex = await Ph101ppDailyPhoto.tokenIdFromDate(year, month, day);
-  
+
   res.setHeader("Cache-Control",`s-maxage=${60*60*24*31}`); // max cache
   res.json(tokenIndex.toNumber());
 }

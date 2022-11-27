@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { isValidDate } from "../../../utils/isValidDate";
 import { ethers } from "ethers";
-import contract from "../../../../contract/artifacts/contracts/Ph101ppDailyPhoto.sol/Ph101ppDailyPhoto.json";
+import contract from "../../../utils/Ph101ppDailyPhoto.json";
 
 const wallet = ethers.Wallet.createRandom();
 const alchemyProvider = new ethers.providers.AnkrProvider("goerli");
