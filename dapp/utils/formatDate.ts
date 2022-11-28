@@ -5,7 +5,7 @@ const months = ["January", "February", "March", "April", "May", "June",
 const monthsShort = ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.",
 "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
 
-export const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+export const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function formatDate(tokenDate: string) {
   const year = parseInt(tokenDate.slice(0, 4));

@@ -32,6 +32,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
   const day = parseInt(tokenDate.slice(6, 8));
 
   const date = new Date(year, month, day);
+  const weekday = date.getDay();
   const timestamp = Math.ceil(date.getTime() / 1000);
   const formattedDate = formatDate(tokenDate);
   const paddedNumber = parseInt(tokenIndex) > 9999 ? tokenIndex : `#${tokenIndex.padStart(4, "0")}`
@@ -56,7 +57,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
       },
       {
         "trait_type": "Weekday",
-        "value": weekdays[day]
+        "value": weekdays[weekday]
       },
       {
         "display_type": "number",
