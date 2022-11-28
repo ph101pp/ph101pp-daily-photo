@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, September 4, 2022.",
+  "image": "https://arweave.net/35o8MG-hJvcav9yChJdflfeTUEOqmXd49IqDrLUVdwI",
+  "image_url": "https://arweave.net/35o8MG-hJvcav9yChJdflfeTUEOqmXd49IqDrLUVdwI",
+  "name": "#0004 – Sunday, September 4, 2022",
+  "created_by": "Philipp Adrian",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220904-4",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Redhook, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/3.2 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Photo"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Photo Nº",
+      "value": 4
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662260400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 4
+    }
+  ],
+  "image_details": {
+    "size": 3213483,
+    "type": "image/jpeg",
+    "width": 1925,
+    "height": 2888,
+    "sha256": "a446d51fe5389cbfdf838d3da3d93bcb3414bd30f208bf68e65c0d46cc16c91c"
+  }
+}
