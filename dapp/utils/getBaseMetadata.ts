@@ -47,7 +47,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
       },
       {
         "trait_type": "# Photo",
-        "value": `${tokenIndex}`
+        "value": tokenIndex
       },
       {
         "display_type": "date",
