@@ -59,14 +59,17 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
         "value": weekdays[day]
       },
       {
+        "display_type": "number",
         "trait_type": "Month",
         "value": month + 1
       },
       {
+        "display_type": "number",
         "trait_type": "Year",
         "value": year
       },
       {
+        "display_type": "number",
         "trait_type": "Day",
         "value": day,
       }
