@@ -1,4 +1,5 @@
 import { selector } from "recoil";
+import formatDate from "../../utils/formatDate";
 import getBaseMetadata from "../../utils/getBaseMetadata";
 import { TokenMetadataInputType } from "../_types/TokenMetadataInputType";
 import imageAtom from "./imageAtom";
@@ -53,17 +54,16 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     const [tokenDate, tokenIndex] = tokenId.split("-");
     const imageDimensions = await getImageDimensions(image.dataURL);
     const sha = await sha256(image.dataURL);
-    const baseMetadata = getBaseMetadata(tokenDate, tokenIndex);
     const autoCamera = `${image.exif.Make} ${image.exif.Model}`
     const exposureTime = parseFloat(image.exif.ExposureTime);
     const shutterSpeed = exposureTime >= 1 ? `${exposureTime}` : `1/${getShutterspeed(exposureTime)}`;
     const autoSettings = `${image.exif.FocalLength}mm ${shutterSpeed}s ƒ/${image.exif.FNumber} ISO${image.exif.ISOSpeedRatings}`;
-    const formatedDate = baseMetadata.name.split("–")[1].trimStart();
+    const formattedDate = formatDate(tokenDate);
     return {
       tokenId: 1,
       settings: autoSettings,
       camera: autoCamera,
-      description: `This moment was captured on ${formatedDate}.`,
+      description: `This moment was captured on ${formattedDate}.`,
       project: "None",
       place: "",
       country: "",

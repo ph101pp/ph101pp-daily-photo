@@ -1,11 +1,4 @@
-
-const months = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"];
-
-const monthsShort = ["Jan.", "Feb.", "Mar.", "Apr.", "May.", "Jun.",
-  "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
-
-const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+import formatDate, { weekdays } from "./formatDate";
 
 export type BaseMetadataType = {
   "name": string,
@@ -32,18 +25,19 @@ export type MetadataType = {
   }
 } & BaseMetadataType;
 
+
 export default function getBaseMetadata(tokenDate: string, tokenIndex: string): BaseMetadataType {
   const year = parseInt(tokenDate.slice(0, 4));
   const month = parseInt(tokenDate.slice(4, 6)) - 1;
   const day = parseInt(tokenDate.slice(6, 8));
 
   const date = new Date(year, month, day);
-  const weekday = weekdays[date.getUTCDay()]
-  const formattedDate = `${weekday}, ${months[month]} ${day}, ${year}`;
-  const timestamp = Math.round(date.getTime() / 1000);
+  const timestamp = Math.ceil(date.getTime() / 1000);
+  const formattedDate = formatDate(tokenDate);
+  const paddedNumber = parseInt(tokenIndex) > 9999 ? tokenIndex : `#${tokenIndex.padStart(4, "0")}`
 
   return {
-    "name": `#${tokenIndex.padStart(4, "0")} – ${formattedDate}`,
+    "name": `${paddedNumber} – ${formattedDate}`,
     "created_by": "Philipp Adrian",
     "external_url": `https://daily-photo.ph101pp.xyz/${tokenDate}-${tokenIndex}`,
     "attributes": [
@@ -52,8 +46,8 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
         "value": "Ph101pp"
       },
       {
-        "trait_type": "Photo",
-        "value": `#${tokenIndex}`
+        "trait_type": "# Photo",
+        "value": `${tokenIndex}`
       },
       {
         "display_type": "date",
@@ -62,7 +56,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
       },
       {
         "trait_type": "Weekday",
-        "value": weekday
+        "value": weekdays[day]
       },
       {
         "display_type": "number",
