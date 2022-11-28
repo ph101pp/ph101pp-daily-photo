@@ -46,6 +46,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
         "value": "Ph101pp"
       },
       {
+        "display_type": "level",
         "trait_type": "# Photo",
         "value": parseInt(tokenIndex)
       },
