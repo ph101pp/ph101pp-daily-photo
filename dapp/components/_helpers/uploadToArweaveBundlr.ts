@@ -1,4 +1,4 @@
-// import base64ToArrayBuffer from "./base64ToArrayBuffer";
+import base64ToArrayBuffer from "./base64ToArrayBuffer";
 
 
 // async function bundlrToArweave() {
