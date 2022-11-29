@@ -14,14 +14,14 @@ export default function getFutureMetadata(dateString: string, tokenIndex: string
       ...baseMetadata.attributes
     ],
     "description": `This photo will be taken on ${formattedDate}.`,
-    "image": "https://arweave.net/Tm6hxGnIE-eEMwNyvOEb1NdZMAPBeSQ-HrME1haIOxA",
-    "image_url": "https://arweave.net/Tm6hxGnIE-eEMwNyvOEb1NdZMAPBeSQ-HrME1haIOxA",
+    "image": "https://arweave.net/NkXul8Lsv3LGGkwMt5LJ7USOZ_GaVcBx9SimH7zObbI",
+    "image_url": "https://arweave.net/NkXul8Lsv3LGGkwMt5LJ7USOZ_GaVcBx9SimH7zObbI",
     "image_details": {
-      "size": 3070599,
+      "size": 2780151,
       "type": "image/jpeg",
       "width": 3000,
       "height": 2000,
-      "sha256": "88c84df0192ae34918b03631d49eba04cd03eb1c7f9866a4f77519c1fe97dc3e"
+      "sha256": "bb6e6b60a5ed05f873c60d85af676b73746264ac6d4e4e3b648692d8696bd3df"
     }
   }
 }
