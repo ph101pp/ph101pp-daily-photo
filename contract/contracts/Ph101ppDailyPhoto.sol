@@ -28,7 +28,8 @@ contract Ph101ppDailyPhoto is
 
     uint[][] private _initialSupplies;
     uint[] private _initialSupplyRange;
-    string[] private _permanentUris;
+    string[] internal _permanentUris;
+    uint[] internal _permanentUriRange;
     string private _proxyUri;
 
     uint public lastRangeTokenIdWithPermanentUri;
@@ -52,6 +53,8 @@ contract Ph101ppDailyPhoto is
         _initialSupplies.push([2, 3]);
 
         _permanentUris.push(newPermanentUri);
+        _permanentUriRange.push(0);
+
         _proxyUri = newProxyUri;
         _owner = msg.sender;
         _setDefaultRoyalty(msg.sender, 500);
@@ -132,12 +135,24 @@ contract Ph101ppDailyPhoto is
         return _proxyUri;
     }
 
+    function permanentBaseUri(
+        uint tokenId
+    ) public view returns (string memory) {
+        require(tokenId <= lastRangeTokenIdWithPermanentUri);
+        uint permanentUriIndex = _findInRange(_permanentUriRange, tokenId);
+        return _permanentUris[permanentUriIndex];
+    }
+
     function permanentBaseUri() public view returns (string memory) {
         return _permanentUris[_permanentUris.length - 1];
     }
 
-    function permanentBaseUriHistory() public view returns (string[] memory) {
-        return _permanentUris;
+    function permanentBaseUriHistory()
+        public
+        view
+        returns (string[] memory, uint256[] memory)
+    {
+        return (_permanentUris, _permanentUriRange);
     }
 
     function setPermanentBaseUriUpTo(
@@ -146,9 +161,10 @@ contract Ph101ppDailyPhoto is
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
         require(
             validUpToTokenId > lastRangeTokenIdWithPermanentUri,
-            "Error: TokenId must be larger than lastTokenIdWithValidPermanentUri."
+            "Error: TokenId <= lastTokenIdWithValidPermanentUri."
         );
         _permanentUris.push(newUri);
+        _permanentUriRange.push(lastRangeTokenIdWithPermanentUri + 1);
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
     }
 
