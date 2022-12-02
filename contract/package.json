@@ -2,6 +2,7 @@
   "scripts": {
     "test": "npx hardhat test",
     "test-gas": "REPORT_GAS=true npx hardhat test",
+    "test-size": "npx hardhat size-contracts",
     "test-fast": "TS_NODE_TYPE_CHECK=false npx hardhat test",
     "deploy-test": "npx hardhat run scripts/deploy.ts",
     "deploy-goerli": "npm run test && npx hardhat run scripts/deploy.ts --network goerli",
@@ -15,7 +16,9 @@
     "@openzeppelin/contracts": "^4.7.3",
     "dotenv": "^16.0.2",
     "hardhat": "^2.11.1",
-    "hardhat-gas-reporter": "^1.0.9"
+    "hardhat-contract-sizer": "^2.6.1",
+    "hardhat-gas-reporter": "^1.0.9",
+    "typescript": "^4.9.3"
   },
   "dependencies": {
     "operator-filter-registry": "^1.2.1"
