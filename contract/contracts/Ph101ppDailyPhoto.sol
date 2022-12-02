@@ -45,7 +45,7 @@ contract Ph101ppDailyPhoto is
         _grantRole(CLAIM_MINTER_ROLE, msg.sender);
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
-        _registerToOpenseaOperatorFilterRegistry(true);
+        _subscribeToOpenseaOperatorFilterRegistry();
 
         // set initial max supply to 2-3;
         _initialSupplyRange.push(0);

@@ -29,33 +29,20 @@ abstract contract OpenseaOperatorFilterer {
     function owner() public virtual returns (address);
 
     // Register contract with OperatorFilterRegistry
-    // and copy / subscribe to OpenSea Curated Subscription
+    // and subscribe to OpenSea Curated Subscription
     // Currently (Nov 22) this makes sense for mostly everyone.
-    function _registerToOpenseaOperatorFilterRegistry(bool subscribe)
-        internal
-        virtual
-    {
-        if (subscribe) {
-            IOperatorFilterRegistry(operatorFilterRegistry)
-                .registerAndSubscribe(
-                    address(this),
-                    openseaSubscriptionAddress
-                );
-        } else {
-            IOperatorFilterRegistry(operatorFilterRegistry)
-                .registerAndCopyEntries(
-                    address(this),
-                    openseaSubscriptionAddress
-                );
-        }
+    function _subscribeToOpenseaOperatorFilterRegistry() internal virtual {
+        IOperatorFilterRegistry(operatorFilterRegistry).registerAndSubscribe(
+            address(this),
+            openseaSubscriptionAddress
+        );
     }
 
-    // Enables updating registry contract address 
+    // Enables updating registry contract address
     // (requires manual registering / unregistring with Registry)
-    function _setOperatorFilterRegistry(address _operatorFilterRegistry)
-        internal
-        virtual
-    {
+    function _setOperatorFilterRegistry(
+        address _operatorFilterRegistry
+    ) internal virtual {
         require(!isOperatorFilterPermanentlyDisabled, "Permanently disabled");
         operatorFilterRegistry = _operatorFilterRegistry;
     }
