@@ -10,8 +10,6 @@ import "./ERC1155MintRangePausable.sol";
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
  */
 abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
-    string private constant ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT =
-        "Invalid input. Use _verifyUpdateInitialHolderRangeInput().";
     string private constant ERROR_CANT_UPDATE_LOCKED_HOLDERS =
         "Error: Can't update locked initial holders.";
     // used to check validity of updateInitialHolderRangeInput
@@ -93,7 +91,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         );
         require(
             inputChecksum == checksum,
-            ERROR_INVALID_UPDATE_INITIAL_HOLDER_RANGE_INPUT
+            "Invalid input. Use _verifyUpdateInitialHolderRangeInput()."
         );
 
         address[][] memory localInitialHoders = _initialHolders;

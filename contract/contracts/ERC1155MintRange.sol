@@ -10,8 +10,6 @@ import "./ERC1155_.sol";
  * and adds tracking of total supply per id.
  */
 abstract contract ERC1155MintRange is ERC1155_ {
-    string private constant ERROR_INVALID_MINT_RANGE_INPUT =
-        "Invalid input. Use getMintRangeInput()";
 
     // Mapping from token ID to balancesInitialzed flag
     mapping(uint => mapping(address => bool)) public isBalanceInitialized;
@@ -146,9 +144,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
     function _maybeInitializeBalance(address account, uint id) private {
         if (
             account != address(0) &&
-            _inRange(id) &&
             !isBalanceInitialized[id][account] &&
             !isManualMint[id] &&
+            _inRange(id) &&
             isInitialHolderOf(account, id)
         ) {
             uint balance = initialBalanceOf(account, id);
@@ -302,7 +300,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 _customMintRangeChecksum()
             )
         );
-        require(inputChecksum == checksum, ERROR_INVALID_MINT_RANGE_INPUT);
+        require(inputChecksum == checksum, "Invalid input. Use getMintRangeInput()");
 
         lastRangeTokenIdMinted = ids[ids.length - 1];
 

@@ -30,7 +30,7 @@ abstract contract OpenseaOperatorFilterer {
 
     // Register contract with OperatorFilterRegistry
     // and subscribe to OpenSea Curated Subscription
-    // Currently (Nov 22) this makes sense for mostly everyone.
+    // Currently (Nov 2022) this makes sense for mostly everyone.
     function _subscribeToOpenseaOperatorFilterRegistry() internal virtual {
         IOperatorFilterRegistry(operatorFilterRegistry).registerAndSubscribe(
             address(this),
@@ -40,6 +40,7 @@ abstract contract OpenseaOperatorFilterer {
 
     // Enables updating registry contract address
     // (requires manual registering / unregistring with Registry)
+    // set to address(0) to disable operator filtering 
     function _setOperatorFilterRegistry(
         address _operatorFilterRegistry
     ) internal virtual {

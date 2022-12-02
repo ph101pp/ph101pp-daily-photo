@@ -14,8 +14,6 @@ contract Ph101ppDailyPhoto is
     AccessControl,
     OpenseaOperatorFilterer
 {
-    string private constant ERROR_NO_INITIAL_SUPPLY =
-        "No max initial supply set. Use setMaxInitialSupply()";
     uint public constant START_DATE = 1661990400; // Sept 1, 2022
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
     bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
@@ -28,8 +26,8 @@ contract Ph101ppDailyPhoto is
 
     uint[][] private _initialSupplies;
     uint[] private _initialSupplyRange;
-    string[] internal _permanentUris;
-    uint[] internal _permanentUriRange;
+    string[] private _permanentUris;
+    uint[] private _permanentUriRange;
     string private _proxyUri;
 
     uint public lastRangeTokenIdWithPermanentUri;
@@ -42,6 +40,8 @@ contract Ph101ppDailyPhoto is
         string memory newPermanentUri,
         address[] memory initialHolders
     ) ERC1155_("") ERC1155MintRange(initialHolders) {
+        // require(initialHolders.length == 2);
+
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(CLAIM_MINTER_ROLE, msg.sender);
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
