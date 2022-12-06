@@ -1,6 +1,7 @@
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box, Button } from "@mui/material";
 import { MetadataType } from "../utils/getBaseMetadata";
 import Image from "next/image";
+import arweaveUrl from "./_helpers/arweaveUrl";
 
 const ExistingToken = ({ tokenMetadata }: { tokenMetadata: MetadataType }) => {
   const maxSize = 500;
@@ -22,8 +23,9 @@ const ExistingToken = ({ tokenMetadata }: { tokenMetadata: MetadataType }) => {
         >
           {tokenMetadata.image &&
             <Image
+              alt="image"
               layout={"fixed"}
-              src={tokenMetadata.image}
+              src={arweaveUrl(tokenMetadata.image)}
               height={height}
               width={width}
             />

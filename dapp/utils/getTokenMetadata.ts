@@ -20,8 +20,8 @@ export default function getTokenMetadata({
   const baseMetadata = getBaseMetadata(dateString, tokenIndex);
   return {
     "description": `${description}`,
-    "image": `https://arweave.net/${imageTx}`,
-    "image_url": `https://arweave.net/${imageTx}`,
+    "image": `ar://${imageTx}`,
+    "image_url": `ar://${imageTx}`,
     ...baseMetadata,
     attributes: [
       {

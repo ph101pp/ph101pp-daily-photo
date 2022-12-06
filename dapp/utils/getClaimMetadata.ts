@@ -16,8 +16,8 @@ export default function getClaimMetadata(): MetadataType {
         "value": "Claim"
       },
     ],
-    "image": "https://arweave.net/h0VC9yAnIrT5WJTWBYJNF30Np1tTMEeqoUeX818k_Q8",
-    "image_url": "https://arweave.net/h0VC9yAnIrT5WJTWBYJNF30Np1tTMEeqoUeX818k_Q8",
+    "image": "ar://h0VC9yAnIrT5WJTWBYJNF30Np1tTMEeqoUeX818k_Q8",
+    "image_url": "ar://h0VC9yAnIrT5WJTWBYJNF30Np1tTMEeqoUeX818k_Q8",
     "image_details": {
       "size": 7545841,
       "type": "image/jpeg",
