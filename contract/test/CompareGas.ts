@@ -159,7 +159,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
   it("mintRange() transfer() transfer()", async function () {
     const { erc, c1, c2, pdp, treasury, account1, account2 } = await loadFixture(deployFixture);
 
-    await pdp.setMaxInitialSupply(1);
+    await pdp.setInitialSupply([1, 1]);
     await c1.setInitialHolders([account1.address]);
     await c2.setInitialHolders([account1.address]);
 

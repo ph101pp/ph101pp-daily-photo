@@ -77,24 +77,38 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       const history = await c.permanentBaseUriHistory();
       expect(history.length).to.equal(2);
-      expect(history[0]).to.equal(immutableUri);
-      expect(history[1]).to.equal(immutableUri2);
+      const urls = history[0];
+      expect(urls.length).to.equal(2);
+      expect(urls[0]).to.equal(immutableUri);
+      expect(urls[1]).to.equal(immutableUri2);
+
+      expect(history[1][0]).to.equal(0)
+      expect(history[1][1]).to.equal(1)
+      expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(100);
 
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
 
-      const histor2 = await c.permanentBaseUriHistory();
-      expect(histor2.length).to.equal(3);
-      expect(histor2[0]).to.equal(immutableUri);
-      expect(histor2[1]).to.equal(immutableUri2);
-      expect(histor2[2]).to.equal(immutableUri3);
+      const history2 = await c.permanentBaseUriHistory();
+      expect(history2.length).to.equal(2);
+      const urls2 = history2[0];
+      expect(urls2.length).to.equal(3);
+      expect(urls2[0]).to.equal(immutableUri);
+      expect(urls2[1]).to.equal(immutableUri2);
+      expect(urls2[2]).to.equal(immutableUri3);
+
+      expect(history2[1][0]).to.equal(0)
+      expect(history2[1][1]).to.equal(1)
+      expect(history2[1][2]).to.equal(101)
+      expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(101);
     });
 
     it("Should require new permanentUri via setPermanentBaseUriUpTo() to be valid for more tokenIds than the last one.", async function () {
       const immutableUri2 = "2.immutable.uri";
       const immutableUri3 = "3.immutable.uri";
       const { c, owner } = await loadFixture(deployFixture);
-      const tx = await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Error: TokenId must be larger than lastTokenIdWithValidPermanentUri.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("Error: TokenId <= lastTokenIdWithValidPermanentUri.");
+      await c.setPermanentBaseUriUpTo(immutableUri2, 100);
+      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Error: TokenId <= lastTokenIdWithValidPermanentUri.");
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
     });
   });
@@ -147,13 +161,14 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     ]
 
     async function testDate2TokenID(c: Ph101ppDailyPhoto, test: TokenIdTest) {
-      const [year, month, day] = await c.tokenIdToDate(test.tokenID);
-      const tokenId = await c.tokenIdFromDate(test.year, test.month, test.day);
+      const tokenSlug1 = await c.tokenSlugFromTokenId(test.tokenID);
+      const tokenSlug2 = await c.tokenSlugFromDate(test.year, test.month, test.day);
 
-      expect(year).to.equal(test.year);
-      expect(month).to.equal(test.month);
-      expect(day).to.equal(test.day);
-      assert(tokenId.eq(test.tokenID), `${tokenId.toString()} === ${test.tokenID}`)
+      expect(tokenSlug1).to.equal(tokenSlug2);
+      expect(tokenSlug1).to.include(test.month);
+      expect(tokenSlug1).to.include(test.year);
+      expect(tokenSlug1).to.include(test.day);
+      expect(tokenSlug1).to.include(test.tokenID);
     }
 
     it("should correcty convert date string <> token ID", async function () {
@@ -162,35 +177,31 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       for (const i in tokenIDTests) {
         await testDate2TokenID(c, tokenIDTests[i]);
       }
-    });
-
-    it("should fail to translate tokenID:0 (claims) to date", async function () {
-      const { c } = await loadFixture(deployFixture);
-      await expect(
-        c.tokenIdToDate(0)
-      ).to.be.revertedWith('No date associated with claims!');
+      expect(
+        await c.tokenSlugFromTokenId(0)
+      ).to.include('CLAIM-0');
     });
 
     it("should fail to translate date before Sept 1, 2022 to tokenId", async function () {
       const { c } = await loadFixture(deployFixture);
       await expect(
-        c.tokenIdFromDate(2022, 8, 1)
+        c.tokenSlugFromDate(2022, 8, 1)
       ).to.be.revertedWith('Invalid date! Project started September 1, 2022!');
     });
 
     it("should fail to translate date if invalid date (incl leap years)", async function () {
       const { c } = await loadFixture(deployFixture);
       await expect(
-        c.tokenIdFromDate(5138, 13, 17)
+        c.tokenSlugFromDate(5138, 13, 17)
       ).to.be.revertedWith('Invalid date!');
       await expect(
-        c.tokenIdFromDate(2023, 2, 29)
+        c.tokenSlugFromDate(2023, 2, 29)
       ).to.be.revertedWith('Invalid date!');
       await expect(
-        c.tokenIdFromDate(2025, 2, 29)
+        c.tokenSlugFromDate(2025, 2, 29)
       ).to.be.revertedWith('Invalid date!');
       assert(
-        await c.tokenIdFromDate(2024, 2, 29),
+        await c.tokenSlugFromDate(2024, 2, 29),
         "20240229 should be valid date");
     });
   });
@@ -206,7 +217,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       const { c, mutableUri } = await loadFixture(deployFixture);
 
-      expect(await c.uri(tokenId)).to.equal(mutableUri + tokenDate + "-" + tokenId +  ".json");
+      expect(await c.uri(tokenId)).to.equal(mutableUri + tokenDate + "-" + tokenId + ".json");
     });
 
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
@@ -355,6 +366,17 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
   })
 
   describe("Mint Photos", function () {
+    it("should fail to mint <= 0 tokens", async function () {
+      const { c, vault, treasury } = await loadFixture(deployFixture);
+
+      expect(await c.lastRangeTokenIdMinted()).to.equal(0);
+      await c.setInitialSupply([1, 2]);
+      await expect(c.getMintRangeInput(-1)).to.be.rejected;
+    
+      const input = await c.getMintRangeInput(0);
+      await expect(c.mintPhotos(...input)).to.be.rejected;
+    });
+
     it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { c, vault, treasury } = await loadFixture(deployFixture);
       const photos = 100;

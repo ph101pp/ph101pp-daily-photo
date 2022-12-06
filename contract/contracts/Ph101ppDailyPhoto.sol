@@ -92,55 +92,33 @@ contract Ph101ppDailyPhoto is
     ///////////////////////////////////////////////////////////////////////////////
 
     function uri(uint tokenId) public view override returns (string memory) {
-        string memory tokenDate;
         string memory currentUri;
-        // token...
-        if (tokenId == CLAIM_TOKEN_ID) {
-            // ... is claim -> return claim
-            tokenDate = _CLAIM_TOKEN;
+
+        if (exists(tokenId) && lastRangeTokenIdWithPermanentUri >= tokenId) {
+            // ... uri updated since token -> immutable uri
             currentUri = permanentBaseUri();
         } else {
-            (uint year, uint month, uint day) = tokenIdToDate(tokenId);
-
-            tokenDate = string.concat(
-                Strings.toString(year),
-                month <= 9 ? "0" : "",
-                Strings.toString(month),
-                day <= 9 ? "0" : "",
-                Strings.toString(day)
-            );
-
-            if (
-                exists(tokenId) && lastRangeTokenIdWithPermanentUri >= tokenId
-            ) {
-                // ... uri updated since token -> immutable uri
-                currentUri = permanentBaseUri();
-            } else {
-                // ... uri not yet updated since token -> mutable uri
-                currentUri = proxyBaseUri();
-            }
+            // ... uri not yet updated since token -> mutable uri
+            currentUri = proxyBaseUri();
         }
 
         return
-            string.concat(
-                currentUri,
-                tokenDate,
-                "-",
-                Strings.toString(tokenId),
-                ".json"
-            );
+            string.concat(currentUri, tokenSlugFromTokenId(tokenId), ".json");
     }
 
     function proxyBaseUri() public view returns (string memory) {
         return _proxyUri;
     }
 
-    function permanentBaseUri(
-        uint tokenId
-    ) public view returns (string memory) {
+    function firstPermanentUri(uint tokenId) public view returns (string memory) {
         require(tokenId <= lastRangeTokenIdWithPermanentUri);
         uint permanentUriIndex = _findInRange(_permanentUriRange, tokenId);
-        return _permanentUris[permanentUriIndex];
+        return
+            string.concat(
+                _permanentUris[permanentUriIndex],
+                tokenSlugFromTokenId(tokenId),
+                ".json"
+            );
     }
 
     function permanentBaseUri() public view returns (string memory) {
@@ -259,7 +237,7 @@ contract Ph101ppDailyPhoto is
     }
 
     /**
-     * @dev Returns max initial supply of a token.
+     * @dev Returns initial supply of a token.
      */
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
         uint supplyIndex = _findInRange(_initialSupplyRange, tokenId);
@@ -267,7 +245,7 @@ contract Ph101ppDailyPhoto is
     }
 
     /**
-     * @dev Returns max initial supply of a token.
+     * @dev Returns initial supply of future tokens.
      */
     function initialSupply() public view returns (uint[] memory) {
         return _initialSupplies[_initialSupplies.length - 1];
@@ -365,44 +343,59 @@ contract Ph101ppDailyPhoto is
     ///////////////////////////////////////////////////////////////////////////////
     // Token ID < > Date helpers
     ///////////////////////////////////////////////////////////////////////////////
-    function tokenIdToDate(
+    function tokenSlugFromTokenId(
         uint tokenId
-    ) public pure returns (uint year, uint month, uint day) {
-        require(tokenId > 0, "No date associated with claims!"); // No date associated with claims!
-        uint tokenTimestamp = _timestampFromTokenId(tokenId);
-        return _timestampToDate(tokenTimestamp);
+    ) public pure returns (string memory tokenSlug) {
+        if (tokenId == CLAIM_TOKEN_ID) {
+            return
+                string.concat(
+                    _CLAIM_TOKEN,
+                    "-",
+                    Strings.toString(CLAIM_TOKEN_ID)
+                );
+        }
+        (uint year, uint month, uint day) = DateTime.timestampToDate(
+            START_DATE + ((tokenId - 1) * 1 days)
+        );
+        return _tokenSlug(tokenId, year, month, day);
     }
 
-    function tokenIdFromDate(
+    function tokenSlugFromDate(
         uint year,
         uint month,
         uint day
-    ) public pure returns (uint tokenId) {
+    ) public pure returns (string memory tokenSlug) {
         require(DateTime.isValidDate(year, month, day), "Invalid date!");
         uint tokenTimestamp = DateTime.timestampFromDate(year, month, day);
         require(
             tokenTimestamp >= START_DATE,
             "Invalid date! Project started September 1, 2022!"
         );
-        return _timestampToTokenId(tokenTimestamp);
+        return
+            _tokenSlug(
+                (((tokenTimestamp - START_DATE) / 1 days) + 1),
+                year,
+                month,
+                day
+            );
     }
 
-    function _timestampToDate(
-        uint timestamp
-    ) private pure returns (uint year, uint month, uint day) {
-        return DateTime.timestampToDate(timestamp);
-    }
-
-    function _timestampFromTokenId(
-        uint tokenId
-    ) private pure returns (uint timestamp) {
-        return START_DATE + ((tokenId - 1) * 1 days);
-    }
-
-    function _timestampToTokenId(
-        uint timestamp
-    ) private pure returns (uint tokenId) {
-        return ((timestamp - START_DATE) / 1 days) + 1;
+    function _tokenSlug(
+        uint tokenId,
+        uint year,
+        uint month,
+        uint day
+    ) private pure returns (string memory tokenSlug) {
+        return
+            string.concat(
+                Strings.toString(year),
+                month <= 9 ? "0" : "",
+                Strings.toString(month),
+                day <= 9 ? "0" : "",
+                Strings.toString(day),
+                "-",
+                Strings.toString(tokenId)
+            );
     }
 
     ///////////////////////////////////////////////////////////////////////////////
