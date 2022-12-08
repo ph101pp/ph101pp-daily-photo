@@ -38,7 +38,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
 
   if (zeroMinted) {
     for (let i = from; i <= too; i++) {
-      const currentInitialHolders = await c["initialHolders(uint256)"](i);
+      const currentInitialHolders = await c.initialHolders(i);
 
       const balances = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
       const isManuallyMinted = await c.isManualMint(i);

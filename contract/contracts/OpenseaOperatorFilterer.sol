@@ -16,27 +16,14 @@ import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFil
 abstract contract OpenseaOperatorFilterer {
     error OperatorNotAllowed(address operator);
 
-    bool public isOperatorFilterPermanentlyDisabled;
+    bool public isOperatorFilterRegistryPermanentlyFrozen;
 
     // Default: OpenSea OperatorFilterRegistry contract
     address public operatorFilterRegistry =
         0x000000000000AAeB6D7670E522A718067333cd4E;
-    // OpenSea Curated Subscription Address
-    address constant openseaSubscriptionAddress =
-        0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6;
 
     // required as authority to make updates to OperatorFilterRegistry for this contract.
     function owner() public virtual returns (address);
-
-    // Register contract with OperatorFilterRegistry
-    // and subscribe to OpenSea Curated Subscription
-    // Currently (Nov 2022) this makes sense for mostly everyone.
-    function _subscribeToOpenseaOperatorFilterRegistry() internal virtual {
-        IOperatorFilterRegistry(operatorFilterRegistry).registerAndSubscribe(
-            address(this),
-            openseaSubscriptionAddress
-        );
-    }
 
     // Enables updating registry contract address
     // (requires manual registering / unregistring with Registry)
@@ -44,14 +31,13 @@ abstract contract OpenseaOperatorFilterer {
     function _setOperatorFilterRegistry(
         address _operatorFilterRegistry
     ) internal virtual {
-        require(!isOperatorFilterPermanentlyDisabled, "Permanently disabled");
+        require(!isOperatorFilterRegistryPermanentlyFrozen, "Permanently frozen");
         operatorFilterRegistry = _operatorFilterRegistry;
     }
 
-    // Permanently disable filtering.
-    function _permanentlyDisableOperatorFilter() internal virtual {
-        isOperatorFilterPermanentlyDisabled = true;
-        operatorFilterRegistry = address(0);
+    // Permanently freeze filter registry address.
+    function _permanentlyFreezeOperatorFilterRegistry() internal virtual {
+        isOperatorFilterRegistryPermanentlyFrozen = true;
     }
 
     function _isOperatorAllowed(address operator) private view {

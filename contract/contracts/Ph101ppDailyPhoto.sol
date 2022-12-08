@@ -46,7 +46,6 @@ contract Ph101ppDailyPhoto is
         _grantRole(CLAIM_MINTER_ROLE, msg.sender);
         _grantRole(PHOTO_MINTER_ROLE, msg.sender);
         _grantRole(URI_UPDATER_ROLE, msg.sender);
-        _subscribeToOpenseaOperatorFilterRegistry();
 
         // set initial max supply to 2-3;
         _initialSupplyRange.push(0);
@@ -110,8 +109,7 @@ contract Ph101ppDailyPhoto is
             currentUri = proxyBaseUri();
         }
 
-        return
-            string.concat(currentUri, tokenSlugFromTokenId(tokenId), ".json");
+        return string.concat(currentUri, tokenSlugFromTokenId(tokenId), ".json");
     }
 
     // Returns proxy base Uri that is used for
@@ -120,18 +118,21 @@ contract Ph101ppDailyPhoto is
         return _proxyUri;
     }
 
-    // Returns first permanent Uri that included tokenId
-    function firstPermanentUri(
-        uint tokenId
-    ) public view returns (string memory) {
+    function uriHistory(uint tokenId) public view returns (string[] memory) {
         require(tokenId <= lastRangeTokenIdWithPermanentUri);
         uint permanentUriIndex = _findInRange(_permanentUriRange, tokenId);
-        return
-            string.concat(
-                _permanentUris[permanentUriIndex],
-                tokenSlugFromTokenId(tokenId),
+        string memory slug = tokenSlugFromTokenId(tokenId);
+        string[] memory history = new string[](
+            _permanentUris.length - permanentUriIndex
+        );
+        for (uint i = permanentUriIndex; i < _permanentUris.length; i++) {
+            history[i - permanentUriIndex] = string.concat(
+                _permanentUris[i],
+                slug,
                 ".json"
             );
+        }
+        return history;
     }
 
     // Returns latest permanent base Uri
@@ -268,11 +269,6 @@ contract Ph101ppDailyPhoto is
         return _initialSupplies[supplyIndex];
     }
 
-    // Returns current initial supply for next mint
-    function initialSupply() public view returns (uint[] memory) {
-        return _initialSupplies[_initialSupplies.length - 1];
-    }
-
     ///////////////////////////////////////////////////////////////////////////////
     // Initial Holders
     ///////////////////////////////////////////////////////////////////////////////
@@ -399,7 +395,7 @@ contract Ph101ppDailyPhoto is
         uint tokenTimestamp = DateTime.timestampFromDate(year, month, day);
         require(
             tokenTimestamp >= START_DATE,
-            "Invalid date! Project started September 1, 2022!"
+            "Project started September 1, 2022!"
         );
         return
             _tokenSlug(
@@ -453,13 +449,13 @@ contract Ph101ppDailyPhoto is
         _setOperatorFilterRegistry(_operatorFilterRegistry);
     }
 
-    // Defensive Coding: Permanently disable OperatorFilterRegistry checks.
-    function permanentlyDisableOperatorFilter()
+    // Defensive Coding: Permanently freeze operator filter registry address
+    function permanentlyFreezeOperatorFilterRegistry()
         public
         whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        _permanentlyDisableOperatorFilter();
+        _permanentlyFreezeOperatorFilterRegistry();
     }
 
     ///////////////////////////////////////////////////////////////////////////////

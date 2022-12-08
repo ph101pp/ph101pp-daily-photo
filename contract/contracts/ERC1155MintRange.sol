@@ -199,13 +199,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
-     * @dev Return current initial holders
-     */
-    function initialHolders() public view virtual returns (address[] memory) {
-        return _initialHolders[_initialHolders.length - 1];
-    }
-
-    /**
      * @dev Returns true if address is an initial holder of tokenId
      */
     function isInitialHolderOf(address account, uint tokenId)
@@ -245,7 +238,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         )
     {
         uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
-        address[] memory holders = initialHolders();
+        address[] memory holders = initialHolders(firstId);
         uint[] memory ids = new uint[](numberOfTokens);
         uint[][] memory amounts = new uint[][](holders.length);
 
@@ -287,7 +280,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint[][] memory amounts,
         bytes32 inputChecksum
     ) internal virtual {
-        address[] memory addresses = initialHolders();
+        address[] memory addresses = initialHolders(ids[0]);
 
         bytes32 checksum = keccak256(
             abi.encode(
