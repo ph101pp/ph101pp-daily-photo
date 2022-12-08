@@ -65,13 +65,18 @@ contract Ph101ppDailyPhoto is
     // Token Balances
     ///////////////////////////////////////////////////////////////////////////////
 
+    // Defines initial balances for "lazy" minted photo nfts
     function initialBalanceOf(
         address account,
         uint tokenId
     ) internal view override returns (uint) {
         address[] memory addresses = initialHolders(tokenId);
+
+        // if account is treasury account:
         if (account == addresses[TREASURY_ID]) {
             uint[] memory _initialSupply = initialSupply(tokenId);
+
+            // calculate deterministic random initial balance between min / max initialSupply.
             uint supply = (uint(
                 keccak256(abi.encode(tokenId, address(this), _initialSupply))
             ) % (_initialSupply[1] - _initialSupply[0] + 1)) +
@@ -80,10 +85,12 @@ contract Ph101ppDailyPhoto is
             return supply;
         }
 
+        // if account is vault account initial balance is 1
         if (account == addresses[VAULT_ID]) {
             return 1;
         }
 
+        // all other accounts have no initial balance
         return 0;
     }
 
@@ -91,6 +98,7 @@ contract Ph101ppDailyPhoto is
     // Uris
     ///////////////////////////////////////////////////////////////////////////////
 
+    // Returns permanent uri where already available, otherwise proxy uri.
     function uri(uint tokenId) public view override returns (string memory) {
         string memory currentUri;
 
@@ -106,11 +114,16 @@ contract Ph101ppDailyPhoto is
             string.concat(currentUri, tokenSlugFromTokenId(tokenId), ".json");
     }
 
+    // Returns proxy base Uri that is used for
+    // tokens not included in the permanent Uris yet.
     function proxyBaseUri() public view returns (string memory) {
         return _proxyUri;
     }
 
-    function firstPermanentUri(uint tokenId) public view returns (string memory) {
+    // Returns first permanent Uri that included tokenId
+    function firstPermanentUri(
+        uint tokenId
+    ) public view returns (string memory) {
         require(tokenId <= lastRangeTokenIdWithPermanentUri);
         uint permanentUriIndex = _findInRange(_permanentUriRange, tokenId);
         return
@@ -121,10 +134,12 @@ contract Ph101ppDailyPhoto is
             );
     }
 
+    // Returns latest permanent base Uri
     function permanentBaseUri() public view returns (string memory) {
         return _permanentUris[_permanentUris.length - 1];
     }
 
+    // Returns all historical permanent base Uris for the record.
     function permanentBaseUriHistory()
         public
         view
@@ -133,6 +148,8 @@ contract Ph101ppDailyPhoto is
         return (_permanentUris, _permanentUriRange);
     }
 
+    // Updates latest permanent base Uri.
+    // New uri must include more token Ids than previous one.
     function setPermanentBaseUriUpTo(
         string memory newUri,
         uint validUpToTokenId
@@ -146,6 +163,8 @@ contract Ph101ppDailyPhoto is
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
     }
 
+    // Update proxy base Uri that is used for
+    // tokens not included in the permanent Uris yet.
     function setProxyBaseUri(
         string memory newProxyUri
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
@@ -156,6 +175,7 @@ contract Ph101ppDailyPhoto is
     // Claims
     ///////////////////////////////////////////////////////////////////////////////
 
+    // Mint new claims to a wallet.
     function mintClaims(
         address to,
         uint amount
@@ -163,6 +183,7 @@ contract Ph101ppDailyPhoto is
         _mint(to, CLAIM_TOKEN_ID, amount, "");
     }
 
+    // Redeem a claim token for a photo nft (1:1).
     function redeemClaim(uint tokenId) public {
         address[] memory initialHolders = initialHolders(tokenId);
         _burn(msg.sender, CLAIM_TOKEN_ID, 1);
@@ -175,6 +196,7 @@ contract Ph101ppDailyPhoto is
         );
     }
 
+    // Redeem multiple claim tokens for photo nfts (n:n).
     function redeemClaimBatch(
         uint[] memory tokenIds,
         uint[] memory amounts
@@ -198,6 +220,8 @@ contract Ph101ppDailyPhoto is
     // Mint Photos (Mint Range)
     ///////////////////////////////////////////////////////////////////////////////
 
+    // Lazy mint a new batch of unrevealed / future photos.
+    // Use getMintRangeInput(uint numberOfTokens) to generate input.
     function mintPhotos(
         uint[] memory ids,
         uint[][] memory amounts,
@@ -206,6 +230,7 @@ contract Ph101ppDailyPhoto is
         _mintRange(ids, amounts, checkSum);
     }
 
+    // ensures MintRangeInput get invalidated when initial supply changes
     function _customMintRangeChecksum()
         internal
         view
@@ -219,6 +244,7 @@ contract Ph101ppDailyPhoto is
     // Initial Supply
     ///////////////////////////////////////////////////////////////////////////////
 
+    // Update initial supply range [min, max] for future mints.
     function setInitialSupply(
         uint[] memory newInitialSupply
     ) public whenNotPaused onlyRole(PHOTO_MINTER_ROLE) {
@@ -236,17 +262,13 @@ contract Ph101ppDailyPhoto is
         _initialSupplies.push(newInitialSupply);
     }
 
-    /**
-     * @dev Returns initial supply of a token.
-     */
+    // Returns initial supply range that was used for a tokenId.
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
         uint supplyIndex = _findInRange(_initialSupplyRange, tokenId);
         return _initialSupplies[supplyIndex];
     }
 
-    /**
-     * @dev Returns initial supply of future tokens.
-     */
+    // Returns current initial supply for next mint
     function initialSupply() public view returns (uint[] memory) {
         return _initialSupplies[_initialSupplies.length - 1];
     }
@@ -255,6 +277,7 @@ contract Ph101ppDailyPhoto is
     // Initial Holders
     ///////////////////////////////////////////////////////////////////////////////
 
+    // Update initial holder accounts for future mints.
     function setInitialHolders(
         address treasury,
         address vault
@@ -265,15 +288,12 @@ contract Ph101ppDailyPhoto is
         _setInitialHolders(addresses);
     }
 
-    /**
-     * @dev Lock initial holders up to tokenid
-     */
-    function setLockInitialHoldersUpTo(
-        uint256 tokenId
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        _setLockInitialHoldersUpTo(tokenId);
-    }
-
+    // Update initial holder accounts for existing mints.
+    // This method allows unsold & never transfered & non-locked tokens
+    // in the treasury & vault to be moved to new treasury & vault
+    // wallets without having to transfer them through ERC1155.
+    // This method doesnt affect ERC1155.balances, so tokens that
+    // have been sold or transfered before can't ever be affected by this method.
     function updateInitialHoldersRange(
         address[] memory fromAddresses,
         address[] memory toAddresses,
@@ -295,6 +315,15 @@ contract Ph101ppDailyPhoto is
         );
     }
 
+    // Defensive coding: Lock initial holders up to tokenId
+    // so they cant be updated via updateInitialHoldersRange.
+    function setLockInitialHoldersUpTo(
+        uint256 tokenId
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setLockInitialHoldersUpTo(tokenId);
+    }
+
+    // Defensive coding: Permanently disable updateInitialHoldersRange.
     function permanentlyDisableInitialHoldersRangeUpdate()
         public
         whenNotPaused
@@ -304,7 +333,7 @@ contract Ph101ppDailyPhoto is
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // Royalties
+    // ERC2981 Royalties
     ///////////////////////////////////////////////////////////////////////////////
 
     function setDefaultRoyalty(
@@ -343,6 +372,7 @@ contract Ph101ppDailyPhoto is
     ///////////////////////////////////////////////////////////////////////////////
     // Token ID < > Date helpers
     ///////////////////////////////////////////////////////////////////////////////
+
     function tokenSlugFromTokenId(
         uint tokenId
     ) public pure returns (string memory tokenSlug) {
@@ -402,26 +432,28 @@ contract Ph101ppDailyPhoto is
     // Opensea Operator Filterer
     ///////////////////////////////////////////////////////////////////////////////
 
+    // Owner can be used to make updates (register / subscribe)
+    // to the OperatorFilterRegistry on behalf of this contract.
     function owner() public view override returns (address) {
         return _owner;
     }
 
-    /**
-     * @dev Set new owner. This address will be returned by owner().
-     * Can be used to make updates to the OperatorFilterRegistry on behalf of this contract.
-     */
+    // Set new owner. This address will be returned by owner().
     function setOwner(
         address newOwner
     ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _owner = newOwner;
     }
 
+    // Update address to OperatorFilterRegistry contract.
+    // Set to address(0) to disable registry checks.
     function setOperatorFilterRegistry(
         address _operatorFilterRegistry
     ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _setOperatorFilterRegistry(_operatorFilterRegistry);
     }
 
+    // Defensive Coding: Permanently disable OperatorFilterRegistry checks.
     function permanentlyDisableOperatorFilter()
         public
         whenNotPaused
@@ -429,6 +461,10 @@ contract Ph101ppDailyPhoto is
     {
         _permanentlyDisableOperatorFilter();
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Transfer & Approval modifiers for Opensea Operator Filterer
+    ///////////////////////////////////////////////////////////////////////////////
 
     function setApprovalForAll(
         address operator,

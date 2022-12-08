@@ -26,11 +26,9 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     /**
      * @dev Lock initial holders up to tokenid
      */
-    function _setLockInitialHoldersUpTo(uint256 tokenId)
-        internal
-        virtual
-        whenNotPaused
-    {
+    function _setLockInitialHoldersUpTo(
+        uint256 tokenId
+    ) internal virtual whenNotPaused {
         require(
             tokenId > lastRangeTokenIdWithLockedInitialHolders,
             "Error: Tokens already locked"
@@ -60,7 +58,12 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     /**
      * @dev Implement: May be overwritten to add custom values to checksum test.
      */
-    function _customUpdateInitialHoldersRangeChecksum() internal view virtual returns (bytes32) {
+    function _customUpdateInitialHoldersRangeChecksum()
+        internal
+        view
+        virtual
+        returns (bytes32)
+    {
         return 0x00;
     }
 
@@ -91,7 +94,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         );
         require(
             inputChecksum == checksum,
-            "Invalid input. Use _verifyUpdateInitialHolderRangeInput()."
+            "Invalid input. Use verifyUpdateInitialHolderRangeInput()."
         );
 
         address[][] memory localInitialHoders = _initialHolders;
@@ -146,7 +149,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     }
 
     /**
-     * @dev Verify and hash input updateInitialHolderRangeInput.
+     * @dev Verify and hash input updateInitialHolderRange method.
      */
     function verifyUpdateInitialHolderRangeInput(
         address[] memory fromAddresses,
@@ -191,8 +194,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 require(balanceOf(from, tokenId) >= balance, "E:08");
                 require(isInitialHolderOf(from, tokenId), "E:09");
 
-                if(isZeroLocked) {
-                    require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "E:15");
+                if (isZeroLocked) {
+                    require(
+                        tokenId > lastRangeTokenIdWithLockedInitialHolders,
+                        "E:15"
+                    );
                 }
 
                 uint newInitialHoldersIndex = _findInRange(

@@ -48,6 +48,7 @@ abstract contract OpenseaOperatorFilterer {
         operatorFilterRegistry = _operatorFilterRegistry;
     }
 
+    // Permanently disable filtering.
     function _permanentlyDisableOperatorFilter() internal virtual {
         isOperatorFilterPermanentlyDisabled = true;
         operatorFilterRegistry = address(0);
