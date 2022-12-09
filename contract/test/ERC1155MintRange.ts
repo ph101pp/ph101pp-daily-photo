@@ -272,19 +272,19 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
   });
 
   describe("initialHolders", function () {
-    it("Should return current initial holders when called without params", async function () {
+    it("Should return current initial holders when called with tokenID > number tokens minted", async function () {
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       const initialHolders2 = [account5.address, account6.address, account7.address, account8.address];
 
       await c.setInitialHolders(initialHolders);
 
-      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders);
+      expect(await c.initialHolders(1000)).to.deep.equal(initialHolders);
 
       const inputs = await c.getMintRangeInput(5);
       await c.mintRange(...inputs);
       await c.setInitialHolders(initialHolders2);
-      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders2);
+      expect(await c.initialHolders(1000)).to.deep.equal(initialHolders2);
     });
 
     it("Should return initial holders for tokenId (also after they where updated)", async function () {
@@ -299,18 +299,18 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.setInitialHolders(initialHolders2);
       const inputs2 = await c.getMintRangeInput(5);
       await c.mintRange(...inputs2);
-      expect(await c["initialHolders()"]()).to.deep.equal(initialHolders2);
+      expect(await c.initialHolders(1000)).to.deep.equal(initialHolders2);
 
       for (let i = 0; i < 10; i++) {
         if (i < 5) {
-          expect(await c["initialHolders(uint256)"](i)).to.deep.equal(initialHolders);
+          expect(await c.initialHolders(i)).to.deep.equal(initialHolders);
           for (let h = 0; h < initialHolders.length; h++) {
             expect(await c.isInitialHolderOf(initialHolders[h], i)).to.be.true;
             expect(await c.isInitialHolderOf(initialHolders2[h], i)).to.be.false;
           }
         }
         else {
-          expect(await c["initialHolders(uint256)"](i)).to.deep.equal(initialHolders2);
+          expect(await c.initialHolders(i)).to.deep.equal(initialHolders2);
           for (let h = 0; h < initialHolders2.length; h++) {
             expect(await c.isInitialHolderOf(initialHolders[h], i)).to.be.false;
             expect(await c.isInitialHolderOf(initialHolders2[h], i)).to.be.true;

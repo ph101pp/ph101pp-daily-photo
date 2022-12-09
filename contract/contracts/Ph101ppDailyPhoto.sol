@@ -118,8 +118,11 @@ contract Ph101ppDailyPhoto is
         return _proxyUri;
     }
 
+    // Returns all histoical uris that include tokenId
     function uriHistory(uint tokenId) public view returns (string[] memory) {
-        require(tokenId <= lastRangeTokenIdWithPermanentUri);
+        if(tokenId > lastRangeTokenIdWithPermanentUri) {
+            return new string[](0);
+        }
         uint permanentUriIndex = _findInRange(_permanentUriRange, tokenId);
         string memory slug = tokenSlugFromTokenId(tokenId);
         string[] memory history = new string[](
@@ -156,9 +159,11 @@ contract Ph101ppDailyPhoto is
         uint validUpToTokenId
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
         require(
-            validUpToTokenId > lastRangeTokenIdWithPermanentUri,
-            "Error: TokenId <= lastTokenIdWithValidPermanentUri."
+            validUpToTokenId > lastRangeTokenIdWithPermanentUri
+            && validUpToTokenId <= lastRangeTokenIdMinted,
+            "Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri."
         );
+        // require(newUri[newUri.length-1] == "/");
         _permanentUris.push(newUri);
         _permanentUriRange.push(lastRangeTokenIdWithPermanentUri + 1);
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;

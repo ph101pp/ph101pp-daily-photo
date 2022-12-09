@@ -52,6 +52,16 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
 
 export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101ppDailyPhoto> & FixturePDP>) {
 
+  describe("Interface", function () {
+    it("It should support interfaces ERC1155, ERC2981, ERC165", async function () {
+      const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
+
+      expect(await c.supportsInterface("0xffffffff")).to.be.false;
+      expect(await c.supportsInterface("0xd9b67a26")).to.be.true;
+      expect(await c.supportsInterface("0x2a55205a")).to.be.true;
+      expect(await c.supportsInterface("0x01ffc9a7")).to.be.true;
+    });
+  });  
   describe("URI storing / updating", function () {
     it("Should set the correct mutableUri and immutableUri during deploy", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
@@ -67,10 +77,15 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.proxyBaseUri()).to.equal(mutableUri2);
     });
 
-    it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriHistory to reflect this.", async function () {
-      const immutableUri2 = "2.immutable.uri";
-      const immutableUri3 = "3.immutable.uri";
+    it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriHistory + uriHistory to reflect this.", async function () {
+      const immutableUri2 = "immutable.uri.2/";
+      const immutableUri3 = "immutable.uri.3/";
       const { c, immutableUri } = await loadFixture(deployFixture);
+
+      await c.setInitialSupply([1,1]);
+      const input = await c.getMintRangeInput(101);
+      await c.mintPhotos(...input);
+
       expect(await c.permanentBaseUri()).to.equal(immutableUri);
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
       expect(await c.permanentBaseUri()).to.equal(immutableUri2);
@@ -100,16 +115,43 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(history2[1][1]).to.equal(1)
       expect(history2[1][2]).to.equal(101)
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(101);
+
+      const history0 = await c.uriHistory(0);
+      expect(history0.length).to.equal(3);
+      expect(history0[0]).to.include(immutableUri);
+      expect(history0[1]).to.include(immutableUri2);
+      expect(history0[2]).to.include(immutableUri3);
+
+      const history1 = await c.uriHistory(1);
+      expect(history1.length).to.equal(2);
+      expect(history1[0]).to.include(immutableUri2);
+      expect(history1[1]).to.include(immutableUri3);
+
+      const history5 = await c.uriHistory(5);
+      expect(history5.length).to.equal(2);
+      expect(history5[0]).to.include(immutableUri2);
+      expect(history5[1]).to.include(immutableUri3);
+
+      const history101 = await c.uriHistory(101);
+      expect(history101.length).to.equal(1);
+      expect(history101[0]).to.include(immutableUri3);
+
     });
 
-    it("Should require new permanentUri via setPermanentBaseUriUpTo() to be valid for more tokenIds than the last one.", async function () {
+    it("Should require new permanentUri via setPermanentBaseUriUpTo() to be valid for more tokenIds than the last one and less than last minted one.", async function () {
       const immutableUri2 = "2.immutable.uri";
       const immutableUri3 = "3.immutable.uri";
       const { c, owner } = await loadFixture(deployFixture);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("Error: TokenId <= lastTokenIdWithValidPermanentUri.");
+
+      await c.setInitialSupply([1,1]);
+      const input = await c.getMintRangeInput(101);
+      await c.mintPhotos(...input);
+
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri.");
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Error: TokenId <= lastTokenIdWithValidPermanentUri.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri.");
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri.");
     });
   });
 
@@ -186,7 +228,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const { c } = await loadFixture(deployFixture);
       await expect(
         c.tokenSlugFromDate(2022, 8, 1)
-      ).to.be.revertedWith('Invalid date! Project started September 1, 2022!');
+      ).to.be.revertedWith('Project started September 1, 2022!');
     });
 
     it("should fail to translate date if invalid date (incl leap years)", async function () {
@@ -226,21 +268,13 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.uri(tokenId)).to.equal(immutableUri + "CLAIM-0.json");
     });
 
-    it("should return mutable url for all unminted nfts ", async function () {
-      const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      await c.setPermanentBaseUriUpTo(immutableUri, 100);
-
-      for (let i = 1; i < 100; i++) {
-        expect(await c.uri(i)).to.include(mutableUri);
-      }
-    });
-
     it("should return immutable url for all minted nfts ", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      await c.setPermanentBaseUriUpTo(immutableUri, 100);
+      
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await c.mintPhotos(...inputs);
+      await c.setPermanentBaseUriUpTo(immutableUri, 50);
 
       for (let i = 1; i < 100; i++) {
         if (i > 50) expect(await c.uri(i)).to.include(mutableUri);
@@ -250,10 +284,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should return mutable url for minted nfts after _uriValidUptoTokenId", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      await c.setPermanentBaseUriUpTo(immutableUri, 10);
+
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await c.mintPhotos(...inputs);
+      await c.setPermanentBaseUriUpTo(immutableUri, 10);
 
       for (let i = 1; i < 50; i++) {
         if (i > 10) expect(await c.uri(i)).to.include(mutableUri);
@@ -283,7 +318,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const initialSupply2 = [1, 7];
 
       await c.setInitialSupply(initialSupply);
-      let cIS = await c["initialSupply()"]();
+      let cIS = await c.initialSupply(1000);
       expect(cIS[0].eq(initialSupply[0]));
       expect(cIS[1].eq(initialSupply[1]));
 
@@ -300,7 +335,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setInitialSupply(initialSupply);
 
-      let cIS = await c["initialSupply()"]();
+      let cIS = await c.initialSupply(1000);
       expect(cIS[0].eq(initialSupply[0]));
       expect(cIS[1].eq(initialSupply[1]));
 
@@ -308,26 +343,26 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.mintPhotos(...inputs);
 
       for (let i = 0; i < inputs[0].length; i++) {
-        cIS = await c["initialSupply(uint256)"](inputs[0][i]);
+        cIS = await c.initialSupply(inputs[0][i]);
         expect(cIS[0].eq(initialSupply[0]));
         expect(cIS[1].eq(initialSupply[1]));
       }
 
       await c.setInitialSupply(initialSupply3);
-      cIS = await c["initialSupply()"]();
+      cIS = await c.initialSupply(1000);
       expect(cIS[0].eq(initialSupply3[0]));
       expect(cIS[1].eq(initialSupply3[1]));
 
       await c.setInitialSupply(initialSupply2);
 
-      cIS = await c["initialSupply()"]();
+      cIS = await c.initialSupply(1000);
       expect(cIS[0].eq(initialSupply2[0]));
       expect(cIS[1].eq(initialSupply2[1]));
 
       const inputs2 = await c.getMintRangeInput(5);
       await c.mintPhotos(...inputs2);
       for (let i = 0; i < inputs2[0].length; i++) {
-        cIS = await c["initialSupply(uint256)"](inputs2[0][i]);
+        cIS = await c.initialSupply(inputs2[0][i]);
         expect(cIS[0].eq(initialSupply2[0]));
         expect(cIS[1].eq(initialSupply2[1]));
       }
@@ -792,15 +827,17 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should correctly register contract with Operator Filter Registry and subscribe to opensea", async function () {
       const { c, ofr } = await loadFixture(deployFixture);
-
+      expect(await c.operatorFilterRegistry()).to.equal("0x000000000000AAeB6D7670E522A718067333cd4E");
+      await ofr.registerAndSubscribe(c.address, "0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
       expect(await ofr.isRegistered(c.address)).to.be.true;
       expect(await ofr.subscriptionOf(c.address)).to.equal("0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
-      expect(await c.operatorFilterRegistry()).to.equal("0x000000000000AAeB6D7670E522A718067333cd4E");
 
     });
 
     it("should prevent filtered operator to transfer tokens (+ disable / disablePermanently)", async function () {
       const { c, ofr, treasury, account1, account2 } = await loadFixture(deployFixture);
+
+      await ofr.registerAndSubscribe(c.address, "0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
 
       const subscribedFilteredOperators = await ofr.filteredOperators(c.address);
       await ofr.unsubscribe(c.address, true);
@@ -825,9 +862,10 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
 
       // permanently disable operator filter
-      await c.permanentlyDisableOperatorFilter();
+      await c.setOperatorFilterRegistry(ethers.constants.AddressZero);
+      await c.permanentlyFreezeOperatorFilterRegistry();
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
-      await expect(c.setOperatorFilterRegistry(ethers.constants.AddressZero)).to.be.revertedWith("Permanently disabled");
+      await expect(c.setOperatorFilterRegistry(ethers.constants.AddressZero)).to.be.revertedWith("Permanently frozen");
     });
 
   });
