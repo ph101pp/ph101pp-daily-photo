@@ -4,6 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
+import "./Arrays.sol";
 
 /**
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
@@ -64,7 +65,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     {
         require(
             account != address(0),
-            "ERC1155: address zero is not a valid owner"
+            "ERC1155: not a valid owner"
         );
 
         if (
@@ -194,7 +195,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         virtual
         returns (address[] memory)
     {
-        uint index = _findInRange(_initialHoldersRange, tokenId);
+        uint index = Arrays.findLowerBound(_initialHoldersRange, tokenId);
         return _initialHolders[index];
     }
 
@@ -206,7 +207,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         view
         returns (bool)
     {
-        uint index = _findInRange(_initialHoldersRange, tokenId);
+        uint index = Arrays.findLowerBound(_initialHoldersRange, tokenId);
         return _initialHoldersMappings[index][account];
     }
 
@@ -326,21 +327,5 @@ abstract contract ERC1155MintRange is ERC1155_ {
      */
     function _inRange(uint tokenId) private view returns (bool) {
         return isZeroMinted && tokenId <= lastRangeTokenIdMinted;
-    }
-
-    /**
-     * @dev Utility find range/bucket for tokenId.
-     */
-    function _findInRange(uint[] memory range, uint tokenId)
-        internal
-        pure
-        returns (uint)
-    {
-        for (uint i = range.length - 1; i >= 0; i--) {
-            if (tokenId >= range[i]) {
-                return i;
-            }
-        }
-        return 0;
     }
 }

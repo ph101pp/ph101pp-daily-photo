@@ -3,7 +3,7 @@ pragma solidity ^0.8.12;
 
 import "./ERC1155MintRangeUpdateable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
+// import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./DateTime.sol";
 import "./OpenseaOperatorFilterer.sol";
@@ -123,7 +123,7 @@ contract Ph101ppDailyPhoto is
         if(tokenId > lastRangeTokenIdWithPermanentUri) {
             return new string[](0);
         }
-        uint permanentUriIndex = _findInRange(_permanentUriRange, tokenId);
+        uint permanentUriIndex = Arrays.findLowerBound(_permanentUriRange, tokenId);
         string memory slug = tokenSlugFromTokenId(tokenId);
         string[] memory history = new string[](
             _permanentUris.length - permanentUriIndex
@@ -270,7 +270,7 @@ contract Ph101ppDailyPhoto is
 
     // Returns initial supply range that was used for a tokenId.
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
-        uint supplyIndex = _findInRange(_initialSupplyRange, tokenId);
+        uint supplyIndex = Arrays.findLowerBound(_initialSupplyRange, tokenId);
         return _initialSupplies[supplyIndex];
     }
 
