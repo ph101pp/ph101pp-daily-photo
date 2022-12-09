@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 
 import "./ERC1155MintRange.sol";
 import "./ERC1155MintRangePausable.sol";
-import "./Arrays.sol";
+import "./DateTime.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -100,11 +100,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
         address[][] memory localInitialHoders = _initialHolders;
 
-        uint lastLockedIndex = Arrays.findLowerBound(
+        uint lastLockedIndex = DateTime.findLowerBound(
             _initialHoldersRange,
             lastRangeTokenIdWithLockedInitialHolders
         );
-        uint newLastLockedIndex = Arrays.findLowerBound(
+        uint newLastLockedIndex = DateTime.findLowerBound(
             newInitialHoldersRange,
             lastRangeTokenIdWithLockedInitialHolders
         );
@@ -118,6 +118,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 if (!isZeroLocked || k > lastLockedIndex) {
                     delete _initialHoldersMappings[k][localInitialHoders[k][i]];
                 } else {
+                    // TODO: move this into verify method
                     require(
                         localInitialHoders[k][i] == newInitialHolders[k][i],
                         ERROR_CANT_UPDATE_LOCKED_HOLDERS
@@ -202,7 +203,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     );
                 }
 
-                uint newInitialHoldersIndex = Arrays.findLowerBound(
+                uint newInitialHoldersIndex = DateTime.findLowerBound(
                     newInitialHoldersRange,
                     tokenId
                 );

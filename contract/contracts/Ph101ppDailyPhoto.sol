@@ -99,17 +99,22 @@ contract Ph101ppDailyPhoto is
 
     // Returns permanent uri where already available, otherwise proxy uri.
     function uri(uint tokenId) public view override returns (string memory) {
-        string memory currentUri;
-
         if (exists(tokenId) && lastRangeTokenIdWithPermanentUri >= tokenId) {
             // ... uri updated since token -> immutable uri
-            currentUri = permanentBaseUri();
-        } else {
-            // ... uri not yet updated since token -> mutable uri
-            currentUri = proxyBaseUri();
+            return
+                string.concat(
+                    permanentBaseUri(),
+                    tokenSlugFromTokenId(tokenId),
+                    ".json"
+                );
         }
-
-        return string.concat(currentUri, tokenSlugFromTokenId(tokenId), ".json");
+        // else ... uri not yet updated since token -> mutable uri
+        return
+            string.concat(
+                proxyBaseUri(),
+                tokenSlugFromTokenId(tokenId),
+                ".json"
+            );
     }
 
     // Returns proxy base Uri that is used for
@@ -120,10 +125,13 @@ contract Ph101ppDailyPhoto is
 
     // Returns all histoical uris that include tokenId
     function uriHistory(uint tokenId) public view returns (string[] memory) {
-        if(tokenId > lastRangeTokenIdWithPermanentUri) {
+        if (tokenId > lastRangeTokenIdWithPermanentUri) {
             return new string[](0);
         }
-        uint permanentUriIndex = Arrays.findLowerBound(_permanentUriRange, tokenId);
+        uint permanentUriIndex = DateTime.findLowerBound(
+            _permanentUriRange,
+            tokenId
+        );
         string memory slug = tokenSlugFromTokenId(tokenId);
         string[] memory history = new string[](
             _permanentUris.length - permanentUriIndex
@@ -131,8 +139,7 @@ contract Ph101ppDailyPhoto is
         for (uint i = permanentUriIndex; i < _permanentUris.length; i++) {
             history[i - permanentUriIndex] = string.concat(
                 _permanentUris[i],
-                slug,
-                ".json"
+                slug
             );
         }
         return history;
@@ -159,9 +166,9 @@ contract Ph101ppDailyPhoto is
         uint validUpToTokenId
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
         require(
-            validUpToTokenId > lastRangeTokenIdWithPermanentUri
-            && validUpToTokenId <= lastRangeTokenIdMinted,
-            "Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri."
+            validUpToTokenId > lastRangeTokenIdWithPermanentUri &&
+                validUpToTokenId <= lastRangeTokenIdMinted,
+            "Required: lastIdWithPermanentUri < TokenId <= lastIdMinted."
         );
         // require(newUri[newUri.length-1] == "/");
         _permanentUris.push(newUri);
@@ -270,7 +277,10 @@ contract Ph101ppDailyPhoto is
 
     // Returns initial supply range that was used for a tokenId.
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
-        uint supplyIndex = Arrays.findLowerBound(_initialSupplyRange, tokenId);
+        uint supplyIndex = DateTime.findLowerBound(
+            _initialSupplyRange,
+            tokenId
+        );
         return _initialSupplies[supplyIndex];
     }
 
@@ -377,18 +387,7 @@ contract Ph101ppDailyPhoto is
     function tokenSlugFromTokenId(
         uint tokenId
     ) public pure returns (string memory tokenSlug) {
-        if (tokenId == CLAIM_TOKEN_ID) {
-            return
-                string.concat(
-                    _CLAIM_TOKEN,
-                    "-",
-                    Strings.toString(CLAIM_TOKEN_ID)
-                );
-        }
-        (uint year, uint month, uint day) = DateTime.timestampToDate(
-            START_DATE + ((tokenId - 1) * 1 days)
-        );
-        return _tokenSlug(tokenId, year, month, day);
+        return DateTime.tokenSlugFromTokenId(tokenId);
     }
 
     function tokenSlugFromDate(
@@ -396,37 +395,7 @@ contract Ph101ppDailyPhoto is
         uint month,
         uint day
     ) public pure returns (string memory tokenSlug) {
-        require(DateTime.isValidDate(year, month, day), "Invalid date!");
-        uint tokenTimestamp = DateTime.timestampFromDate(year, month, day);
-        require(
-            tokenTimestamp >= START_DATE,
-            "Project started September 1, 2022!"
-        );
-        return
-            _tokenSlug(
-                (((tokenTimestamp - START_DATE) / 1 days) + 1),
-                year,
-                month,
-                day
-            );
-    }
-
-    function _tokenSlug(
-        uint tokenId,
-        uint year,
-        uint month,
-        uint day
-    ) private pure returns (string memory tokenSlug) {
-        return
-            string.concat(
-                Strings.toString(year),
-                month <= 9 ? "0" : "",
-                Strings.toString(month),
-                day <= 9 ? "0" : "",
-                Strings.toString(day),
-                "-",
-                Strings.toString(tokenId)
-            );
+        return DateTime.tokenSlugFromDate(year, month, day);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

@@ -40,7 +40,7 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
     const dt = await DT.deploy();
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
       libraries: {
-        "DateTime": dt.address // test: "0x947cc35992e6723de50bf704828a01fd2d5d6641" //dt.address
+        "DateTime": dt.address, // test: "0x947cc35992e6723de50bf704828a01fd2d5d6641" //dt.address
       }
     });
     const c = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]) as T;
@@ -61,7 +61,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.supportsInterface("0x2a55205a")).to.be.true;
       expect(await c.supportsInterface("0x01ffc9a7")).to.be.true;
     });
-  });  
+  });
   describe("URI storing / updating", function () {
     it("Should set the correct mutableUri and immutableUri during deploy", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
@@ -82,7 +82,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const immutableUri3 = "immutable.uri.3/";
       const { c, immutableUri } = await loadFixture(deployFixture);
 
-      await c.setInitialSupply([1,1]);
+      await c.setInitialSupply([1, 1]);
       const input = await c.getMintRangeInput(101);
       await c.mintPhotos(...input);
 
@@ -143,15 +143,15 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const immutableUri3 = "3.immutable.uri";
       const { c, owner } = await loadFixture(deployFixture);
 
-      await c.setInitialSupply([1,1]);
+      await c.setInitialSupply([1, 1]);
       const input = await c.getMintRangeInput(101);
       await c.mintPhotos(...input);
 
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("Required: lastIdWithPermanentUri < TokenId <= lastIdMinted.");
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Required: lastIdWithPermanentUri < TokenId <= lastIdMinted.");
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("Required: lastRangeTokenIdMinted >= TokenId > lastTokenIdWithValidPermanentUri.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("Required: lastIdWithPermanentUri < TokenId <= lastIdMinted.");
     });
   });
 
@@ -270,7 +270,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should return immutable url for all minted nfts ", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
-      
+
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await c.mintPhotos(...inputs);
@@ -374,7 +374,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       const mints = 500;
       const testSuppliesTo = 8;
-      const acceptedVariance = 0.7;
+      const acceptedVariance = 0.6;
 
       for (let i = 1; i <= testSuppliesTo; i++) {
         const supply = [10, 10 + i];
@@ -407,14 +407,14 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.lastRangeTokenIdMinted()).to.equal(0);
       await c.setInitialSupply([1, 2]);
       await expect(c.getMintRangeInput(-1)).to.be.rejected;
-    
+
       const input = await c.getMintRangeInput(0);
       await expect(c.mintPhotos(...input)).to.be.rejected;
     });
 
     it("should mint 1 vault and up to max supply to treasury ", async function () {
       const { c, vault, treasury } = await loadFixture(deployFixture);
-      const photos = 100;
+      const photos = 1000;
       const maxSupply = [1, 2];
       await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);

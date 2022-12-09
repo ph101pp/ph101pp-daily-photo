@@ -64,7 +64,7 @@ async function runTestCase(dateTime: TestDateTime, testCase: TestCase): Promise<
   expect(epochDate.day.toNumber()).to.equal(testCase.day);
 }
 
-describe("DateTime", function () {
+describe.skip("DateTime", function () {
 
   async function deployFixture() {
     const DT = await ethers.getContractFactory("DateTime");

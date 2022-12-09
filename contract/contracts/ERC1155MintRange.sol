@@ -4,7 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
-import "./Arrays.sol";
+import "./DateTime.sol";
 
 /**
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
@@ -115,6 +115,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint[] memory amounts,
         bytes memory data
     ) internal virtual override {
+        // for each token transfered:
         for (uint i = 0; i < ids.length; ++i) {
             uint id = ids[i];
 
@@ -195,7 +196,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         virtual
         returns (address[] memory)
     {
-        uint index = Arrays.findLowerBound(_initialHoldersRange, tokenId);
+        uint index = DateTime.findLowerBound(_initialHoldersRange, tokenId);
         return _initialHolders[index];
     }
 
@@ -207,7 +208,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         view
         returns (bool)
     {
-        uint index = Arrays.findLowerBound(_initialHoldersRange, tokenId);
+        uint index = DateTime.findLowerBound(_initialHoldersRange, tokenId);
         return _initialHoldersMappings[index][account];
     }
 
