@@ -31,7 +31,7 @@ function Root() {
       ...manifest,
       paths: {
         ...manifest.paths,
-        [`CLAIM-0.json`]: {
+        [`CLAIM-0`]: {
           id: claimTx
         }
       }

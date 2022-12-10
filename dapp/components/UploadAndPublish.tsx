@@ -49,7 +49,7 @@ const UploadAndPublish = () => {
       ...manifest,
       paths: {
         ...manifest.paths,
-        [`${tokenId}.json`]: {
+        [tokenId]: {
           id: tokenTx
         }
       }

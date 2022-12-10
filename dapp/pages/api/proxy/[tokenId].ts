@@ -10,7 +10,7 @@ export default async function handler(
 ) {
   const query = req.query.tokenId;
 
-  if (query === "CLAIM-0.json") {
+  if (query === "CLAIM-0") {
     res.setHeader("Cache-Control", `s-maxage=${60 * 60 * 48}, stale-while-revalidate=59`);
     return res.json(getClaimMetadata())
   }
@@ -19,11 +19,11 @@ export default async function handler(
     return res.status(404).end();
   }
 
-  const [token, ext] = query.split(".");
-  const [tokenDate, tokenIndex] = token.split("-");
+  const [tokenSlug, _json] = query.split(".");
+  const [tokenDate, tokenIndex] = tokenSlug.split("-");
   
 
-  if (ext !== "json" || !isValidDate(tokenDate) || isNaN(parseInt(tokenIndex))) {
+  if (!isValidDate(tokenDate) || isNaN(parseInt(tokenIndex))) {
     return res.status(404).end();
   }
 
@@ -31,7 +31,7 @@ export default async function handler(
 
   res.setHeader("Cache-Control", `s-maxage=${60 * 60 * 48}, stale-while-revalidate=59`);
 
-  return fetch(arweaveURL + query)
+  return fetch(arweaveURL + tokenSlug)
     .then((arweaveResult) => {
       return arweaveResult.json()
     })

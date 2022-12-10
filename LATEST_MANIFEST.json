@@ -2,19 +2,19 @@
   "manifest": "arweave/paths",
   "version": "0.1.0",
   "paths": {
-    "CLAIM-0.json": {
+    "CLAIM-0": {
       "id": "aw4DD8m6j2LmTgnm76xMHb4QV2i4In0Mp6aXdy9oCPA"
     },
-    "20220901-1.json": {
+    "20220901-1": {
       "id": "6AQPWoTJRQ85ys1Vhn_lwzKLzPsYUhmfKzM5EHFXOls"
     },
-    "20220902-2.json": {
+    "20220902-2": {
       "id": "lznZ2S1sUTc0fJK6xTfQaeAuvHulfZeo8sLTiCQ1kS4"
     },
-    "20220903-3.json": {
+    "20220903-3": {
       "id": "Ru2VfEMcy6l6oN2xSQhGvOpTksFhxdI5Mxzz4F44tI4"
     },
-    "20220904-4.json": {
+    "20220904-4": {
       "id": "xxq4TogtLyijVbir6GDl96lh4IcEE5LD6JuW9QKkBpk"
     }
   }

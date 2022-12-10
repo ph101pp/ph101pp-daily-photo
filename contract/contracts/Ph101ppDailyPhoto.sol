@@ -108,16 +108,14 @@ contract Ph101ppDailyPhoto is
             return
                 string.concat(
                     permanentBaseUri(),
-                    tokenSlugFromTokenId(tokenId),
-                    ".json"
+                    tokenSlugFromTokenId(tokenId)
                 );
         }
         // else ... uri not yet updated since token -> mutable uri
         return
             string.concat(
                 proxyBaseUri(),
-                tokenSlugFromTokenId(tokenId),
-                ".json"
+                tokenSlugFromTokenId(tokenId)
             );
     }
 

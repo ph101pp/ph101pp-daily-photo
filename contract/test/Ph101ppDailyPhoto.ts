@@ -259,13 +259,13 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       const { c, mutableUri } = await loadFixture(deployFixture);
 
-      expect(await c.uri(tokenId)).to.equal(mutableUri + tokenDate + "-" + tokenId + ".json");
+      expect(await c.uri(tokenId)).to.equal(mutableUri + tokenDate + "-" + tokenId);
     });
 
     it("should return correct url for tokenId:0 (CLAIM) ", async function () {
       const tokenId = 0;
       const { c, immutableUri } = await loadFixture(deployFixture);
-      expect(await c.uri(tokenId)).to.equal(immutableUri + "CLAIM-0.json");
+      expect(await c.uri(tokenId)).to.equal(immutableUri + "CLAIM-0");
     });
 
     it("should return immutable url for all minted nfts ", async function () {
