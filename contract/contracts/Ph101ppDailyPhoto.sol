@@ -196,21 +196,8 @@ contract Ph101ppDailyPhoto is
         _mint(to, CLAIM_TOKEN_ID, amount, "");
     }
 
-    // Redeem a claim token for a photo nft (1:1).
-    function redeemClaim(uint tokenId) public {
-        address[] memory initialHolders = initialHolders(tokenId);
-        _burn(msg.sender, CLAIM_TOKEN_ID, 1);
-        _safeTransferFrom(
-            initialHolders[TREASURY_ID],
-            msg.sender,
-            tokenId,
-            1,
-            ""
-        );
-    }
-
     // Redeem multiple claim tokens for photo nfts (n:n).
-    function redeemClaimBatch(
+    function redeemClaims(
         uint[] memory tokenIds,
         uint[] memory amounts
     ) public {

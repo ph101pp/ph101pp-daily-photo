@@ -464,7 +464,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     });
 
-    it("should claim mints from treasury and burn claims when redeemClaimBatch is called", async function () {
+    it("should claim mints from treasury and burn claims when redeemClaims is called", async function () {
 
       const { c, treasury, vault, account1, account2 } = await loadFixture(deployFixture);
 
@@ -482,11 +482,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(2);
 
-      await expect(c.connect(account1).redeemClaimBatch([8, 9, 7], [1, 1, 1])).to.be.rejected;
-      await expect(c.connect(account1).redeemClaimBatch([8], [1, 1])).to.be.rejected;
-      await expect(c.connect(account1).redeemClaimBatch([8, 9], [1])).to.be.rejected;
-      await expect(c.connect(account1).redeemClaimBatch([8, 2], [1, 1])).to.be.rejected;
-      await c.connect(account1).redeemClaimBatch([4, 2], [1, 1]);
+      await expect(c.connect(account1).redeemClaims([8, 9, 7], [1, 1, 1])).to.be.rejected;
+      await expect(c.connect(account1).redeemClaims([8], [1, 1])).to.be.rejected;
+      await expect(c.connect(account1).redeemClaims([8, 9], [1])).to.be.rejected;
+      await expect(c.connect(account1).redeemClaims([8, 2], [1, 1])).to.be.rejected;
+      await c.connect(account1).redeemClaims([4, 2], [1, 1]);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(0);
       expect(await c.balanceOf(account1.address, 2)).to.equal(1);
@@ -514,8 +514,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(2);
 
-      await c.connect(account1).redeemClaim(8);
-      await c.connect(account1).redeemClaim(2);
+      await c.connect(account1).redeemClaims([8], [1]);
+      await c.connect(account1).redeemClaims([2], [1]);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(0);
       expect(await c.balanceOf(account1.address, 2)).to.equal(1);
@@ -808,8 +808,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.mintPhotos(...mintInput)).to.be.rejectedWith("paused");
 
       await expect(c.mintClaims(account1.address, 5)).to.be.rejectedWith("paused");
-      await expect(c.redeemClaim(5)).to.be.rejectedWith("paused");
-      await expect(c.redeemClaimBatch([2], [5])).to.be.rejectedWith("paused");
+      // await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
+      await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
 
       await expect(c.setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("paused");
       await expect(c.setProxyBaseUri("")).to.be.rejectedWith("paused");
