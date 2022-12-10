@@ -3,16 +3,25 @@ const deployArguments = require("./deployArguments") as [string, string, [string
 
 async function main() {
 
-  const DT = await ethers.getContractFactory("DateTime");
-  const dt = await DT.deploy();
+  // deploy utils
+  const Utils = await ethers.getContractFactory("Ph101ppDailyPhotoUtils");
+  const utils = await Utils.deploy();
+
+  // deploy Pdp
   const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
     libraries: {
-      "DateTime": dt.address
+      "Ph101ppDailyPhotoUtils": utils.address
     }
   });
   const pdp = await PDP.deploy(...deployArguments);
   await pdp.deployed();
-  console.log(`deployed: Ph101ppDailyPhotos`, pdp.address);
+
+  // register with operator fiter registry
+  const OperatorFilterRegistry = await ethers.getContractFactory("TestOperatorFilterRegistry");
+  const ofr = await OperatorFilterRegistry.attach("0x000000000000AAeB6D7670E522A718067333cd4E");
+  await ofr.registerAndSubscribe(pdp.address, "0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
+
+  console.log(`deployed: Ph101ppDailyPhoto`, pdp.address);
 
 }
 

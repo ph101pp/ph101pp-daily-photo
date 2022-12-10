@@ -21,6 +21,6 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
-    "operator-filter-registry": "^1.2.1"
+    "operator-filter-registry": "^1.3.1"
   }
 }
