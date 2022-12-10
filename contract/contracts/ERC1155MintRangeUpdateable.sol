@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 
 import "./ERC1155MintRange.sol";
 import "./ERC1155MintRangePausable.sol";
-import "./DateTime.sol";
+import "./Ph101ppDailyPhotoUtils.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -100,29 +100,15 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
         address[][] memory localInitialHoders = _initialHolders;
 
-        uint lastLockedIndex = DateTime.findLowerBound(
+        uint lastLockedIndex = Ph101ppDailyPhotoUtils.findLowerBound(
             _initialHoldersRange,
             lastRangeTokenIdWithLockedInitialHolders
         );
-        uint newLastLockedIndex = DateTime.findLowerBound(
-            newInitialHoldersRange,
-            lastRangeTokenIdWithLockedInitialHolders
-        );
 
-        require(
-            newLastLockedIndex == lastLockedIndex,
-            ERROR_CANT_UPDATE_LOCKED_HOLDERS
-        );
         for (uint k = 0; k < localInitialHoders.length; k++) {
             for (uint i = 0; i < localInitialHoders[k].length; i++) {
                 if (!isZeroLocked || k > lastLockedIndex) {
                     delete _initialHoldersMappings[k][localInitialHoders[k][i]];
-                } else {
-                    // TODO: move this into verify method
-                    require(
-                        localInitialHoders[k][i] == newInitialHolders[k][i],
-                        ERROR_CANT_UPDATE_LOCKED_HOLDERS
-                    );
                 }
             }
         }
@@ -170,11 +156,37 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         );
         require(newInitialHoldersRange[0] == 0, "E:05");
 
-        for (uint j = 1; j < newInitialHoldersRange.length; j++) {
-            require(
-                newInitialHoldersRange[j] > newInitialHoldersRange[j - 1],
-                "E:06"
-            );
+        address[][] memory localInitialHoders = _initialHolders;
+
+        uint lastLockedIndex = Ph101ppDailyPhotoUtils.findLowerBound(
+            _initialHoldersRange,
+            lastRangeTokenIdWithLockedInitialHolders
+        );
+        uint newLastLockedIndex = Ph101ppDailyPhotoUtils.findLowerBound(
+            newInitialHoldersRange,
+            lastRangeTokenIdWithLockedInitialHolders
+        );
+
+        require(
+            newLastLockedIndex == lastLockedIndex,
+            "E:16"
+        );
+
+        for (uint k = 0; k < newInitialHoldersRange.length; k++) {
+            if (k >= 0) {
+                require(
+                    newInitialHoldersRange[k] > newInitialHoldersRange[k - 1],
+                    "E:06"
+                );
+            }
+            for (uint i = 0; i < localInitialHoders[k].length; i++) {
+                if (isZeroLocked && k <= lastLockedIndex) {
+                    require(
+                        localInitialHoders[k][i] == newInitialHolders[k][i],
+                        ERROR_CANT_UPDATE_LOCKED_HOLDERS
+                    );
+                }
+            }
         }
 
         for (uint i = 0; i < ids.length; i++) {
@@ -203,10 +215,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     );
                 }
 
-                uint newInitialHoldersIndex = DateTime.findLowerBound(
-                    newInitialHoldersRange,
-                    tokenId
-                );
+                uint newInitialHoldersIndex = Ph101ppDailyPhotoUtils
+                    .findLowerBound(newInitialHoldersRange, tokenId);
                 address[] memory nextInitialHolders = newInitialHolders[
                     newInitialHoldersIndex
                 ];

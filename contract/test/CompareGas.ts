@@ -20,12 +20,12 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     const ERC = await ethers.getContractFactory("TestERC1155");
     const erc = await ERC.deploy();
 
-    const DT = await ethers.getContractFactory("DateTime");
+    const DT = await ethers.getContractFactory("Ph101ppDailyPhotoUtils");
     const dt = await DT.deploy();
 
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
       libraries: {
-        DateTime: dt.address
+        Ph101ppDailyPhotoUtils: dt.address
       }
     });
     const pdp = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]);

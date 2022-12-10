@@ -5,7 +5,7 @@ import "./ERC1155MintRangeUpdateable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 // import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "./DateTime.sol";
+import "./Ph101ppDailyPhotoUtils.sol";
 import "./OpenseaOperatorFilterer.sol";
 
 contract Ph101ppDailyPhoto is
@@ -128,7 +128,7 @@ contract Ph101ppDailyPhoto is
         if (tokenId > lastRangeTokenIdWithPermanentUri) {
             return new string[](0);
         }
-        uint permanentUriIndex = DateTime.findLowerBound(
+        uint permanentUriIndex = Ph101ppDailyPhotoUtils.findLowerBound(
             _permanentUriRange,
             tokenId
         );
@@ -277,7 +277,11 @@ contract Ph101ppDailyPhoto is
 
     // Returns initial supply range that was used for a tokenId.
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
-        uint supplyIndex = DateTime.findLowerBound(
+        // optimization for mintRange
+        if (_initialSupplyRange[_initialSupplyRange.length - 1] <= tokenId) {
+            return _initialSupplies[_initialSupplyRange.length - 1];
+        }
+        uint supplyIndex = Ph101ppDailyPhotoUtils.findLowerBound(
             _initialSupplyRange,
             tokenId
         );
@@ -387,7 +391,7 @@ contract Ph101ppDailyPhoto is
     function tokenSlugFromTokenId(
         uint tokenId
     ) public pure returns (string memory tokenSlug) {
-        return DateTime.tokenSlugFromTokenId(tokenId);
+        return Ph101ppDailyPhotoUtils.tokenSlugFromTokenId(tokenId);
     }
 
     function tokenSlugFromDate(
@@ -395,7 +399,7 @@ contract Ph101ppDailyPhoto is
         uint month,
         uint day
     ) public pure returns (string memory tokenSlug) {
-        return DateTime.tokenSlugFromDate(year, month, day);
+        return Ph101ppDailyPhotoUtils.tokenSlugFromDate(year, month, day);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

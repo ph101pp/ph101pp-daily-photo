@@ -36,11 +36,11 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
     const OperatorFilterRegistry = await ethers.getContractFactory("TestOperatorFilterRegistry")
     const ofr = await OperatorFilterRegistry.attach("0x000000000000AAeB6D7670E522A718067333cd4E")
 
-    const DT = await ethers.getContractFactory("DateTime");
+    const DT = await ethers.getContractFactory("Ph101ppDailyPhotoUtils");
     const dt = await DT.deploy();
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
       libraries: {
-        "DateTime": dt.address, // test: "0x947cc35992e6723de50bf704828a01fd2d5d6641" //dt.address
+        "Ph101ppDailyPhotoUtils": dt.address, // test: "0x947cc35992e6723de50bf704828a01fd2d5d6641" //dt.address
       }
     });
     const c = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]) as T;

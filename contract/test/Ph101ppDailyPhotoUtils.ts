@@ -1,7 +1,7 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { TestDateTime } from "../typechain-types";
+import { TestPh101ppDailyPhotoUtils } from "../typechain-types";
 
 type TestCase = {
   ts: number,
@@ -49,7 +49,7 @@ const testCases: TestCase[]=[
   },
 ];
 
-async function runTestCase(dateTime: TestDateTime, testCase: TestCase): Promise<void> {
+async function runTestCase(dateTime: TestPh101ppDailyPhotoUtils, testCase: TestCase): Promise<void> {
   const epochTimestamp = await dateTime.timestampFromDate(
     testCase.year,
     testCase.month,
@@ -64,17 +64,17 @@ async function runTestCase(dateTime: TestDateTime, testCase: TestCase): Promise<
   expect(epochDate.day.toNumber()).to.equal(testCase.day);
 }
 
-describe.skip("DateTime", function () {
+describe("Ph101ppDailyPhotoUtils", function () {
 
   async function deployFixture() {
-    const DT = await ethers.getContractFactory("DateTime");
+    const DT = await ethers.getContractFactory("Ph101ppDailyPhotoUtils");
     const dt = await DT.deploy();
-    const DateTime = await ethers.getContractFactory("TestDateTime", {
+    const Ph101ppDailyPhotoUtils = await ethers.getContractFactory("TestPh101ppDailyPhotoUtils", {
       libraries: {
-        "DateTime": dt.address
+        "Ph101ppDailyPhotoUtils": dt.address
       }
     });
-    const dateTime = await DateTime.deploy();
+    const dateTime = await Ph101ppDailyPhotoUtils.deploy();
     return {dateTime};
   }
 

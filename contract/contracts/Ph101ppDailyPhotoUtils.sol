@@ -4,38 +4,42 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-// ----------------------------------------------------------------------------
-// DateTime Library v2.0
-//
-// A gas-efficient Solidity date and time library
-//
-// https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
-//
-// Tested date range 1970/01/01 to 2345/12/31
-//
-// Conventions:
-// Unit      | Range         | Notes
-// :-------- |:-------------:|:-----
-// timestamp | >= 0          | Unix timestamp, number of seconds since 1970/01/01 00:00:00 UTC
-// year      | 1970 ... 2345 |
-// month     | 1 ... 12      |
-// day       | 1 ... 31      |
-// hour      | 0 ... 23      |
-// minute    | 0 ... 59      |
-// second    | 0 ... 59      |
-// dayOfWeek | 1 ... 7       | 1 = Monday, ..., 7 = Sunday
-//
-//
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018-2019. The MIT Licence.
-// ----------------------------------------------------------------------------
 
-library DateTime {
+library Ph101ppDailyPhotoUtils {
     uint256 constant SECONDS_PER_DAY = 1 days;
     int256 constant OFFSET19700101 = 2440588;
     uint public constant START_DATE = 1661990400; // Sept 1, 2022
     uint public constant CLAIM_TOKEN_ID = 0;
     string private constant _CLAIM_TOKEN = "CLAIM";
 
+    ///////////////////////////////////////////////////////////////////////////
+    // DateTime
+    ///////////////////////////////////////////////////////////////////////////
+
+    // ----------------------------------------------------------------------------
+    // DateTime Library v2.0
+    //
+    // A gas-efficient Solidity date and time library
+    //
+    // https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary
+    //
+    // Tested date range 1970/01/01 to 2345/12/31
+    //
+    // Conventions:
+    // Unit      | Range         | Notes
+    // :-------- |:-------------:|:-----
+    // timestamp | >= 0          | Unix timestamp, number of seconds since 1970/01/01 00:00:00 UTC
+    // year      | 1970 ... 2345 |
+    // month     | 1 ... 12      |
+    // day       | 1 ... 31      |
+    // hour      | 0 ... 23      |
+    // minute    | 0 ... 59      |
+    // second    | 0 ... 59      |
+    // dayOfWeek | 1 ... 7       | 1 = Monday, ..., 7 = Sunday
+    //
+    //
+    // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2018-2019. The MIT Licence.
+    // ----------------------------------------------------------------------------
     // ------------------------------------------------------------------------
     // Calculate the number of days from 1970/01/01 to year/month/day using
     // the date conversion algorithm from
@@ -100,14 +104,26 @@ library DateTime {
         }
     }
 
+    function timestampFromDate(uint256 year, uint256 month, uint256 day) external pure returns (uint256 timestamp) {
+        return _timestampFromDate(year, month, day);
+    }
+
     function _timestampFromDate(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 timestamp) {
         timestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY;
+    }
+
+    function timestampToDate(uint256 timestamp) external pure returns (uint256 year, uint256 month, uint256 day) {
+        return _timestampToDate(timestamp);
     }
 
     function _timestampToDate(uint256 timestamp) internal pure returns (uint256 year, uint256 month, uint256 day) {
         unchecked {
             (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
         }
+    }
+
+    function isValidDate(uint256 year, uint256 month, uint256 day) external pure returns (bool valid) {
+        return _isValidDate(year, month, day);
     }
 
     function _isValidDate(uint256 year, uint256 month, uint256 day) internal pure returns (bool valid) {
@@ -133,56 +149,10 @@ library DateTime {
       leapYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
     }
 
-    /**
-     * @dev Searches a sorted `array` and returns the last index that contains
-     * a value smaller or equal to `element`. This method will fail if no such index exists (i.e. all
-     * values in the array are strictly more than `element`)
-     * This is impossible within Ph101ppDailyPhoto. Time complexity O(log n).
-     *
-     * `array` is expected to be sorted in ascending order, and to contain no
-     * repeated elements.
-     */
-    function findLowerBound(
-        uint256[] calldata array,
-        uint256 element
-    ) external pure returns (uint256) {
-        // this cant happen in Ph101ppDailyPhoto
-        // if (array.length == 0) {
-        //     return 0;
-        // }
 
-        // optimization for mintRange
-        if(array[array.length-1] <= element) {
-            return array.length-1;
-        }
-        
-        uint256 low = 0;
-        uint256 high = array.length;
-
-        while (low < high) {
-            uint256 mid = Math.average(low, high);
-
-            // Note that mid will always be strictly less than high (i.e. it will be a valid array index)
-            // because Math.average rounds down (it does integer division with truncation).
-            if (array[mid] > element) {
-                high = mid;
-            } else {
-                low = mid + 1;
-            }
-        }
-        
-        // Change to use lower bound for Ph101ppDailyPhoto
-        // This is safe because all ranges in Ph101ppDailyPhoto start with 0 and tokenId can't be negative. So low is never 0.
-        return low - 1;
-
-        // // At this point `low` is the exclusive upper bound. We will return the inclusive upper bound.
-        // if (low > 0 && array[low - 1] == element) {
-        //     return low - 1;
-        // } else {
-        //     return low;
-        // }
-    }
-
+    ///////////////////////////////////////////////////////////////////////////
+    // TokenSlug
+    ///////////////////////////////////////////////////////////////////////////
 
     function tokenSlugFromTokenId(
         uint tokenId
@@ -237,5 +207,55 @@ library DateTime {
                 "-",
                 Strings.toString(tokenId)
             );
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Arrays
+    ///////////////////////////////////////////////////////////////////////////
+   
+
+    /**
+     * @dev Searches a sorted `array` and returns the last index that contains
+     * a value smaller or equal to `element`. This method will fail if no such index exists (i.e. all
+     * values in the array are strictly more than `element`)
+     * This is impossible within Ph101ppDailyPhoto. Time complexity O(log n).
+     *
+     * `array` is expected to be sorted in ascending order, and to contain no
+     * repeated elements.
+     */
+    function findLowerBound(
+        uint256[] calldata array,
+        uint256 element
+    ) external pure returns (uint256) {
+        // this cant happen in Ph101ppDailyPhoto
+        // if (array.length == 0) {
+        //     return 0;
+        // }
+
+        uint256 low = 0;
+        uint256 high = array.length;
+
+        while (low < high) {
+            uint256 mid = Math.average(low, high);
+
+            // Note that mid will always be strictly less than high (i.e. it will be a valid array index)
+            // because Math.average rounds down (it does integer division with truncation).
+            if (array[mid] > element) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+        
+        // Change to use lower bound for Ph101ppDailyPhoto
+        // This is safe because all ranges in Ph101ppDailyPhoto start with 0 and tokenId can't be negative. So low is never 0.
+        return low - 1;
+
+        // // At this point `low` is the exclusive upper bound. We will return the inclusive upper bound.
+        // if (low > 0 && array[low - 1] == element) {
+        //     return low - 1;
+        // } else {
+        //     return low;
+        // }
     }
 }
