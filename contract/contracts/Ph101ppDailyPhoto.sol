@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 // import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
+import "./IPh101ppDailyPhotoListener.sol";
 import "./OpenseaOperatorFilterer.sol";
 
 contract Ph101ppDailyPhoto is
@@ -32,6 +33,9 @@ contract Ph101ppDailyPhoto is
 
     uint public lastRangeTokenIdWithPermanentUri;
     bool public isInitialHoldersRangeUpdatePermanentlyDisabled;
+
+    address public transferEventListenerAddress;
+    // bool public isTransferEventListenerAddressPermanentlyFrozen = false;
 
     address private _owner;
 
@@ -421,6 +425,46 @@ contract Ph101ppDailyPhoto is
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _permanentlyFreezeOperatorFilterRegistry();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Transfer Event Listener
+    ///////////////////////////////////////////////////////////////////////////////
+
+    function setTransferEventListenerAddress(
+        address listener
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+        // require(!isTransferEventListenerAddressPermanentlyFrozen);
+        transferEventListenerAddress = listener;
+    }
+
+    // function permanentlyFreezeTransferEventListenerAddress()
+    //     public
+    //     whenNotPaused
+    //     onlyRole(DEFAULT_ADMIN_ROLE)
+    // {
+    //     isTransferEventListenerAddressPermanentlyFrozen = true;
+    // }
+
+    function _afterTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint[] memory ids,
+        uint[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        if (transferEventListenerAddress != address(0)) {
+            IPh101ppDailyPhotoListener(transferEventListenerAddress)
+                .Ph101ppDailyPhotoTransferHandler(
+                    operator,
+                    from,
+                    to,
+                    ids,
+                    amounts,
+                    data
+                );
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////
