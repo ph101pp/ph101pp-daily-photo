@@ -85,6 +85,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 amounts,
                 newInitialHolders,
                 newInitialHoldersRange,
+                _initialHolders,
+                _initialHoldersRange,
                 _pauseTimestamp,
                 paused(),
                 _customUpdateInitialHoldersRangeChecksum()
@@ -229,6 +231,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     amounts,
                     newInitialHolders,
                     newInitialHoldersRange,
+                    _initialHolders,
+                    _initialHoldersRange,
                     _pauseTimestamp,
                     paused(),
                     _customUpdateInitialHoldersRangeChecksum()
