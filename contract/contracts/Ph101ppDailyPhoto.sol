@@ -35,7 +35,7 @@ contract Ph101ppDailyPhoto is
     bool public isInitialHoldersRangeUpdatePermanentlyDisabled;
 
     address public transferEventListenerAddress;
-    // bool public isTransferEventListenerAddressPermanentlyFrozen = false;
+    bool public isTransferEventListenerAddressPermanentlyFrozen = false;
 
     address private _owner;
 
@@ -432,17 +432,17 @@ contract Ph101ppDailyPhoto is
     function setTransferEventListenerAddress(
         address listener
     ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-        // require(!isTransferEventListenerAddressPermanentlyFrozen);
+        require(!isTransferEventListenerAddressPermanentlyFrozen);
         transferEventListenerAddress = listener;
     }
 
-    // function permanentlyFreezeTransferEventListenerAddress()
-    //     public
-    //     whenNotPaused
-    //     onlyRole(DEFAULT_ADMIN_ROLE)
-    // {
-    //     isTransferEventListenerAddressPermanentlyFrozen = true;
-    // }
+    function permanentlyFreezeTransferEventListenerAddress()
+        public
+        whenNotPaused
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        isTransferEventListenerAddressPermanentlyFrozen = true;
+    }
 
     function _afterTokenTransfer(
         address operator,
