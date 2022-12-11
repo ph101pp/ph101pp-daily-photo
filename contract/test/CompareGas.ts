@@ -8,7 +8,7 @@ async function cost(tx: Promise<ContractTransaction>): Promise<number> {
   return receipt.cumulativeGasUsed.toNumber() / interations;
 }
 
-describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
+describe.only("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
   console.log("ITERATIONS", interations);
 
   async function deployFixture() {
@@ -31,18 +31,10 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     const pdp = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]);
     await pdp.setOperatorFilterRegistry(ethers.constants.AddressZero);
 
-    const C1 = await ethers.getContractFactory("TestERC1155MintRange", {
-      libraries: {
-        Ph101ppDailyPhotoUtils: dt.address
-      }
-    });
+    const C1 = await ethers.getContractFactory("TestERC1155MintRange");
     const c1 = await C1.deploy([]);
 
-    const C2 = await ethers.getContractFactory("TestERC1155MintRangeUpdateable", {
-      libraries: {
-        Ph101ppDailyPhotoUtils: dt.address
-      }
-    });
+    const C2 = await ethers.getContractFactory("TestERC1155MintRangeUpdateable");
     const c2 = await C2.deploy([]);
 
 
@@ -165,8 +157,8 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     console.log(report);
   });
 
-  it("mintRange() transfer() transfer()", async function () {
-    const { erc, c1, c2, pdp, treasury, account1, account2 } = await loadFixture(deployFixture);
+  it.only("mintRange() transfer() transfer()", async function () {
+    const { erc, c1, c2, pdp, treasury, account1, account2, account3, account4 } = await loadFixture(deployFixture);
 
     await pdp.setInitialSupply([1, 1]);
     await c1.setInitialHolders([account1.address]);
@@ -195,6 +187,18 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
         TestERC1155MintRange: 0,
         TestERC1155MintRangeUpdateable: 0,
         Ph101ppDailyPhoto: 0
+      },
+      safeTransferFrom3: {
+        TestERC1155: 0,
+        TestERC1155MintRange: 0,
+        TestERC1155MintRangeUpdateable: 0,
+        Ph101ppDailyPhoto: 0
+      },
+      safeTransferFrom4: {
+        TestERC1155: 0,
+        TestERC1155MintRange: 0,
+        TestERC1155MintRangeUpdateable: 0,
+        Ph101ppDailyPhoto: 0
       }
     }
 
@@ -206,10 +210,24 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     }
 
     for (let i = 0; i < interations; i++) {
-      report.safeTransferFrom2.TestERC1155 += await cost(erc.connect(account2).safeTransferFrom(account2.address, account1.address, i, 1, []));
-      report.safeTransferFrom2.TestERC1155MintRange += await cost(c1.connect(account2).safeTransferFrom(account2.address, account1.address, i, 1, []));
-      report.safeTransferFrom2.TestERC1155MintRangeUpdateable += await cost(c2.connect(account2).safeTransferFrom(account2.address, account1.address, i, 1, []));
-      report.safeTransferFrom2.Ph101ppDailyPhoto += await cost(pdp.connect(account2).safeTransferFrom(account2.address, account1.address, i, 1, []));
+      report.safeTransferFrom2.TestERC1155 += await cost(erc.connect(account2).safeTransferFrom(account2.address, account3.address, i, 1, []));
+      report.safeTransferFrom2.TestERC1155MintRange += await cost(c1.connect(account2).safeTransferFrom(account2.address, account3.address, i, 1, []));
+      report.safeTransferFrom2.TestERC1155MintRangeUpdateable += await cost(c2.connect(account2).safeTransferFrom(account2.address, account3.address, i, 1, []));
+      report.safeTransferFrom2.Ph101ppDailyPhoto += await cost(pdp.connect(account2).safeTransferFrom(account2.address, account3.address, i, 1, []));
+    }
+
+    for (let i = 0; i < interations; i++) {
+      report.safeTransferFrom3.TestERC1155 += await cost(erc.connect(account3).safeTransferFrom(account3.address, account4.address, i, 1, []));
+      report.safeTransferFrom3.TestERC1155MintRange += await cost(c1.connect(account3).safeTransferFrom(account3.address, account4.address, i, 1, []));
+      report.safeTransferFrom3.TestERC1155MintRangeUpdateable += await cost(c2.connect(account3).safeTransferFrom(account3.address, account4.address, i, 1, []));
+      report.safeTransferFrom3.Ph101ppDailyPhoto += await cost(pdp.connect(account3).safeTransferFrom(account3.address, account4.address, i, 1, []));
+    }
+
+    for (let i = 0; i < interations; i++) {
+      report.safeTransferFrom4.TestERC1155 += await cost(erc.connect(account4).safeTransferFrom(account4.address, account3.address, i, 1, []));
+      report.safeTransferFrom4.TestERC1155MintRange += await cost(c1.connect(account4).safeTransferFrom(account4.address, account3.address, i, 1, []));
+      report.safeTransferFrom4.TestERC1155MintRangeUpdateable += await cost(c2.connect(account4).safeTransferFrom(account4.address, account3.address, i, 1, []));
+      report.safeTransferFrom4.Ph101ppDailyPhoto += await cost(pdp.connect(account4).safeTransferFrom(account4.address, account3.address, i, 1, []));
     }
 
     console.log(report);
