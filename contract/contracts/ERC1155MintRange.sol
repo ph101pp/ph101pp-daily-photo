@@ -4,14 +4,12 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
-import "./Ph101ppDailyPhotoUtils.sol";
 
 /**
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
  * and adds tracking of total supply per id.
  */
 abstract contract ERC1155MintRange is ERC1155_ {
-
     // Mapping from token ID to balancesInitialzed flag
     mapping(uint => mapping(address => bool)) public isBalanceInitialized;
 
@@ -47,26 +45,19 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Implement: Return initial token balance for address.
      * This function MUST be pure: Always return the same values for a given input.
      */
-    function initialBalanceOf(address account, uint tokenId)
-        internal
-        view
-        virtual
-        returns (uint);
+    function initialBalanceOf(
+        address account,
+        uint tokenId
+    ) internal view virtual returns (uint);
 
     /**
      * @dev See {ERC1155-balanceOf}.
      */
-    function balanceOf(address account, uint id)
-        public
-        view
-        virtual
-        override
-        returns (uint)
-    {
-        require(
-            account != address(0),
-            "ERC1155: not a valid owner"
-        );
+    function balanceOf(
+        address account,
+        uint id
+    ) public view virtual override returns (uint) {
+        require(account != address(0), "ERC1155: not a valid owner");
 
         if (
             !isBalanceInitialized[id][account] &&
@@ -167,7 +158,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
      */
     function _setInitialHolders(address[] memory addresses) internal virtual {
         uint256 firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
-        uint256 lastIndex = _initialHolders.length-1;
+        uint256 lastIndex = _initialHolders.length - 1;
         uint256 lastId = _initialHoldersRange[lastIndex];
         if (lastId == firstId) {
             address[] memory prevInitialHolders = _initialHolders[lastId];
@@ -180,7 +171,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         } else {
             _initialHoldersRange.push(firstId);
             _initialHolders.push(addresses);
-            lastIndex = lastIndex+1;
+            lastIndex = lastIndex + 1;
         }
         for (uint i = 0; i < addresses.length; i++) {
             _initialHoldersMappings[lastIndex][addresses[i]] = true;
@@ -190,30 +181,32 @@ abstract contract ERC1155MintRange is ERC1155_ {
     /**
      * @dev Returns initial holders of a token.
      */
-    function initialHolders(uint tokenId)
-        public
-        view
-        virtual
-        returns (address[] memory)
-    {
+    function initialHolders(
+        uint tokenId
+    ) public view virtual returns (address[] memory) {
         // optimization for mintRange
         uint lastIndex = _initialHoldersRange.length-1;
         if(_initialHoldersRange[lastIndex] <= tokenId) {
             return  _initialHolders[lastIndex];
         }
-        uint index = Ph101ppDailyPhotoUtils.findLowerBound(_initialHoldersRange, tokenId);
+        uint index = _findLowerBound(
+            _initialHoldersRange,
+            tokenId
+        );
         return _initialHolders[index];
     }
 
     /**
      * @dev Returns true if address is an initial holder of tokenId
      */
-    function isInitialHolderOf(address account, uint tokenId)
-        public
-        view
-        returns (bool)
-    {
-        uint index = Ph101ppDailyPhotoUtils.findLowerBound(_initialHoldersRange, tokenId);
+    function isInitialHolderOf(
+        address account,
+        uint tokenId
+    ) public view returns (bool) {
+        uint index = _findLowerBound(
+            _initialHoldersRange,
+            tokenId
+        );
         return _initialHoldersMappings[index][account];
     }
 
@@ -235,15 +228,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
     /**
      * @dev Generate mintRange inputs for x new tokens.
      */
-    function getMintRangeInput(uint numberOfTokens)
-        public
-        view
-        returns (
-            uint[] memory,
-            uint[][] memory,
-            bytes32
-        )
-    {
+    function getMintRangeInput(
+        uint numberOfTokens
+    ) public view returns (uint[] memory, uint[][] memory, bytes32) {
         uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
         address[] memory holders = initialHolders(firstId);
         uint[] memory ids = new uint[](numberOfTokens);
@@ -300,7 +287,10 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 _customMintRangeChecksum()
             )
         );
-        require(inputChecksum == checksum, "Invalid input. Use getMintRangeInput()");
+        require(
+            inputChecksum == checksum,
+            "Invalid input. Use getMintRangeInput()"
+        );
 
         lastRangeTokenIdMinted = ids[ids.length - 1];
 
@@ -333,5 +323,17 @@ abstract contract ERC1155MintRange is ERC1155_ {
      */
     function _inRange(uint tokenId) private view returns (bool) {
         return isZeroMinted && tokenId <= lastRangeTokenIdMinted;
+    }
+
+    function _findLowerBound(
+        uint256[] memory array,
+        uint256 element
+    ) internal pure returns (uint256) {
+        for (uint i = array.length - 1; i >= 0; i--) {
+            if (element >= array[i]) {
+                return i;
+            }
+        }
+        return 0;
     }
 }

@@ -122,7 +122,7 @@ contract Ph101ppDailyPhoto is
         if (tokenId > lastRangeTokenIdWithPermanentUri) {
             return new string[](0);
         }
-        uint permanentUriIndex = Ph101ppDailyPhotoUtils.findLowerBound(
+        uint permanentUriIndex = _findLowerBound(
             _permanentUriRange,
             tokenId
         );
@@ -263,7 +263,7 @@ contract Ph101ppDailyPhoto is
         if (_initialSupplyRange[lastIndex] <= tokenId) {
             return _initialSupplies[lastIndex];
         }
-        uint supplyIndex = Ph101ppDailyPhotoUtils.findLowerBound(
+        uint supplyIndex = _findLowerBound(
             _initialSupplyRange,
             tokenId
         );

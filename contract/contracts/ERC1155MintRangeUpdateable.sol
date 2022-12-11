@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 
 import "./ERC1155MintRange.sol";
 import "./ERC1155MintRangePausable.sol";
-import "./Ph101ppDailyPhotoUtils.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -99,7 +98,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         address[][] memory localInitialHolders = _initialHolders;
         uint[] memory localInitialHoldersRange = _initialHoldersRange;
 
-        uint lastLockedIndex = Ph101ppDailyPhotoUtils.findLowerBound(
+        uint lastLockedIndex = _findLowerBound(
             _initialHoldersRange,
             lastRangeTokenIdWithLockedInitialHolders
         );
@@ -203,8 +202,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     );
                 }
 
-                uint newInitialHoldersIndex = Ph101ppDailyPhotoUtils
-                    .findLowerBound(newInitialHoldersRange, tokenId);
+                uint newInitialHoldersIndex = _findLowerBound(newInitialHoldersRange, tokenId);
                 address[] memory nextInitialHolders = newInitialHolders[
                     newInitialHoldersIndex
                 ];

@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-
 library Ph101ppDailyPhotoUtils {
     uint256 constant SECONDS_PER_DAY = 1 days;
     int256 constant OFFSET19700101 = 2440588;
@@ -53,15 +52,25 @@ library Ph101ppDailyPhotoUtils {
     //      - 3 * ((year + 4900 + (month - 14) / 12) / 100) / 4
     //      - offset
     // ------------------------------------------------------------------------
-    function _daysFromDate(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 _days) {
+    function _daysFromDate(
+        uint256 year,
+        uint256 month,
+        uint256 day
+    ) internal pure returns (uint256 _days) {
         require(year >= 1970);
         int256 _year = int256(year);
         int256 _month = int256(month);
         int256 _day = int256(day);
 
-        int256 __days = _day - 32075 + (1461 * (_year + 4800 + (_month - 14) / 12)) / 4
-            + (367 * (_month - 2 - ((_month - 14) / 12) * 12)) / 12
-            - (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) / 4 - OFFSET19700101;
+        int256 __days = _day -
+            32075 +
+            (1461 * (_year + 4800 + (_month - 14) / 12)) /
+            4 +
+            (367 * (_month - 2 - ((_month - 14) / 12) * 12)) /
+            12 -
+            (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) /
+            4 -
+            OFFSET19700101;
 
         _days = uint256(__days);
     }
@@ -83,7 +92,9 @@ library Ph101ppDailyPhotoUtils {
     // month = month + 2 - 12 * L
     // year = 100 * (N - 49) + year + L
     // ------------------------------------------------------------------------
-    function _daysToDate(uint256 _days) internal pure returns (uint256 year, uint256 month, uint256 day) {
+    function _daysToDate(
+        uint256 _days
+    ) internal pure returns (uint256 year, uint256 month, uint256 day) {
         unchecked {
             int256 __days = int256(_days);
 
@@ -104,29 +115,49 @@ library Ph101ppDailyPhotoUtils {
         }
     }
 
-    function timestampFromDate(uint256 year, uint256 month, uint256 day) external pure returns (uint256 timestamp) {
+    function timestampFromDate(
+        uint256 year,
+        uint256 month,
+        uint256 day
+    ) external pure returns (uint256 timestamp) {
         return _timestampFromDate(year, month, day);
     }
 
-    function _timestampFromDate(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 timestamp) {
+    function _timestampFromDate(
+        uint256 year,
+        uint256 month,
+        uint256 day
+    ) internal pure returns (uint256 timestamp) {
         timestamp = _daysFromDate(year, month, day) * SECONDS_PER_DAY;
     }
 
-    function timestampToDate(uint256 timestamp) external pure returns (uint256 year, uint256 month, uint256 day) {
+    function timestampToDate(
+        uint256 timestamp
+    ) external pure returns (uint256 year, uint256 month, uint256 day) {
         return _timestampToDate(timestamp);
     }
 
-    function _timestampToDate(uint256 timestamp) internal pure returns (uint256 year, uint256 month, uint256 day) {
+    function _timestampToDate(
+        uint256 timestamp
+    ) internal pure returns (uint256 year, uint256 month, uint256 day) {
         unchecked {
             (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
         }
     }
 
-    function isValidDate(uint256 year, uint256 month, uint256 day) external pure returns (bool valid) {
+    function isValidDate(
+        uint256 year,
+        uint256 month,
+        uint256 day
+    ) external pure returns (bool valid) {
         return _isValidDate(year, month, day);
     }
 
-    function _isValidDate(uint256 year, uint256 month, uint256 day) internal pure returns (bool valid) {
+    function _isValidDate(
+        uint256 year,
+        uint256 month,
+        uint256 day
+    ) internal pure returns (bool valid) {
         if (year >= 1970 && month > 0 && month <= 12) {
             uint256 daysInMonth = _getDaysInMonth(year, month);
             if (day > 0 && day <= daysInMonth) {
@@ -135,20 +166,30 @@ library Ph101ppDailyPhotoUtils {
         }
     }
 
-    function _getDaysInMonth(uint256 year, uint256 month) internal pure returns (uint256 daysInMonth) {
-      if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-          daysInMonth = 31;
-      } else if (month != 2) {
-          daysInMonth = 30;
-      } else {
-          daysInMonth = _isLeapYear(year) ? 29 : 28;
-      }
+    function _getDaysInMonth(
+        uint256 year,
+        uint256 month
+    ) internal pure returns (uint256 daysInMonth) {
+        if (
+            month == 1 ||
+            month == 3 ||
+            month == 5 ||
+            month == 7 ||
+            month == 8 ||
+            month == 10 ||
+            month == 12
+        ) {
+            daysInMonth = 31;
+        } else if (month != 2) {
+            daysInMonth = 30;
+        } else {
+            daysInMonth = _isLeapYear(year) ? 29 : 28;
+        }
     }
 
     function _isLeapYear(uint256 year) internal pure returns (bool leapYear) {
-      leapYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+        leapYear = ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
     }
-
 
     ///////////////////////////////////////////////////////////////////////////
     // TokenSlug
@@ -207,55 +248,5 @@ library Ph101ppDailyPhotoUtils {
                 "-",
                 Strings.toString(tokenId)
             );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Arrays
-    ///////////////////////////////////////////////////////////////////////////
-   
-
-    /**
-     * @dev Searches a sorted `array` and returns the last index that contains
-     * a value smaller or equal to `element`. This method will fail if no such index exists (i.e. all
-     * values in the array are strictly more than `element`)
-     * This is impossible within Ph101ppDailyPhoto. Time complexity O(log n).
-     *
-     * `array` is expected to be sorted in ascending order, and to contain no
-     * repeated elements.
-     */
-    function findLowerBound(
-        uint256[] calldata array,
-        uint256 element
-    ) external pure returns (uint256) {
-        // this cant happen in Ph101ppDailyPhoto
-        // if (array.length == 0) {
-        //     return 0;
-        // }
-
-        uint256 low = 0;
-        uint256 high = array.length;
-
-        while (low < high) {
-            uint256 mid = Math.average(low, high);
-
-            // Note that mid will always be strictly less than high (i.e. it will be a valid array index)
-            // because Math.average rounds down (it does integer division with truncation).
-            if (array[mid] > element) {
-                high = mid;
-            } else {
-                low = mid + 1;
-            }
-        }
-        
-        // Change to use lower bound for Ph101ppDailyPhoto
-        // This is safe because all ranges in Ph101ppDailyPhoto start with 0 and tokenId can't be negative. So low is never 0.
-        return low - 1;
-
-        // // At this point `low` is the exclusive upper bound. We will return the inclusive upper bound.
-        // if (low > 0 && array[low - 1] == element) {
-        //     return low - 1;
-        // } else {
-        //     return low;
-        // }
     }
 }
