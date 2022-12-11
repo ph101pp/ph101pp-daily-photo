@@ -395,17 +395,17 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
     it("should fail to lock initial holders of unminted tokens or if tokens are already locked", async function(){
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
 
-      await expect(c.setLockInitialHoldersUpTo(6)).to.be.rejectedWith("Error: Can't lock initial holders of unminted tokens.")
+      await expect(c.setLockInitialHoldersUpTo(6)).to.be.rejectedWith("Unminted tokens.")
       
       const initialHolders = [account1.address, account2.address];
       await c.setInitialHolders(initialHolders);
       const mintIntput = await c.getMintRangeInput(5);
       await c.mintRange(...mintIntput);
 
-      await expect(c.setLockInitialHoldersUpTo(7)).to.be.rejectedWith("Error: Can't lock initial holders of unminted tokens.")
+      await expect(c.setLockInitialHoldersUpTo(7)).to.be.rejectedWith("Unminted tokens.")
       await expect(c.setLockInitialHoldersUpTo(4)).to.not.be.rejected;
 
-      await expect(c.setLockInitialHoldersUpTo(4)).to.be.rejectedWith("Error: Tokens already locked");
+      await expect(c.setLockInitialHoldersUpTo(4)).to.be.rejectedWith("Already locked.");
     });
 
     it("should fail to lock initial holders when paused", async function(){
@@ -416,6 +416,20 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
       await c.mintRange(...mintIntput);
       await c.pause();
       await expect(c.setLockInitialHoldersUpTo(4)).to.be.rejectedWith("Pausable: paused");
+    });
+
+    it("should fail to create update initialHolders input when new holder is address(0)", async function () {
+      const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address];
+      const initialHolders2 = [account3.address, account4.address];
+      await c.setInitialHolders(initialHolders);
+      const mintIntput = await c.getMintRangeInput(5);
+      await c.mintRange(...mintIntput);
+      await c.pause();
+      const newInitialHolders = [ethers.constants.AddressZero, account3.address];
+      const newInitialHolders2 = [account1.address, ethers.constants.AddressZero];
+      await expect(_getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders)).to.be.rejectedWith("E:16");
+      await expect(_getUpdateInitialHoldersRangeInput(c, 4, 5, newInitialHolders2)).to.be.rejectedWith("E:16");
     });
 
     it("should fail to create update initialHolders input of locked range", async function () {
@@ -435,6 +449,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
       await expect(_getUpdateInitialHoldersRangeInput(c, 4, 5, newInitialHolders)).to.be.rejectedWith("E:15");
       await expect(_getUpdateInitialHoldersRangeInput(c, 5, 5, newInitialHolders)).to.not.be.rejected;
     });
+
 
     it.skip("should fail to update initialHolders of locked range", async function () {
       // to test this comment-out the E:15 check in verifyUpdateInitialHolderRangeInput;

@@ -30,11 +30,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     ) internal virtual whenNotPaused {
         require(
             tokenId > lastRangeTokenIdWithLockedInitialHolders,
-            "Error: Tokens already locked"
+            "Already locked."
         );
         require(
             isZeroMinted && tokenId <= lastRangeTokenIdMinted,
-            "Error: Can't lock initial holders of unminted tokens."
+            "Unminted tokens."
         );
         lastRangeTokenIdWithLockedInitialHolders = tokenId;
         if (!isZeroLocked) {
@@ -93,7 +93,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         );
         require(
             inputChecksum == checksum,
-            "Invalid input. Use verifyUpdateInitialHolderRangeInput()."
+            "Invalid Input. Use verifyUpdateInitialHolderRangeInput()."
         );
 
         address[][] memory localInitialHolders = _initialHolders;
@@ -106,22 +106,19 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
         for (uint k = 0; k < localInitialHolders.length; k++) {
             for (uint i = 0; i < localInitialHolders[k].length; i++) {
+                address holderAddress = localInitialHolders[k][i];
                 if (!isZeroLocked || k > lastLockedIndex) {
-                    delete _initialHoldersMappings[k][
-                        localInitialHolders[k][i]
-                    ];
+                    delete _initialHoldersMappings[k][holderAddress];
                 } else {
-                    require(
-                        localInitialHolders[k][i] == newInitialHolders[k][i],
-                        "E:17"
-                    );
+                    require(holderAddress == newInitialHolders[k][i], "E:17");
                 }
             }
         }
         for (uint k = 0; k < newInitialHolders.length; k++) {
             if (!isZeroLocked || k > lastLockedIndex) {
-                for (uint i = 0; i < newInitialHolders[k].length; i++) {
-                    _initialHoldersMappings[k][newInitialHolders[k][i]] = true;
+                address[] memory newInitialHolder = newInitialHolders[k];
+                for (uint i = 0; i < newInitialHolder.length; i++) {
+                    _initialHoldersMappings[k][newInitialHolder[i]] = true;
                 }
             } else {
                 require(
@@ -167,11 +164,17 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         );
         require(newInitialHoldersRange[0] == 0, "E:05");
 
-        for (uint k = 1; k < newInitialHoldersRange.length; k++) {
-            require(
-                newInitialHoldersRange[k] > newInitialHoldersRange[k - 1],
-                "E:06"
-            );
+        for (uint k = 0; k < newInitialHoldersRange.length; k++) {
+            if (k > 0) {
+                require(
+                    newInitialHoldersRange[k] > newInitialHoldersRange[k - 1],
+                    "E:06"
+                );
+            }
+            address[] memory newInitialHolder = newInitialHolders[k];
+            for (uint j = 0; j < newInitialHolder.length; j++) {
+                require(newInitialHolder[j] != address(0), "E:16");
+            }
         }
 
         for (uint i = 0; i < ids.length; i++) {
@@ -184,7 +187,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             for (uint k = 0; k < id.length; k++) {
                 uint tokenId = id[k];
                 uint balance = amount[k];
-
+                
                 require(exists(tokenId) == true, "E:11");
                 require(isManualMint[tokenId] == false, "E:12");
                 require(_balances[tokenId][from] == 0, "E:13");
