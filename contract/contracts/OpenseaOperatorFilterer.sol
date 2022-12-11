@@ -9,9 +9,7 @@ import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFil
  *         - `onlyAllowedOperator` modifier for `transferFrom` and `safeTransferFrom` methods.
  *         - `onlyAllowedOperatorApproval` modifier for `approve` and `setApprovalForAll` methods.
  *         - `_setOperatorFilterRegistry to update the registry contract to check against
- *         - `_setIsOperatorFilterDisabled` to enable/disable registry checks
- *         - `_permanentlyDisableOperatorFilter` to permanently disable registry checks
- *         - `_registerToOpenseaOperatorFilterRegistry` to register a contract to openseas registry.
+ *         - `_permanentlyFreezeOperatorFilterRegistry` to permanently disable registry checks
  */
 abstract contract OpenseaOperatorFilterer {
     error OperatorNotAllowed(address operator);

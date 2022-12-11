@@ -103,20 +103,12 @@ contract Ph101ppDailyPhoto is
 
     // Returns permanent uri where already available, otherwise proxy uri.
     function uri(uint tokenId) public view override returns (string memory) {
-        if (exists(tokenId) && lastRangeTokenIdWithPermanentUri >= tokenId) {
-            // ... uri updated since token -> immutable uri
-            return
-                string.concat(
-                    permanentBaseUri(),
-                    tokenSlugFromTokenId(tokenId)
-                );
-        }
-        // else ... uri not yet updated since token -> mutable uri
-        return
-            string.concat(
-                proxyBaseUri(),
-                tokenSlugFromTokenId(tokenId)
-            );
+        string memory base = (exists(tokenId) &&
+            lastRangeTokenIdWithPermanentUri >= tokenId)
+            ? permanentBaseUri() // ... uri updated since token -> immutable uri
+            : proxyBaseUri(); // else ... uri not yet updated since token -> mutable uri
+
+        return string.concat(base, tokenSlugFromTokenId(tokenId));
     }
 
     // Returns proxy base Uri that is used for
@@ -170,7 +162,7 @@ contract Ph101ppDailyPhoto is
         require(
             validUpToTokenId > lastRangeTokenIdWithPermanentUri &&
                 validUpToTokenId <= lastRangeTokenIdMinted,
-            "Required: lastIdWithPermanentUri < TokenId <= lastIdMinted."
+            "!(lastIdWithPermanentUri < TokenId <= lastIdMinted)"
         );
         // require(newUri[newUri.length-1] == "/");
         _permanentUris.push(newUri);
@@ -267,8 +259,9 @@ contract Ph101ppDailyPhoto is
     // Returns initial supply range that was used for a tokenId.
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
         // optimization for mintRange
-        if (_initialSupplyRange[_initialSupplyRange.length - 1] <= tokenId) {
-            return _initialSupplies[_initialSupplyRange.length - 1];
+        uint lastIndex = _initialSupplyRange.length - 1;
+        if (_initialSupplyRange[lastIndex] <= tokenId) {
+            return _initialSupplies[lastIndex];
         }
         uint supplyIndex = Ph101ppDailyPhotoUtils.findLowerBound(
             _initialSupplyRange,
@@ -285,7 +278,7 @@ contract Ph101ppDailyPhoto is
     function setInitialHolders(
         address treasury,
         address vault
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         address[] memory addresses = new address[](2);
         addresses[0] = treasury;
         addresses[1] = vault;
@@ -323,7 +316,7 @@ contract Ph101ppDailyPhoto is
     // so they cant be updated via updateInitialHoldersRange.
     function setLockInitialHoldersUpTo(
         uint256 tokenId
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _setLockInitialHoldersUpTo(tokenId);
     }
 

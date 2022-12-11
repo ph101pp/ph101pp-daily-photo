@@ -69,9 +69,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
         );
 
         if (
-            _inRange(id) &&
             !isBalanceInitialized[id][account] &&
             !isManualMint[id] &&
+            _inRange(id) &&
             isInitialHolderOf(account, id)
         ) {
             return initialBalanceOf(account, id);
@@ -197,8 +197,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
         returns (address[] memory)
     {
         // optimization for mintRange
-        if(_initialHoldersRange[_initialHoldersRange.length-1] <= tokenId) {
-            return  _initialHolders[_initialHoldersRange.length-1];
+        uint lastIndex = _initialHoldersRange.length-1;
+        if(_initialHoldersRange[lastIndex] <= tokenId) {
+            return  _initialHolders[lastIndex];
         }
         uint index = Ph101ppDailyPhotoUtils.findLowerBound(_initialHoldersRange, tokenId);
         return _initialHolders[index];
