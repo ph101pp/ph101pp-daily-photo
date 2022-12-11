@@ -4,31 +4,30 @@ pragma solidity ^0.8.12;
 import "./ERC1155MintRangePausable.sol";
 
 contract TestERC1155MintRangePausable is ERC1155MintRangePausable {
-    constructor(address[] memory initialHolders)
-        ERC1155_("")
-        ERC1155MintRange(initialHolders)
-    {}
-    
-    function initialBalanceOf(address, uint256 tokenId)
-        internal
-        pure
-        override
-        returns (uint256)
-    {
-        // tokenId 0 -> everyone gets 99
-        if (tokenId == 0) {
-            return 9999;
+    constructor(
+        address[] memory initialHolders
+    ) ERC1155_("") ERC1155MintRange(initialHolders) {}
+
+    function initialBalanceOf(
+        address account,
+        uint256 tokenId
+    ) internal view override returns (uint256) {
+        if (_includesAddress(initialHolders(tokenId), account)) {
+            // tokenId 0 -> everyone gets 99
+            if (tokenId == 0) {
+                return 9999;
+            }
+            // other tokens -> dynamic by token id
+            else {
+                return (tokenId % 10) + 1;
+            }
         }
-        // other tokens -> dynamic by token id
-        else {
-            return (tokenId % 10) + 1;
-        }
+        return 0;
     }
 
     function setInitialHolders(address[] memory addresses) public {
         _setInitialHolders(addresses);
     }
-
 
     function mintRange(
         uint256[] memory ids,
@@ -64,11 +63,7 @@ contract TestERC1155MintRangePausable is ERC1155MintRangePausable {
         _mintBatch(to, ids, amounts, data);
     }
 
-    function burn(
-        address from,
-        uint256 id,
-        uint256 amount
-    ) public virtual {
+    function burn(address from, uint256 id, uint256 amount) public virtual {
         _burn(from, id, amount);
     }
 

@@ -451,6 +451,10 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
         expect(treasuryBalances[i]).to.lte(maxSupply[1]);
         expect(treasuryBalances[i]).to.gte(maxSupply[0]);
       }
+
+      expect(await c.balanceOf(treasury.address, photos+1)).to.equal(0)
+      expect(await c.balanceOf(vault.address, photos+1)).to.equal(0)
+
     });
   })
 

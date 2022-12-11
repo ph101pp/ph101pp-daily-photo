@@ -145,7 +145,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
         expect(await c.exists(i)).to.equal(i < 21);
       }
 
-      const invalidBalances = await c.balanceOfBatch(initialHolders, [20, 21, 22, 23]);
+      const invalidBalances = await c.balanceOfBatch(initialHolders, [19, 20, 21, 22]);
       for (let i = 0; i < initialHolders.length; i++) {
         expect(invalidBalances[i].toNumber()).to.equal(0);
       }
@@ -303,17 +303,19 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
 
       for (let i = 0; i < 10; i++) {
         if (i < 5) {
-          expect(await c.initialHolders(i)).to.deep.equal(initialHolders);
+          const currInitialHolders = await c.initialHolders(i);
+          expect(currInitialHolders).to.deep.equal(initialHolders);
           for (let h = 0; h < initialHolders.length; h++) {
-            expect(await c.isInitialHolderOf(initialHolders[h], i)).to.be.true;
-            expect(await c.isInitialHolderOf(initialHolders2[h], i)).to.be.false;
+            expect(currInitialHolders).to.include(initialHolders[h]);
+            expect(currInitialHolders).to.not.include(initialHolders2[h]);
           }
         }
         else {
-          expect(await c.initialHolders(i)).to.deep.equal(initialHolders2);
+          const currInitialHolders = await c.initialHolders(i);
+          expect(currInitialHolders).to.deep.equal(initialHolders2);
           for (let h = 0; h < initialHolders2.length; h++) {
-            expect(await c.isInitialHolderOf(initialHolders[h], i)).to.be.false;
-            expect(await c.isInitialHolderOf(initialHolders2[h], i)).to.be.true;
+            expect(currInitialHolders).to.not.include(initialHolders[h]);
+            expect(currInitialHolders).to.include(initialHolders2[h]);
           }
         }
       }

@@ -103,27 +103,23 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             lastRangeTokenIdWithLockedInitialHolders
         );
 
-        for (uint k = 0; k < localInitialHolders.length; k++) {
-            for (uint i = 0; i < localInitialHolders[k].length; i++) {
-                address holderAddress = localInitialHolders[k][i];
-                if (!isZeroLocked || k > lastLockedIndex) {
-                    delete _initialHoldersMappings[k][holderAddress];
-                } else {
-                    require(holderAddress == newInitialHolders[k][i], "E:17");
-                }
-            }
-        }
         for (uint k = 0; k < newInitialHolders.length; k++) {
-            if (!isZeroLocked || k > lastLockedIndex) {
-                address[] memory newInitialHolder = newInitialHolders[k];
-                for (uint i = 0; i < newInitialHolder.length; i++) {
-                    _initialHoldersMappings[k][newInitialHolder[i]] = true;
-                }
-            } else {
+            bool isLocked = isZeroLocked && k <= lastLockedIndex;
+            if (isLocked) {
                 require(
                     localInitialHoldersRange[k] == newInitialHoldersRange[k],
                     "E:18"
                 );
+            }
+            address[] memory newInitialHolder = newInitialHolders[k];
+            for (uint i = 0; i < newInitialHolder.length; i++) {
+                if (isLocked) {
+                    require(
+                        localInitialHolders[k][i] == newInitialHolders[k][i],
+                        "E:17"
+                    );
+                }
+                _initialHoldersAddressMap[newInitialHolder[i]] = true;
             }
         }
 
@@ -186,14 +182,18 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             for (uint k = 0; k < id.length; k++) {
                 uint tokenId = id[k];
                 uint balance = amount[k];
-                
+
                 require(exists(tokenId) == true, "E:11");
                 require(isManualMint[tokenId] == false, "E:12");
                 require(_balances[tokenId][from] == 0, "E:13");
                 require(_balances[tokenId][to] == 0, "E:14");
 
                 require(balanceOf(from, tokenId) >= balance, "E:08");
-                require(isInitialHolderOf(from, tokenId), "E:09");
+
+                address[] memory currentInitialHolders = initialHolders(
+                    tokenId
+                );
+                require(_includesAddress(currentInitialHolders, from), "E:09");
 
                 if (isZeroLocked) {
                     require(
@@ -202,7 +202,10 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     );
                 }
 
-                uint newInitialHoldersIndex = _findLowerBound(newInitialHoldersRange, tokenId);
+                uint newInitialHoldersIndex = _findLowerBound(
+                    newInitialHoldersRange,
+                    tokenId
+                );
                 address[] memory nextInitialHolders = newInitialHolders[
                     newInitialHoldersIndex
                 ];

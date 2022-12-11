@@ -8,7 +8,7 @@ async function cost(tx: Promise<ContractTransaction>): Promise<number> {
   return receipt.cumulativeGasUsed.toNumber() / interations;
 }
 
-describe.only("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
+describe("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
   console.log("ITERATIONS", interations);
 
   async function deployFixture() {
@@ -157,7 +157,7 @@ describe.only("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     console.log(report);
   });
 
-  it.only("mintRange() transfer() transfer()", async function () {
+  it("mintRange() transfer() transfer()", async function () {
     const { erc, c1, c2, pdp, treasury, account1, account2, account3, account4 } = await loadFixture(deployFixture);
 
     await pdp.setInitialSupply([1, 1]);

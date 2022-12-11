@@ -24,7 +24,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     // Track initial holders across tokenID ranges + lookup mapping;
     address[][] internal _initialHolders;
     uint[] internal _initialHoldersRange;
-    mapping(uint => mapping(address => bool)) internal _initialHoldersMappings;
+    mapping(address => bool) internal _initialHoldersAddressMap;
 
     // last tokenId minted via mintRange.
     uint public lastRangeTokenIdMinted;
@@ -34,7 +34,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         _initialHoldersRange.push(0);
         _initialHolders.push(initialInitialHolders);
         for (uint i = 0; i < initialInitialHolders.length; i++) {
-            _initialHoldersMappings[0][initialInitialHolders[i]] = true;
+            _initialHoldersAddressMap[initialInitialHolders[i]] = true;
         }
     }
 
@@ -60,10 +60,10 @@ abstract contract ERC1155MintRange is ERC1155_ {
         require(account != address(0), "ERC1155: not a valid owner");
 
         if (
+            _maybeInitialHolder(account) &&
             !isBalanceInitialized[id][account] &&
             !isManualMint[id] &&
-            _inRange(id) &&
-            isInitialHolderOf(account, id)
+            _inRange(id)
         ) {
             return initialBalanceOf(account, id);
         }
@@ -136,17 +136,17 @@ abstract contract ERC1155MintRange is ERC1155_ {
      */
     function _maybeInitializeBalance(address account, uint id) private {
         if (
+            _maybeInitialHolder(account) &&
             account != address(0) &&
             !isBalanceInitialized[id][account] &&
             !isManualMint[id] &&
-            _inRange(id) &&
-            isInitialHolderOf(account, id)
+            _inRange(id)
         ) {
             uint balance = initialBalanceOf(account, id);
             if (balance > 0) {
-                isBalanceInitialized[id][account] = true;
                 _balances[id][account] = balance;
             }
+            isBalanceInitialized[id][account] = true;
         }
     }
 
@@ -161,20 +161,13 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint256 lastIndex = _initialHolders.length - 1;
         uint256 lastId = _initialHoldersRange[lastIndex];
         if (lastId == firstId) {
-            address[] memory prevInitialHolders = _initialHolders[lastId];
             _initialHolders[lastId] = addresses;
-            for (uint i = 0; i < prevInitialHolders.length; i++) {
-                delete _initialHoldersMappings[lastIndex][
-                    prevInitialHolders[i]
-                ];
-            }
         } else {
             _initialHoldersRange.push(firstId);
             _initialHolders.push(addresses);
-            lastIndex = lastIndex + 1;
         }
         for (uint i = 0; i < addresses.length; i++) {
-            _initialHoldersMappings[lastIndex][addresses[i]] = true;
+            _initialHoldersAddressMap[addresses[i]] = true;
         }
     }
 
@@ -185,29 +178,19 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint tokenId
     ) public view virtual returns (address[] memory) {
         // optimization for mintRange
-        uint lastIndex = _initialHoldersRange.length-1;
-        if(_initialHoldersRange[lastIndex] <= tokenId) {
-            return  _initialHolders[lastIndex];
+        uint lastIndex = _initialHoldersRange.length - 1;
+        if (_initialHoldersRange[lastIndex] <= tokenId) {
+            return _initialHolders[lastIndex];
         }
-        uint index = _findLowerBound(
-            _initialHoldersRange,
-            tokenId
-        );
+        uint index = _findLowerBound(_initialHoldersRange, tokenId);
         return _initialHolders[index];
     }
 
     /**
      * @dev Returns true if address is an initial holder of tokenId
      */
-    function isInitialHolderOf(
-        address account,
-        uint tokenId
-    ) public view returns (bool) {
-        uint index = _findLowerBound(
-            _initialHoldersRange,
-            tokenId
-        );
-        return _initialHoldersMappings[index][account];
+    function _maybeInitialHolder(address account) internal view returns (bool) {
+        return _initialHoldersAddressMap[account];
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -335,5 +318,20 @@ abstract contract ERC1155MintRange is ERC1155_ {
             }
         }
         return 0;
+    }
+
+    /**
+     * @dev Utility to find Address in array of addresses
+     */
+    function _includesAddress(
+        address[] memory array,
+        address value
+    ) internal pure returns (bool) {
+        for (uint i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                return true;
+            }
+        }
+        return false;
     }
 }
