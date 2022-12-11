@@ -8,7 +8,7 @@ async function cost(tx: Promise<ContractTransaction>): Promise<number> {
   return receipt.cumulativeGasUsed.toNumber() / interations;
 }
 
-describe("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
+describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
   console.log("ITERATIONS", interations);
 
   async function deployFixture() {

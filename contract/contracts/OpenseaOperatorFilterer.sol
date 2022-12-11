@@ -14,7 +14,7 @@ import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFil
 abstract contract OpenseaOperatorFilterer {
     error OperatorNotAllowed(address operator);
 
-    bool public isOperatorFilterRegistryPermanentlyFrozen;
+    bool public isOperatorFilterRegistryAddressPermanentlyFrozen;
 
     // Default: OpenSea OperatorFilterRegistry contract
     address public operatorFilterRegistry =
@@ -30,15 +30,15 @@ abstract contract OpenseaOperatorFilterer {
         address _operatorFilterRegistry
     ) internal virtual {
         require(
-            !isOperatorFilterRegistryPermanentlyFrozen,
+            !isOperatorFilterRegistryAddressPermanentlyFrozen,
             "Permanently frozen"
         );
         operatorFilterRegistry = _operatorFilterRegistry;
     }
 
     // Permanently freeze filter registry address.
-    function _permanentlyFreezeOperatorFilterRegistry() internal virtual {
-        isOperatorFilterRegistryPermanentlyFrozen = true;
+    function _permanentlyFreezeOperatorFilterRegistryAddress() internal virtual {
+        isOperatorFilterRegistryAddressPermanentlyFrozen = true;
     }
 
     function _isOperatorAllowed(address operator) private view {

@@ -875,7 +875,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       // permanently disable operator filter
       await c.setOperatorFilterRegistry(ethers.constants.AddressZero);
-      await c.permanentlyFreezeOperatorFilterRegistry();
+      await c.permanentlyFreezeOperatorFilterRegistryAddress();
       await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
       await expect(c.setOperatorFilterRegistry(ethers.constants.AddressZero)).to.be.revertedWith("Permanently frozen");
     });

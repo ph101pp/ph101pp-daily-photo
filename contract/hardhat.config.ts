@@ -14,7 +14,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 500,
+        runs: 300,
       },
     },
   },
@@ -36,7 +36,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      goerli: "5PYVC8HWZZKIM3XYFTM7BKA4C9DEJS8JDV",
+      goerli: `${process.env.GOERLI_ETHERSCAN_API_KEY}`,
     },
   }
 };

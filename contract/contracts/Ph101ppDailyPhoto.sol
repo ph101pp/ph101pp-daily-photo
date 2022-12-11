@@ -122,10 +122,7 @@ contract Ph101ppDailyPhoto is
         if (tokenId > lastRangeTokenIdWithPermanentUri) {
             return new string[](0);
         }
-        uint permanentUriIndex = _findLowerBound(
-            _permanentUriRange,
-            tokenId
-        );
+        uint permanentUriIndex = _findLowerBound(_permanentUriRange, tokenId);
         string memory slug = tokenSlugFromTokenId(tokenId);
         string[] memory history = new string[](
             _permanentUris.length - permanentUriIndex
@@ -250,10 +247,10 @@ contract Ph101ppDailyPhoto is
         uint lastId = _initialSupplyRange[_initialSupplyRange.length - 1];
         if (lastId == firstId) {
             _initialSupplies[_initialSupplies.length - 1] = newInitialSupply;
-            return;
+        } else {
+            _initialSupplyRange.push(firstId);
+            _initialSupplies.push(newInitialSupply);
         }
-        _initialSupplyRange.push(firstId);
-        _initialSupplies.push(newInitialSupply);
     }
 
     // Returns initial supply range that was used for a tokenId.
@@ -263,10 +260,7 @@ contract Ph101ppDailyPhoto is
         if (_initialSupplyRange[lastIndex] <= tokenId) {
             return _initialSupplies[lastIndex];
         }
-        uint supplyIndex = _findLowerBound(
-            _initialSupplyRange,
-            tokenId
-        );
+        uint supplyIndex = _findLowerBound(_initialSupplyRange, tokenId);
         return _initialSupplies[supplyIndex];
     }
 
@@ -410,12 +404,12 @@ contract Ph101ppDailyPhoto is
     }
 
     // Defensive Coding: Permanently freeze operator filter registry address
-    function permanentlyFreezeOperatorFilterRegistry()
+    function permanentlyFreezeOperatorFilterRegistryAddress()
         public
         whenNotPaused
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        _permanentlyFreezeOperatorFilterRegistry();
+        _permanentlyFreezeOperatorFilterRegistryAddress();
     }
 
     ///////////////////////////////////////////////////////////////////////////////
