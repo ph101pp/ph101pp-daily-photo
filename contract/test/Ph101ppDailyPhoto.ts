@@ -2,8 +2,9 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { EtherscanConfig } from "@nomiclabs/hardhat-etherscan/dist/src/types";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
+import { BaseContract } from "ethers";
 import getPh101ppDailyPhotoUpdateInitialHoldersRangeInput from "../scripts/getPh101ppDailyPhotoUpdateInitialHoldersRangeInput";
-import { Ph101ppDailyPhoto, TestOperatorFilterRegistry } from "../typechain-types";
+import { Ph101ppDailyPhoto, TestOperatorFilterRegistry, TestIPh101ppDailyPhotoListener } from "../typechain-types";
 import { Fixture, SignerWithAddress } from "./fixture";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
@@ -11,6 +12,7 @@ const nowTimestamp = Math.ceil(Date.now() / 1000) + SECONDS_PER_DAY * 3;
 
 type FixturePDP = {
   ofr: TestOperatorFilterRegistry,
+  pdpl: TestIPh101ppDailyPhotoListener,
   treasury: SignerWithAddress,
   vault: SignerWithAddress,
   mutableUri: string,
@@ -20,7 +22,7 @@ describe("Ph101ppDailyPhoto", function () {
   testPh101ppDailyPhoto(deployFixture());
 });
 
-function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
+function deployFixture<T extends BaseContract>(): () => Promise<Fixture<T> & FixturePDP> {
   const mutableUri = "mutable_.uri/";
   const immutableUri = "immutable.uri/";
 
@@ -36,6 +38,7 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
     const OperatorFilterRegistry = await ethers.getContractFactory("TestOperatorFilterRegistry")
     const ofr = await OperatorFilterRegistry.attach("0x000000000000AAeB6D7670E522A718067333cd4E")
 
+
     const DT = await ethers.getContractFactory("Ph101ppDailyPhotoUtils");
     const dt = await DT.deploy();
     const PDP = await ethers.getContractFactory("Ph101ppDailyPhoto", {
@@ -43,9 +46,13 @@ function deployFixture<T>(): () => Promise<Fixture<T> & FixturePDP> {
         "Ph101ppDailyPhotoUtils": dt.address, // test: "0x947cc35992e6723de50bf704828a01fd2d5d6641" //dt.address
       }
     });
-    const c = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]) as T;
 
-    return { c, ofr, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6, account7, account8 };
+    const c = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]) as BaseContract as T;
+
+    const PDPL = await ethers.getContractFactory("TestIPh101ppDailyPhotoListener");
+    const pdpl = await PDPL.deploy(c.address);
+
+    return { c, ofr, pdpl, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6, account7, account8 };
   }
 }
 
@@ -62,6 +69,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.supportsInterface("0x01ffc9a7")).to.be.true;
     });
   });
+
   describe("URI storing / updating", function () {
     it("Should set the correct mutableUri and immutableUri during deploy", async function () {
       const { c, mutableUri, immutableUri } = await loadFixture(deployFixture);
@@ -147,11 +155,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const input = await c.getMintRangeInput(101);
       await c.mintPhotos(...input);
 
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("Required: lastIdWithPermanentUri < TokenId <= lastIdMinted.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("Required: lastIdWithPermanentUri < TokenId <= lastIdMinted.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("Required: lastIdWithPermanentUri < TokenId <= lastIdMinted.");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
     });
   });
 
@@ -869,5 +877,61 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
 
   });
+
+  describe("Transfer Listener", function () {
+
+    it("should correcly set transfer listener via setTransferListenerAddress", async function () {
+      const { c, pdpl } = await loadFixture(deployFixture);
+      expect(await c.transferEventListenerAddress()).to.equal(ethers.constants.AddressZero);
+      await c.setTransferEventListenerAddress(pdpl.address);
+      expect(await c.transferEventListenerAddress()).to.equal(pdpl.address);
+    });
+
+    it("should fail to set transfer listener via setTransferListenerAddress when frozen", async function () {
+      const { c, pdpl, account1 } = await loadFixture(deployFixture);
+      expect(await c.transferEventListenerAddress()).to.equal(ethers.constants.AddressZero);
+      await c.setTransferEventListenerAddress(pdpl.address);
+      expect(await c.transferEventListenerAddress()).to.equal(pdpl.address);
+
+      await c.permanentlyFreezeTransferEventListenerAddress();
+
+      expect(await c.transferEventListenerAddress()).to.equal(pdpl.address);
+      await expect(c.setTransferEventListenerAddress(account1.address)).to.be.reverted; 
+
+    });
+
+
+    it("should emit Ph101ppDailyPhotoTransferReceived from Listener on transfer", async function () {
+      const { c, pdpl, treasury, account1 } = await loadFixture(deployFixture);
+
+      await c.setTransferEventListenerAddress(pdpl.address);
+
+      await expect(c.connect(treasury).safeTransferFrom(treasury.address, treasury.address, 0, 1, [])).to.be.revertedWith("Test Revert");
+      await expect(c.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 1, [])).to.not.be.reverted;
+
+      const tx = await c.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 1, []);
+      const receipt = await tx.wait();
+
+      let event;
+      for (let i = 0; i < (receipt?.events?.length ?? 0); i++) {
+        const e = receipt.events?.[i]!;
+        try {
+          event = await pdpl.interface.decodeEventLog("Ph101ppDailyPhotoTransferReceived", e.data);
+          break;
+        }
+        catch (e) {}
+      }
+      if(!event) {
+        return expect(event, "expected event not to be undefined").to.not.be.undefined;
+      }
+      expect(event.sender).to.equal(c.address);
+      expect(event.operator).to.equal(treasury.address);
+      expect(event.from).to.equal(treasury.address);
+      expect(event.to).to.equal(account1.address);
+      expect(event.ids[0].toNumber()).to.equal(0);
+      expect(event.amounts[0].toNumber()).to.equal(1);
+  });
+
+});
 }
 
