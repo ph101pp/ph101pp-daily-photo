@@ -25,11 +25,14 @@ abstract contract OpenseaOperatorFilterer {
 
     // Enables updating registry contract address
     // (requires manual registering / unregistring with Registry)
-    // set to address(0) to disable operator filtering 
+    // set to address(0) to disable operator filtering
     function _setOperatorFilterRegistry(
         address _operatorFilterRegistry
     ) internal virtual {
-        require(!isOperatorFilterRegistryPermanentlyFrozen, "Permanently frozen");
+        require(
+            !isOperatorFilterRegistryPermanentlyFrozen,
+            "Permanently frozen"
+        );
         operatorFilterRegistry = _operatorFilterRegistry;
     }
 
@@ -39,9 +42,7 @@ abstract contract OpenseaOperatorFilterer {
     }
 
     function _isOperatorAllowed(address operator) private view {
-        // Check registry code length to facilitate testing in environments without a deployed registry.
         if (
-            operatorFilterRegistry != address(0) && // && operatorFilterRegistry.code.length > 0
             !IOperatorFilterRegistry(operatorFilterRegistry).isOperatorAllowed(
                 address(this),
                 operator
@@ -55,7 +56,7 @@ abstract contract OpenseaOperatorFilterer {
         // Allow spending tokens from addresses with balance
         // Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
         // from an EOA.
-        if (from != msg.sender) {
+        if (from != msg.sender && operatorFilterRegistry != address(0)) {
             _isOperatorAllowed(msg.sender);
         }
         _;

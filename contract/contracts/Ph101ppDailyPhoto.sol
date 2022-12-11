@@ -419,7 +419,7 @@ contract Ph101ppDailyPhoto is
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // Transfer Event Listener
+    // Transfer Event Listener Address
     ///////////////////////////////////////////////////////////////////////////////
 
     function setTransferEventListenerAddress(
@@ -437,14 +437,27 @@ contract Ph101ppDailyPhoto is
         isTransferEventListenerAddressPermanentlyFrozen = true;
     }
 
-    function _afterTokenTransfer(
+    ///////////////////////////////////////////////////////////////////////////////
+    // Transfer & Approval mods for Opensea Operator Filterer & Transfer Event
+    ///////////////////////////////////////////////////////////////////////////////
+
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) public override whenNotPaused onlyAllowedOperatorApproval(operator) {
+        super.setApprovalForAll(operator, approved);
+    }
+
+    function _beforeTokenTransfer(
         address operator,
         address from,
         address to,
         uint[] memory ids,
         uint[] memory amounts,
         bytes memory data
-    ) internal virtual override {
+    ) internal virtual override onlyAllowedOperator(from) {
+        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+
         if (transferEventListenerAddress != address(0)) {
             IPh101ppDailyPhotoListener(transferEventListenerAddress)
                 .Ph101ppDailyPhotoTransferHandler(
@@ -456,37 +469,6 @@ contract Ph101ppDailyPhoto is
                     data
                 );
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // Transfer & Approval modifiers for Opensea Operator Filterer
-    ///////////////////////////////////////////////////////////////////////////////
-
-    function setApprovalForAll(
-        address operator,
-        bool approved
-    ) public override whenNotPaused onlyAllowedOperatorApproval(operator) {
-        super.setApprovalForAll(operator, approved);
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 amount,
-        bytes memory data
-    ) public override onlyAllowedOperator(from) {
-        super.safeTransferFrom(from, to, tokenId, amount, data);
-    }
-
-    function safeBatchTransferFrom(
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) public override onlyAllowedOperator(from) {
-        super.safeBatchTransferFrom(from, to, ids, amounts, data);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

@@ -8,7 +8,7 @@ async function cost(tx: Promise<ContractTransaction>): Promise<number> {
   return receipt.cumulativeGasUsed.toNumber() / interations;
 }
 
-describe.only("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
+describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateable vs Ph101ppDailyPhoto", function () {
   console.log("ITERATIONS", interations);
 
   async function deployFixture() {
@@ -30,7 +30,7 @@ describe.only("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     });
     const pdp = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]);
     await pdp.setOperatorFilterRegistry(ethers.constants.AddressZero);
-    
+
     const C1 = await ethers.getContractFactory("TestERC1155MintRange", {
       libraries: {
         Ph101ppDailyPhotoUtils: dt.address
