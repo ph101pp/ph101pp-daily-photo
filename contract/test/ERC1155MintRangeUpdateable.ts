@@ -216,7 +216,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
       }
     })
 
-    it("should skip initializedBalances or manuallyMinted tokens", async function () {
+    it.only("should skip initializedBalances or manuallyMinted tokens", async function () {
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
       const initialHolders = [account1.address];
       await c.setInitialHolders(initialHolders);
@@ -226,7 +226,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
       await c.connect(account1).safeTransferFrom(account1.address, account3.address, 5, 3, []);
       await c.pause();
 
-      const [fromAddresses, toAddresses, ids, amounts] = await _getUpdateInitialHoldersRangeInput(c, 0, Infinity, [account4.address]);
+      const [fromAddresses, toAddresses, ids, amounts, ...rest] = await _getUpdateInitialHoldersRangeInput(c, 0, Infinity, [account4.address]);
 
       expect(fromAddresses.length).to.equal(1);
       expect(toAddresses.length).to.equal(1);
@@ -236,6 +236,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: ()=>Promise<Fixtur
       expect(ids[0]).to.not.include(0);
       expect(ids[0]).to.not.include(1);
       expect(ids[0]).to.not.include(5);
+
+      await c.updateInitialHoldersRange(fromAddresses, toAddresses, ids, amounts, ...rest);
+
+      expect(await c.balanceOf(account4.address, 5)).to.equal(0);
+      expect(await c.balanceOf(account3.address, 5)).to.equal(3);
+      expect(await c.balanceOf(account1.address, 5)).to.equal(3);
+
     });
 
     it("should correcly update initialHolders of a simple range", async function () {
