@@ -12,6 +12,7 @@ export default async function getPh101ppDailyPhotoUpdateInitialHoldersRangeInput
   string[],
   number[][],
   number[][],
+  number[][],
   string[][],
   number[],
   string

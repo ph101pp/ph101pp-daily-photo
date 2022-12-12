@@ -539,140 +539,162 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
   });
 
-  // describe.skip("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function () {
-  //   it("should correcly update vault address only", async function () {
-  //     const { c, vault, treasury, account1 } = await loadFixture(deployFixture);
-  //     const photos = 10;
-  //     const maxSupply = [1, 5];
+  describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function () {
+    it.only("should correcly update vault address only", async function () {
+      const { c, vault, treasury, account1, account2 } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = [5, 5];
 
-  //     await c.setInitialSupply(maxSupply);
+      await c.setInitialSupply(maxSupply);
 
-  //     const input = await c.getMintRangeInput(photos);
+      const input = await c.getMintRangeInput(photos);
 
-  //     const vaultAddresses = new Array(photos).fill(vault.address);
-  //     const treasuryAddresses = new Array(photos).fill(treasury.address);
+      const vaultAddresses = new Array(photos).fill(vault.address);
+      const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-  //     await c.mintPhotos(...input);
-  //     const ids = input[0];
-  //     const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
-  //     const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+      await c.mintPhotos(...input);
+      const ids = input[0];
+      const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
+      const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
 
-  //     for (let i = 0; i < photos; i++) {
-  //       expect(vaultBalances[i]).to.equal(1);
-  //       expect(treasuryBalances[i]).to.gte(1);
-  //     }
+      for (let i = 0; i < photos; i++) {
+        expect(vaultBalances[i]).to.equal(1);
+        expect(treasuryBalances[i]).to.equal(5);
+      }
 
-  //     await c.pause();
-  //     const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, treasury.address, account1.address);
 
-  //     const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
-  //     const receipt = await tx.wait();
+      // transfer token 3
+      await c.connect(vault).safeTransferFrom(vault.address, account2.address, 3, 1, []);
 
-  //     const newVaultAddresses = new Array(photos).fill(account1.address);
-  //     const newTreasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
-  //     const newVaultBalances = await c.balanceOfBatch(newVaultAddresses, ids);
-  //     const newOldVaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
+      await c.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, treasury.address, account1.address);
 
-  //     for (let i = 0; i < photos; i++) {
-  //       expect(newVaultBalances[i]).to.equal(1);
-  //       expect(newOldVaultBalances[i]).to.equal(0);
-  //       expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
-  //     }
+      const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
+      const receipt = await tx.wait();
 
-  //     expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
-  //     expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
-  //   });
+      const newVaultAddresses = new Array(photos).fill(account1.address);
+      const newTreasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+      const newVaultBalances = await c.balanceOfBatch(newVaultAddresses, ids);
+      const newOldVaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
 
-  //   it("should correcly update treasury address only", async function () {
-  //     const { c, vault, treasury, account1 } = await loadFixture(deployFixture);
-  //     const photos = 10;
-  //     const maxSupply = [1, 5];
-  //     await c.setInitialSupply(maxSupply);
-  //     const input = await c.getMintRangeInput(photos);
+      console.log(updateInitialHoldersInput);
 
-  //     const vaultAddresses = new Array(photos).fill(vault.address);
-  //     const treasuryAddresses = new Array(photos).fill(treasury.address);
+      expect((await c.balanceOf(vault.address, 3)).toNumber()).to.equal(0)
+      expect((await c.balanceOf(account2.address, 3)).toNumber()).to.equal(1)
 
-  //     await c.mintPhotos(...input);
-  //     const ids = input[0];
-  //     const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
-  //     const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+      /////////
+      expect((await c.balanceOf(account1.address, 3)).toNumber()).to.equal(0) 
+      // this test fails because isBalanceInitialized is not set 
+      // for new vault and so initialBalances is called resulting in additional nfts "minted" 
 
-  //     for (let i = 0; i < photos; i++) {
-  //       expect(vaultBalances[i]).to.equal(1);
-  //       expect(treasuryBalances[i]).to.gte(1);
-  //     }
+      // this is not a trivial problem to solve safely 
+      // -> so I will simplify Ph101ppDailyPhoto and remove ERC1155MintRangeUpdateable.
 
-  //     await c.pause();
-  //     const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
-  //     const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
-  //     const receipt = await tx.wait();
 
-  //     const newTreasuryAddresses = new Array(photos).fill(account1.address);
-  //     const newTreasuryBalances = await c.balanceOfBatch(newTreasuryAddresses, ids);
-  //     const newOldTreasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
-  //     const newVaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
+      // expect((await c.balanceOf(treasury.address, 3)).toNumber()).to.equal(5)
 
-  //     for (let i = 0; i < photos; i++) {
-  //       expect(newVaultBalances[i]).to.equal(1);
-  //       expect(newOldTreasuryBalances[i]).to.equal(0);
-  //       expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
-  //     }
+      return
 
-  //     expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
-  //     expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
-  //   });
+      for (let i = 0; i < photos; i++) {
+        expect(newVaultBalances[i]).to.equal(1);
+        expect(newOldVaultBalances[i]).to.equal(0);
+        expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
+      }
 
-  //   it("should correcly swap treasury and vault addresses", async function () {
-  //     const { c, vault, treasury } = await loadFixture(deployFixture);
-  //     const photos = 10;
-  //     const maxSupply = [1, 5];
-  //     await c.setInitialSupply(maxSupply);
-  //     const input = await c.getMintRangeInput(photos);
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
+      expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
+    });
 
-  //     const vaultAddresses = new Array(photos).fill(vault.address);
-  //     const treasuryAddresses = new Array(photos).fill(treasury.address);
+    it("should correcly update treasury address only", async function () {
+      const { c, vault, treasury, account1 } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = [1, 5];
+      await c.setInitialSupply(maxSupply);
+      const input = await c.getMintRangeInput(photos);
 
-  //     await c.mintPhotos(...input);
-  //     const ids = input[0];
-  //     const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
-  //     const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+      const vaultAddresses = new Array(photos).fill(vault.address);
+      const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-  //     for (let i = 0; i < photos; i++) {
-  //       expect(vaultBalances[i]).to.equal(1);
-  //       expect(treasuryBalances[i]).to.gte(1);
-  //     }
+      await c.mintPhotos(...input);
+      const ids = input[0];
+      const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
+      const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
 
-  //     await c.pause();
-  //     const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, vault.address, treasury.address);
+      for (let i = 0; i < photos; i++) {
+        expect(vaultBalances[i]).to.equal(1);
+        expect(treasuryBalances[i]).to.gte(1);
+      }
 
-  //     await c.updateInitialHoldersRange(...updateInitialHoldersInput);
+      await c.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
+      const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
+      const receipt = await tx.wait();
 
-  //     const newTreasuryBalances = await c.balanceOfBatch(vaultAddresses, ids);
-  //     const newVaultBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+      const newTreasuryAddresses = new Array(photos).fill(account1.address);
+      const newTreasuryBalances = await c.balanceOfBatch(newTreasuryAddresses, ids);
+      const newOldTreasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+      const newVaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
 
-  //     for (let i = 0; i < photos; i++) {
-  //       expect(newVaultBalances[i]).to.equal(vaultBalances[i]);
-  //       expect(newTreasuryBalances[i]).to.equal(treasuryBalances[i]);
-  //     }
-  //   });
+      for (let i = 0; i < photos; i++) {
+        expect(newVaultBalances[i]).to.equal(1);
+        expect(newOldTreasuryBalances[i]).to.equal(0);
+        expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
+      }
 
-  //   it("should fail to updated initialHolders if isInitialHoldersRangeUpdatePermanentlyDisabled", async function () {
-  //     const { c, vault, treasury } = await loadFixture(deployFixture);
-  //     const photos = 10;
-  //     const maxSupply = [1, 5];
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);
+      expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
+    });
 
-  //     await c.setInitialSupply(maxSupply);
-  //     const input = await c.getMintRangeInput(photos);
-  //     await c.mintPhotos(...input);
-  //     await c.permanentlyDisableInitialHoldersRangeUpdate();
-  //     await c.pause();
+    it("should correcly swap treasury and vault addresses", async function () {
+      const { c, vault, treasury } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = [1, 5];
+      await c.setInitialSupply(maxSupply);
+      const input = await c.getMintRangeInput(photos);
 
-  //     const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, vault.address, treasury.address);
-  //     await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
-  //     expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
-  //   })
-  // });
+      const vaultAddresses = new Array(photos).fill(vault.address);
+      const treasuryAddresses = new Array(photos).fill(treasury.address);
+
+      await c.mintPhotos(...input);
+      const ids = input[0];
+      const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
+      const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+
+      for (let i = 0; i < photos; i++) {
+        expect(vaultBalances[i]).to.equal(1);
+        expect(treasuryBalances[i]).to.gte(1);
+      }
+
+      await c.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, vault.address, treasury.address);
+
+      await c.updateInitialHoldersRange(...updateInitialHoldersInput);
+
+      const newTreasuryBalances = await c.balanceOfBatch(vaultAddresses, ids);
+      const newVaultBalances = await c.balanceOfBatch(treasuryAddresses, ids);
+
+      for (let i = 0; i < photos; i++) {
+        expect(newVaultBalances[i]).to.equal(vaultBalances[i]);
+        expect(newTreasuryBalances[i]).to.equal(treasuryBalances[i]);
+      }
+    });
+
+    it("should fail to updated initialHolders if isInitialHoldersRangeUpdatePermanentlyDisabled", async function () {
+      const { c, vault, treasury } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = [1, 5];
+
+      await c.setInitialSupply(maxSupply);
+      const input = await c.getMintRangeInput(photos);
+      await c.mintPhotos(...input);
+      await c.permanentlyDisableInitialHoldersRangeUpdate();
+      await c.pause();
+
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, vault.address, treasury.address);
+      await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
+      expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
+    })
+  });
 
   describe("ERC2981 Token Royalties", function () {
 
@@ -738,8 +760,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should fail to execute access guarded functions without role", async function () {
       const { c, account1 } = await loadFixture(deployFixture);
       await c.pause();
-      // const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
-      // await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
+      await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
       await c.unpause();
       await c.setInitialSupply([1, 4]);
       const mintInput = await c.getMintRangeInput(4);
@@ -754,10 +776,10 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("AccessControl");
-      // await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setInitialSupply([1, 2])).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setOwner(account1.address)).to.be.rejectedWith("AccessControl");
-      // await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("AccessControl");
     });
 
     it("should execute access guarded functions with special role", async function () {
@@ -765,12 +787,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.grantRole(await c.DEFAULT_ADMIN_ROLE(), account1.address);
       await c.pause();
-      // const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
-      // await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
+      await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
       await c.unpause();
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
-      // await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.not.be.rejectedWith("AccessControl");
-      // await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.not.be.rejectedWith("AccessControl");
 
       await expect(c.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
@@ -803,8 +825,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.pause();
       await expect(c.setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("paused");
-      // await expect(c.setLockInitialHoldersUpTo(0)).to.be.rejectedWith("paused");
-      // await expect(c.permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("paused");
+      await expect(c.setLockInitialHoldersUpTo(0)).to.be.rejectedWith("paused");
+      await expect(c.permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("paused");
 
       await expect(c.pause()).to.be.rejectedWith("paused");
 

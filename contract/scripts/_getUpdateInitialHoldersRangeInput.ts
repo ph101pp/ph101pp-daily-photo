@@ -10,7 +10,7 @@ function findInRange(range: number[], needle: number) {
 }
 
 export default async function _getUpdateInitialHoldersRangeInput(
-  c: TestERC1155MintRangeUpdateable, // | Ph101ppDailyPhoto,
+  c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
   from: number,
   to: number,
   newInitialHolders: string[]
@@ -59,7 +59,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
         const balance = balances[a].toNumber();
         const isBalanceInitialized = await c.isBalanceInitialized(i, fromAddress)
 
-        if (balance > 0) {
+        if (balance > 0 || isBalanceInitialized) {
           let addressIndex = fromAddresses.indexOf(fromAddress);
           if (addressIndex < 0) {
             fromAddresses.push(fromAddress);

@@ -217,7 +217,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       }
     })
 
-    it.only("should manuallyMinted tokens && reinitialize initializedBalances", async function () {
+    it("should manuallyMinted tokens && reinitialize initializedBalances", async function () {
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
       const initialHolders = [account1.address];
       await c.setInitialHolders(initialHolders);
