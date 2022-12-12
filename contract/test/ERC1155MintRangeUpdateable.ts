@@ -18,13 +18,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
 
   describe("verifyUpdateInitialHoldersRangeInput", function () {
 
-    it("should return a hash when successfull", async function () {
+    it.only("should return a hash when successfull", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
       await c.mintRange(...input);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[]], [[account2.address]], [0])).to.not.be.rejected;
+      await c.verifyUpdateInitialHolderRangeInput([account1.address], [account2.address], [[1]], [[1]], [[]], [[account2.address]], [0]);
     })
 
     it("should fail when contract is not paused", async function () {

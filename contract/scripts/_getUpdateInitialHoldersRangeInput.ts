@@ -52,7 +52,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
         const fromAddress = currentInitialHolders[a];
         const toAddress = newInitialHolders[a];
 
-        if(fromAddress === toAddress) {
+        if (fromAddress === toAddress) {
           continue;
         }
 
@@ -71,10 +71,10 @@ export default async function _getUpdateInitialHoldersRangeInput(
             amounts[addressIndex] = amounts[addressIndex] ?? [];
           }
 
-          if(isBalanceInitialized) {
+          if (isBalanceInitialized) {
             initialize[addressIndex].push(i);
           }
-          else {
+          else if (balance > 0) {
             ids[addressIndex].push(i);
             amounts[addressIndex].push(balance);
           }
@@ -87,8 +87,8 @@ export default async function _getUpdateInitialHoldersRangeInput(
 
   const [currentInitialHolders, currentInitialHoldersRangeBig] = await c.initialHoldersRange();
 
-  for(let i=0; i<currentInitialHolders.length; i++) {
-    if(currentInitialHolders[0].length !== newInitialHolders.length) {
+  for (let i = 0; i < currentInitialHolders.length; i++) {
+    if (currentInitialHolders[0].length !== newInitialHolders.length) {
       throw Error("Error: newInitialHolders.length does not match");
     }
   }
@@ -107,21 +107,21 @@ export default async function _getUpdateInitialHoldersRangeInput(
       newRangeIndex++;
 
     } else if (current >= from && current <= to) {
-      if(rangeSet){
+      if (rangeSet) {
         continue;
       }
       newInitialHoldersRange[newRangeIndex] = from;
       newInitialHoldersArray[newRangeIndex] = newInitialHolders;
-      newRangeIndex ++;
+      newRangeIndex++;
       rangeSet = true;
 
       if (to === Infinity) {
         break;
       }
-      if(!currentInitialHoldersRange.includes(to+1)) {
+      if (!currentInitialHoldersRange.includes(to + 1)) {
         newInitialHoldersRange[newRangeIndex] = to + 1;
         newInitialHoldersArray[newRangeIndex] = currentInitialHolders[toIndex];
-        newRangeIndex ++;
+        newRangeIndex++;
       }
     }
   }

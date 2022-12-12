@@ -540,7 +540,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
   });
 
   describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function () {
-    it.only("should correcly update vault address only", async function () {
+    it("should correcly update vault address only", async function () {
       const { c, vault, treasury, account1, account2 } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = [5, 5];
@@ -577,28 +577,19 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const newVaultBalances = await c.balanceOfBatch(newVaultAddresses, ids);
       const newOldVaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
 
-      console.log(updateInitialHoldersInput);
-
-      expect((await c.balanceOf(vault.address, 3)).toNumber()).to.equal(0)
-      expect((await c.balanceOf(account2.address, 3)).toNumber()).to.equal(1)
-
-      /////////
-      expect((await c.balanceOf(account1.address, 3)).toNumber()).to.equal(0) 
-      // this test fails because isBalanceInitialized is not set 
-      // for new vault and so initialBalances is called resulting in additional nfts "minted" 
-
-      // this is not a trivial problem to solve safely 
-      // -> so I will simplify Ph101ppDailyPhoto and remove ERC1155MintRangeUpdateable.
-
-
-      // expect((await c.balanceOf(treasury.address, 3)).toNumber()).to.equal(5)
-
-      return
-
       for (let i = 0; i < photos; i++) {
-        expect(newVaultBalances[i]).to.equal(1);
-        expect(newOldVaultBalances[i]).to.equal(0);
-        expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
+        if(i+1 == 3) {
+          expect((await c.balanceOf(vault.address, 3)).toNumber()).to.equal(0)
+          expect((await c.balanceOf(account2.address, 3)).toNumber()).to.equal(1)
+    
+          expect((await c.balanceOf(account1.address, 3)).toNumber()).to.equal(0) 
+          expect((await c.balanceOf(treasury.address, 3)).toNumber()).to.equal(5)    
+        }
+        else {
+          expect(newVaultBalances[i]).to.equal(1);
+          expect(newOldVaultBalances[i]).to.equal(0);
+          expect(treasuryBalances[i]).to.equal(newTreasuryBalances[i]);
+        }
       }
 
       expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(1);

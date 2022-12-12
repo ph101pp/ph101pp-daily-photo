@@ -5,6 +5,9 @@ pragma solidity ^0.8.0;
 
 import "./ERC1155MintRange.sol";
 import "./ERC1155MintRangePausable.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
+
+import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -130,10 +133,9 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         _initialHolders = newInitialHolders;
         _initialHoldersRange = newInitialHoldersRange;
 
-        _unpause();
         for (uint i = 0; i < toAddresses.length; i++) {
             // uint[] memory toInitialize = initialize[i];
-            for(uint k = 0; k<initialize[i].length; k++ ) {
+            for (uint k = 0; k < initialize[i].length; k++) {
                 isBalanceInitialized[initialize[i][k]][toAddresses[i]] = true;
             }
 
@@ -145,7 +147,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 amounts[i]
             );
         }
-        super._pause();
     }
 
     /**
@@ -163,6 +164,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         require(fromAddresses.length == toAddresses.length, "E:01");
         require(fromAddresses.length == ids.length, "E:02");
         require(fromAddresses.length == amounts.length, "E:03");
+        require(fromAddresses.length == initialize.length, "E:03");
         require(
             newInitialHolders.length == newInitialHoldersRange.length,
             "E:04"
@@ -176,58 +178,75 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     "E:06"
                 );
             }
-            address[] memory newInitialHolder = newInitialHolders[k];
-            for (uint j = 0; j < newInitialHolder.length; j++) {
-                require(newInitialHolder[j] != address(0), "E:16");
+            for (uint j = 0; j < newInitialHolders[k].length; j++) {
+                require(newInitialHolders[k][j] != address(0), "E:16");
             }
         }
-
-        for (uint i = 0; i < ids.length; i++) {
+        for (uint i = 0; i < toAddresses.length; i++) {
             address from = fromAddresses[i];
             address to = toAddresses[i];
+            uint[] memory init = initialize[i];
             uint[] memory id = ids[i];
-            uint[] memory amount = amounts[i];
-            require(id.length == amount.length, "E:07");
 
-            for (uint k = 0; k < id.length; k++) {
-                uint tokenId = id[k];
-                uint balance = amount[k];
+            console.log(id[0]);
 
-                require(exists(tokenId) == true, "E:11");
-                require(isManualMint[tokenId] == false, "E:12");
-                require(_balances[tokenId][from] == 0, "E:13");
-                require(_balances[tokenId][to] == 0, "E:14");
+            require(id.length == amounts[i].length, "E:07");
 
-                require(balanceOf(from, tokenId) >= balance, "E:08");
+            // uint min = Math.min(id[0], init[0]);
+            // uint max = Math.max(id[0], init[0]);
 
-                address[] memory currentInitialHolders = initialHolders(
-                    tokenId
-                );
-                require(_includesAddress(currentInitialHolders, from), "E:09");
+            // console.log(max, min);
 
-                if (isZeroLocked) {
-                    require(
-                        tokenId > lastRangeTokenIdWithLockedInitialHolders,
-                        "E:15"
-                    );
-                }
+            uint idId = 0;
+            uint initId = 0;
 
-                uint newInitialHoldersIndex = _findLowerBound(
-                    newInitialHoldersRange,
-                    tokenId
-                );
-                address[] memory nextInitialHolders = newInitialHolders[
-                    newInitialHoldersIndex
-                ];
-                bool toAddressInNextInitialHolders = false;
-                for (uint h = 0; h < nextInitialHolders.length; h++) {
-                    if (nextInitialHolders[h] == to) {
-                        toAddressInNextInitialHolders = true;
-                        break;
-                    }
-                }
-                require(toAddressInNextInitialHolders, "E:10");
-            }
+            // console.log(min, max, from);
+            // for (uint tokenId = min; tokenId <= max; tokenId++) {
+            //     if (id[idId] == tokenId) {
+            //         uint balance = amounts[i][tokenId];
+            //         require(balanceOf(from, tokenId) > 0, "E:19");
+            //         require(balance > 0, "E:20");
+
+            //         // uninitialized
+            //         require(_balances[tokenId][from] == 0, "E:13");
+            //         require(balanceOf(from, tokenId) >= balance, "E:08");
+            //         idId++;
+            //     } else if (init[initId] == tokenId) {
+            //         require(isBalanceInitialized[tokenId][from], "E:21");
+            //         initId++;
+            //     } else {
+            //         require(balanceOf(from, tokenId) == 0, "E:22");
+            //     }
+
+            //     require(_balances[tokenId][to] == 0, "E:14");
+            //     require(exists(tokenId) == true, "E:11");
+            //     require(isManualMint[tokenId] == false, "E:12");
+
+            //     address[] memory currentInitialHolders = initialHolders(
+            //         tokenId
+            //     );
+            //     require(_includesAddress(currentInitialHolders, from), "E:09");
+
+            //     uint newInitialHoldersIndex = _findLowerBound(
+            //         newInitialHoldersRange,
+            //         tokenId
+            //     );
+
+            //     require(
+            //         _includesAddress(
+            //             newInitialHolders[newInitialHoldersIndex],
+            //             to
+            //         ),
+            //         "E:10"
+            //     );
+
+            //     if (isZeroLocked) {
+            //         require(
+            //             tokenId > lastRangeTokenIdWithLockedInitialHolders,
+            //             "E:15"
+            //         );
+            //     }
+            // }
         }
 
         return
