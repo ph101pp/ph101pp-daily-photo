@@ -41,6 +41,7 @@ contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
         address[] memory toAddresses,
         uint256[][] memory ids,
         uint256[][] memory amounts,
+        uint256[][] memory initialize,
         address[][] memory newInitialHolders,
         uint256[] memory newInitialHoldersRange,
         bytes32 inputChecksum
@@ -50,6 +51,7 @@ contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
             toAddresses,
             ids,
             amounts,
+            initialize,
             newInitialHolders,
             newInitialHoldersRange,
             inputChecksum

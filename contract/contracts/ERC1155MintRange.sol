@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
 
+
 /**
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
  * and adds tracking of total supply per id.

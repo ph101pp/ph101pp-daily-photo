@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import "./ERC1155MintRangeUpdateable.sol";
+import "./ERC1155MintRangePausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 // import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
@@ -10,7 +10,7 @@ import "./IPh101ppDailyPhotoListener.sol";
 import "./OpenseaOperatorFilterer.sol";
 
 contract Ph101ppDailyPhoto is
-    ERC1155MintRangeUpdateable,
+    ERC1155MintRangePausable,
     ERC2981,
     AccessControl,
     OpenseaOperatorFilterer
@@ -279,49 +279,49 @@ contract Ph101ppDailyPhoto is
         _setInitialHolders(addresses);
     }
 
-    // Update initial holder accounts for existing mints.
-    // This method allows unsold & never transfered & non-locked tokens
-    // in the treasury & vault to be moved to new treasury & vault
-    // wallets without having to transfer them through ERC1155.
-    // This method doesnt affect ERC1155.balances, so tokens that
-    // have been sold or transfered before can't ever be affected by this method.
-    function updateInitialHoldersRange(
-        address[] memory fromAddresses,
-        address[] memory toAddresses,
-        uint[][] memory ids,
-        uint[][] memory amounts,
-        address[][] memory newInitialHolders,
-        uint[] memory newInitialHoldersRange,
-        bytes32 inputChecksum
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
-        _updateInitialHoldersRange(
-            fromAddresses,
-            toAddresses,
-            ids,
-            amounts,
-            newInitialHolders,
-            newInitialHoldersRange,
-            inputChecksum
-        );
-    }
+    // // Update initial holder accounts for existing mints.
+    // // This method allows unsold & never transfered & non-locked tokens
+    // // in the treasury & vault to be moved to new treasury & vault
+    // // wallets without having to transfer them through ERC1155.
+    // // This method doesnt affect ERC1155.balances, so tokens that
+    // // have been sold or transfered before can't ever be affected by this method.
+    // function updateInitialHoldersRange(
+    //     address[] memory fromAddresses,
+    //     address[] memory toAddresses,
+    //     uint[][] memory ids,
+    //     uint[][] memory amounts,
+    //     address[][] memory newInitialHolders,
+    //     uint[] memory newInitialHoldersRange,
+    //     bytes32 inputChecksum
+    // ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    //     require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
+    //     _updateInitialHoldersRange(
+    //         fromAddresses,
+    //         toAddresses,
+    //         ids,
+    //         amounts,
+    //         newInitialHolders,
+    //         newInitialHoldersRange,
+    //         inputChecksum
+    //     );
+    // }
 
-    // Defensive coding: Lock initial holders up to tokenId
-    // so they cant be updated via updateInitialHoldersRange.
-    function setLockInitialHoldersUpTo(
-        uint256 tokenId
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-        _setLockInitialHoldersUpTo(tokenId);
-    }
+    // // Defensive coding: Lock initial holders up to tokenId
+    // // so they cant be updated via updateInitialHoldersRange.
+    // function setLockInitialHoldersUpTo(
+    //     uint256 tokenId
+    // ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    //     _setLockInitialHoldersUpTo(tokenId);
+    // }
 
-    // Defensive coding: Permanently disable updateInitialHoldersRange.
-    function permanentlyDisableInitialHoldersRangeUpdate()
-        public
-        whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
-        isInitialHoldersRangeUpdatePermanentlyDisabled = true;
-    }
+    // // Defensive coding: Permanently disable updateInitialHoldersRange.
+    // function permanentlyDisableInitialHoldersRangeUpdate()
+    //     public
+    //     whenNotPaused
+    //     onlyRole(DEFAULT_ADMIN_ROLE)
+    // {
+    //     isInitialHoldersRangeUpdatePermanentlyDisabled = true;
+    // }
 
     ///////////////////////////////////////////////////////////////////////////////
     // ERC2981 Royalties

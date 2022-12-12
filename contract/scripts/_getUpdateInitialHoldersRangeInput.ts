@@ -10,13 +10,14 @@ function findInRange(range: number[], needle: number) {
 }
 
 export default async function _getUpdateInitialHoldersRangeInput(
-  c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
+  c: TestERC1155MintRangeUpdateable, // | Ph101ppDailyPhoto,
   from: number,
   to: number,
   newInitialHolders: string[]
 ): Promise<[
   string[],
   string[],
+  number[][],
   number[][],
   number[][],
   string[][],
@@ -29,6 +30,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
   const toAddresses: string[] = [];
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
+  const initialize: number[][] = [];
   const amounts: number[][] = [];
   const lastTokenId = await c.lastRangeTokenIdMinted();
 
@@ -57,17 +59,25 @@ export default async function _getUpdateInitialHoldersRangeInput(
         const balance = balances[a].toNumber();
         const isBalanceInitialized = await c.isBalanceInitialized(i, fromAddress)
 
-        if (!isBalanceInitialized && balance > 0) {
+        if (balance > 0) {
           let addressIndex = fromAddresses.indexOf(fromAddress);
           if (addressIndex < 0) {
             fromAddresses.push(fromAddress);
             toAddresses.push(toAddress);
             addressIndex = fromAddresses.length - 1;
+
+            initialize[addressIndex] = initialize[addressIndex] ?? [];
+            ids[addressIndex] = ids[addressIndex] ?? [];
+            amounts[addressIndex] = amounts[addressIndex] ?? [];
           }
-          ids[addressIndex] = ids[addressIndex] ?? [];
-          ids[addressIndex].push(i);
-          amounts[addressIndex] = amounts[addressIndex] ?? [];
-          amounts[addressIndex].push(balance);
+
+          if(isBalanceInitialized) {
+            initialize[addressIndex].push(i);
+          }
+          else {
+            ids[addressIndex].push(i);
+            amounts[addressIndex].push(balance);
+          }
         }
       }
     }
@@ -129,6 +139,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
     toAddresses,
     ids,
     amounts,
+    initialize,
     newInitialHoldersArray,
     newInitialHoldersRange
   );
@@ -138,6 +149,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
     toAddresses,
     ids,
     amounts,
+    initialize,
     newInitialHoldersArray,
     newInitialHoldersRange,
     checksum

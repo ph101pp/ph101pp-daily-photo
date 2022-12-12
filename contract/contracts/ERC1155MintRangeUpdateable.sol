@@ -73,6 +73,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         address[] memory toAddresses,
         uint[][] memory ids,
         uint[][] memory amounts,
+        uint[][] memory initialize,
         address[][] memory newInitialHolders,
         uint[] memory newInitialHoldersRange,
         bytes32 inputChecksum
@@ -83,6 +84,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 toAddresses,
                 ids,
                 amounts,
+                initialize,
                 newInitialHolders,
                 newInitialHoldersRange,
                 _initialHolders,
@@ -130,6 +132,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
         _unpause();
         for (uint i = 0; i < toAddresses.length; i++) {
+            // uint[] memory toInitialize = initialize[i];
+            for(uint k = 0; k<initialize[i].length; k++ ) {
+                isBalanceInitialized[initialize[i][k]][toAddresses[i]] = true;
+            }
+
             emit TransferBatch(
                 msg.sender,
                 fromAddresses[i],
@@ -149,6 +156,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         address[] memory toAddresses,
         uint[][] memory ids,
         uint[][] memory amounts,
+        uint[][] memory initialize,
         address[][] memory newInitialHolders,
         uint[] memory newInitialHoldersRange
     ) public view virtual whenPaused returns (bytes32) {
@@ -229,6 +237,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     toAddresses,
                     ids,
                     amounts,
+                    initialize,
                     newInitialHolders,
                     newInitialHoldersRange,
                     _initialHolders,
