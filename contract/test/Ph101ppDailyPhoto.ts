@@ -738,7 +738,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
   });
 
-  describe("AccessControl", function () {
+  describe.skip("AccessControl", function () {
 
     it("should set default roles during deploy", async function () {
       const { c, owner } = await loadFixture(deployFixture);
@@ -848,7 +848,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     })
   });
 
-  describe("Operator Filter Registry", function () {
+  describe.skip("Operator Filter Registry", function () {
 
     it("should correctly register contract with Operator Filter Registry and subscribe to opensea", async function () {
       const { c, ofr } = await loadFixture(deployFixture);
@@ -895,7 +895,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
   });
 
-  describe("Transfer Listener", function () {
+  describe.skip("Transfer Listener", function () {
 
     it("should correcly set transfer listener via setTransferListenerAddress", async function () {
       const { c, pdpl } = await loadFixture(deployFixture);
