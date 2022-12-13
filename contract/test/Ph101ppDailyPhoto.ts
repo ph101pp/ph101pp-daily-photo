@@ -618,6 +618,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
+
       const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
       const receipt = await tx.wait();
 
@@ -636,7 +637,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(receipt.events?.filter(e => e.args?.from && e.args?.to && e.args?.from === e.args?.to).length).to.equal(0);
     });
 
-    it("should correcly swap treasury and vault addresses", async function () {
+    // this is not possible anymore with new valid check     
+    it.skip("should correcly swap treasury and vault addresses", async function () {
       const { c, vault, treasury } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = [1, 5];
@@ -658,7 +660,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, vault.address, treasury.address);
-
+      console.log(updateInitialHoldersInput);
+      return; 
       await c.updateInitialHoldersRange(...updateInitialHoldersInput);
 
       const newTreasuryBalances = await c.balanceOfBatch(vaultAddresses, ids);
@@ -671,7 +674,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
 
     it("should fail to updated initialHolders if isInitialHoldersRangeUpdatePermanentlyDisabled", async function () {
-      const { c, vault, treasury } = await loadFixture(deployFixture);
+      const { c,  account1, account2 } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = [1, 5];
 
@@ -681,7 +684,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.permanentlyDisableInitialHoldersRangeUpdate();
       await c.pause();
 
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, vault.address, treasury.address);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account2.address, account1.address,);
       await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
       expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
     })

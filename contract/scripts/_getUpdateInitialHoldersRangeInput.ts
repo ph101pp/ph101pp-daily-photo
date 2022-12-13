@@ -1,4 +1,4 @@
-import { TestERC1155MintRangeUpdateable, Ph101ppDailyPhoto } from "../typechain-types";
+import { TestERC1155MintRangeUpdateable, Ph101ppDailyPhoto, ERC1155MintRangeUpdateable } from "../typechain-types";
 
 function findInRange(range: number[], needle: number) {
   for (let i = range.length - 1; i >= 0; i--) {
@@ -15,18 +15,13 @@ export default async function _getUpdateInitialHoldersRangeInput(
   to: number,
   newInitialHolders: string[]
 ): Promise<[
-  string[],
-  string[],
-  number[][],
-  number[][],
-  number[][],
-  string[][],
-  number[],
+  ERC1155MintRangeUpdateable.UpdateInitialHolderRangeInputStruct,
   string
 ]> {
   if (from < 0 || from > to) {
     throw Error("Error: from < 0 || from > to");
   };
+
   const toAddresses: string[] = [];
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
@@ -59,7 +54,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
         const balance = balances[a].toNumber();
         const isBalanceInitialized = await c.isBalanceInitialized(i, fromAddress)
 
-        if (balance > 0 || isBalanceInitialized) {
+        if ((balance > 0 || isBalanceInitialized)) {
           let addressIndex = fromAddresses.indexOf(fromAddress);
           if (addressIndex < 0) {
             fromAddresses.push(fromAddress);
@@ -133,25 +128,19 @@ export default async function _getUpdateInitialHoldersRangeInput(
       newInitialHoldersArray.push(currentInitialHolders[toIndex]);
     }
   }
-
-  const checksum = await c.verifyUpdateInitialHolderRangeInput(
+  const input = {
     fromAddresses,
     toAddresses,
     ids,
     amounts,
     initialize,
-    newInitialHoldersArray,
+    newInitialHolders: newInitialHoldersArray,
     newInitialHoldersRange
-  );
+  };
+  const checksum = await c.verifyUpdateInitialHolderRangeInput(from, too, input);
 
   return [
-    fromAddresses,
-    toAddresses,
-    ids,
-    amounts,
-    initialize,
-    newInitialHoldersArray,
-    newInitialHoldersRange,
+    input,
     checksum
   ];
 }

@@ -286,24 +286,12 @@ contract Ph101ppDailyPhoto is
     // This method doesnt affect ERC1155.balances, so tokens that
     // have been sold or transfered before can't ever be affected by this method.
     function updateInitialHoldersRange(
-        address[] memory fromAddresses,
-        address[] memory toAddresses,
-        uint[][] memory ids,
-        uint[][] memory amounts,
-        uint[][] memory initialize,
-        address[][] memory newInitialHolders,
-        uint[] memory newInitialHoldersRange,
+        UpdateInitialHolderRangeInput memory input,
         bytes32 inputChecksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
         _updateInitialHoldersRange(
-            fromAddresses,
-            toAddresses,
-            ids,
-            amounts,
-            initialize,
-            newInitialHolders,
-            newInitialHoldersRange,
+            input,
             inputChecksum
         );
     }

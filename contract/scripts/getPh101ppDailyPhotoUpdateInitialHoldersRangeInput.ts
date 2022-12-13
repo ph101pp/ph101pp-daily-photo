@@ -1,5 +1,5 @@
 import _getUpdateInitialHoldersRangeInput from "./_getUpdateInitialHoldersRangeInput";
-import { Ph101ppDailyPhoto } from "../typechain-types";
+import { ERC1155MintRangeUpdateable, Ph101ppDailyPhoto } from "../typechain-types";
 
 export default async function getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(
   c: Ph101ppDailyPhoto,
@@ -8,13 +8,7 @@ export default async function getPh101ppDailyPhotoUpdateInitialHoldersRangeInput
   treasury: string,
   vault: string
 ): Promise<[
-  string[],
-  string[],
-  number[][],
-  number[][],
-  number[][],
-  string[][],
-  number[],
+  ERC1155MintRangeUpdateable.UpdateInitialHolderRangeInputStruct,
   string
 ]> {
   return _getUpdateInitialHoldersRangeInput(c, from, to, [treasury, vault]);
