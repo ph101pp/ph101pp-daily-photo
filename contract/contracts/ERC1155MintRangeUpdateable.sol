@@ -112,6 +112,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         _initialHolders = input.newInitialHolders;
         _initialHoldersRange = input.newInitialHoldersRange;
 
+
+        _unpause();
         // for each affected token "transfer"
         for (uint i = 0; i < input.toAddresses.length; i++) {
             uint[] memory toInitialize = input.initialize[i];
@@ -133,6 +135,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 );
             }
         }
+        super._pause();
     }
 
     /**
@@ -175,7 +178,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     "E:06"
                 );
             }
-
             // can't change locked ranges
             bool isLocked = isZeroLocked && k <= currentLastLockedIndex;
             if (isLocked) {
@@ -184,12 +186,13 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     "E:18"
                 );
             }
+
             address[] memory newInitialHolder = input.newInitialHolders[k];
             for (uint i = 0; i < newInitialHolder.length; i++) {
                 if (isLocked) {
                     require(
                         _initialHolders[k][i] == input.newInitialHolders[k][i],
-                        "E:17"
+                        "E:15"
                     );
                 }
 
@@ -236,6 +239,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     }
 
                     uint balance = amounts[idId];
+
                     require(balance > 0, "E:20");
                     require(balanceOf(from, tokenId) >= balance, "E:08");
 
