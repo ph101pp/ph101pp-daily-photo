@@ -9,11 +9,11 @@ import "./Ph101ppDailyPhotoUtils.sol";
 import "./IPh101ppDailyPhotoListener.sol";
 import "./OpenseaOperatorFilterer.sol";
 
-//    OpenseaOperatorFilterer
 contract Ph101ppDailyPhoto is
     ERC1155MintRangeUpdateable,
     ERC2981,
-    AccessControl
+    AccessControl,
+    OpenseaOperatorFilterer
 {
     uint public constant START_DATE = 1661990400; // Sept 1, 2022
     bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
@@ -372,88 +372,88 @@ contract Ph101ppDailyPhoto is
     // Opensea Operator Filterer
     ///////////////////////////////////////////////////////////////////////////////
 
-    // // Owner can be used to make updates (register / subscribe)
-    // // to the OperatorFilterRegistry on behalf of this contract.
-    // function owner() public view override returns (address) {
-    //     return _owner;
-    // }
+    // Owner can be used to make updates (register / subscribe)
+    // to the OperatorFilterRegistry on behalf of this contract.
+    function owner() public view override returns (address) {
+        return _owner;
+    }
 
-    // // Set new owner. This address will be returned by owner().
-    // function setOwner(
-    //     address newOwner
-    // ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-    //     _owner = newOwner;
-    // }
+    // Set new owner. This address will be returned by owner().
+    function setOwner(
+        address newOwner
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+        _owner = newOwner;
+    }
 
-    // // Update address to OperatorFilterRegistry contract.
-    // // Set to address(0) to disable registry checks.
-    // function setOperatorFilterRegistry(
-    //     address _operatorFilterRegistry
-    // ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-    //     _setOperatorFilterRegistry(_operatorFilterRegistry);
-    // }
+    // Update address to OperatorFilterRegistry contract.
+    // Set to address(0) to disable registry checks.
+    function setOperatorFilterRegistry(
+        address _operatorFilterRegistry
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setOperatorFilterRegistry(_operatorFilterRegistry);
+    }
 
-    // // Defensive Coding: Permanently freeze operator filter registry address
-    // function permanentlyFreezeOperatorFilterRegistryAddress()
-    //     public
-    //     whenNotPaused
-    //     onlyRole(DEFAULT_ADMIN_ROLE)
-    // {
-    //     _permanentlyFreezeOperatorFilterRegistryAddress();
-    // }
+    // Defensive Coding: Permanently freeze operator filter registry address
+    function permanentlyFreezeOperatorFilterRegistryAddress()
+        public
+        whenNotPaused
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _permanentlyFreezeOperatorFilterRegistryAddress();
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Transfer Event Listener Address
     ///////////////////////////////////////////////////////////////////////////////
 
-    // function setTransferEventListenerAddress(
-    //     address listener
-    // ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-    //     require(!isTransferEventListenerAddressPermanentlyFrozen);
-    //     transferEventListenerAddress = listener;
-    // }
+    function setTransferEventListenerAddress(
+        address listener
+    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(!isTransferEventListenerAddressPermanentlyFrozen);
+        transferEventListenerAddress = listener;
+    }
 
-    // function permanentlyFreezeTransferEventListenerAddress()
-    //     public
-    //     whenNotPaused
-    //     onlyRole(DEFAULT_ADMIN_ROLE)
-    // {
-    //     isTransferEventListenerAddressPermanentlyFrozen = true;
-    // }
+    function permanentlyFreezeTransferEventListenerAddress()
+        public
+        whenNotPaused
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        isTransferEventListenerAddressPermanentlyFrozen = true;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Transfer & Approval mods for Opensea Operator Filterer & Transfer Event
     ///////////////////////////////////////////////////////////////////////////////
 
-    // function setApprovalForAll(
-    //     address operator,
-    //     bool approved
-    // ) public override whenNotPaused onlyAllowedOperatorApproval(operator) {
-    //     super.setApprovalForAll(operator, approved);
-    // }
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) public override whenNotPaused onlyAllowedOperatorApproval(operator) {
+        super.setApprovalForAll(operator, approved);
+    }
 
-    // function _beforeTokenTransfer(
-    //     address operator,
-    //     address from,
-    //     address to,
-    //     uint[] memory ids,
-    //     uint[] memory amounts,
-    //     bytes memory data
-    // ) internal virtual override onlyAllowedOperator(from) {
-    //     super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint[] memory ids,
+        uint[] memory amounts,
+        bytes memory data
+    ) internal virtual override onlyAllowedOperator(from) {
+        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
 
-    //     if (transferEventListenerAddress != address(0)) {
-    //         IPh101ppDailyPhotoListener(transferEventListenerAddress)
-    //             .Ph101ppDailyPhotoTransferHandler(
-    //                 operator,
-    //                 from,
-    //                 to,
-    //                 ids,
-    //                 amounts,
-    //                 data
-    //             );
-    //     }
-    // }
+        if (transferEventListenerAddress != address(0)) {
+            IPh101ppDailyPhotoListener(transferEventListenerAddress)
+                .Ph101ppDailyPhotoTransferHandler(
+                    operator,
+                    from,
+                    to,
+                    ids,
+                    amounts,
+                    data
+                );
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Interface
