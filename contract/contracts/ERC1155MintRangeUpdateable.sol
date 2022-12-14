@@ -3,11 +3,9 @@
 
 pragma solidity ^0.8.0;
 
-import "./ERC1155MintRange.sol";
 import "./ERC1155MintRangePausable.sol";
+import "./Ph101ppDailyPhotoUtils.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-
-import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -21,6 +19,22 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         uint[][] initialize;
         address[][] newInitialHolders;
         uint[] newInitialHoldersRange;
+    }
+
+    struct VerifyUpdateInitialHolderRangeInput {
+        uint fromTokenId;
+        uint toTokenId;
+        address[] fromAddresses;
+        address[] toAddresses;
+        uint[][] ids;
+        uint[][] amounts;
+        uint[][] initialize;
+        address[][] newInitialHolders;
+        uint[] newInitialHoldersRange;
+        // privates
+        ERC1155MintRangeUpdateable caller;
+        bytes32 customUpdateInitialHoldersRangeChecksum;
+        uint pauseTimestamp;
     }
 
     // used to check validity of updateInitialHolderRangeInput
@@ -143,19 +157,24 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function verifyUpdateInitialHolderRangeInput(
         uint fromTokenId,
         uint toTokenId,
-        UpdateInitialHolderRangeInput memory input,
-        ERC1155MintRangeUpdateable caller,
-        string memory customUpdateInitialHoldersRangeChecksum,
-        uint pauseTimestamp
+        UpdateInitialHolderRangeInput memory input
     ) public view virtual whenPaused returns (bytes32) {
         return
             Ph101ppDailyPhotoUtils.verifyUpdateInitialHolderRangeInput(
-                fromTokenId,
-                toTokenId,
-                input,
-                this,
-                _customUpdateInitialHoldersRangeChecksum(),
-                _pauseTimestamp
+                VerifyUpdateInitialHolderRangeInput(
+                    fromTokenId,
+                    toTokenId,
+                    input.fromAddresses,
+                    input.toAddresses,
+                    input.ids,
+                    input.amounts,
+                    input.initialize,
+                    input.newInitialHolders,
+                    input.newInitialHoldersRange,
+                    this,
+                    _customUpdateInitialHoldersRangeChecksum(),
+                    _pauseTimestamp
+                )
             );
     }
 }

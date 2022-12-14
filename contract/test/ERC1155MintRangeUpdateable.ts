@@ -8,10 +8,26 @@ import { TestERC1155MintRangeUpdateable, Ph101ppDailyPhoto, ERC1155MintRangeUpda
 import { deployFixture, Fixture } from "./fixture";
 
 
+async function fixture<T>() {
+  // Contracts are deplodyed using the first signer/account by default
+  const [owner, account1, account2, account3, account4, account5, account6, account7, account8] = await ethers.getSigners();
+
+  const DT = await ethers.getContractFactory("Ph101ppDailyPhotoUtils");
+  const dt = await DT.deploy();
+  const C = await ethers.getContractFactory("TestERC1155MintRangeUpdateable", {
+    libraries: {
+      "Ph101ppDailyPhotoUtils": dt.address, // test: "0x947cc35992e6723de50bf704828a01fd2d5d6641" //dt.address
+    }
+  })
+  const c = await C.deploy([]) as T;
+
+  return { c, owner, account1, account2, account3, account4, account5, account6, account7, account8 };
+}
+
 describe("TestERC1155MintRangeUpdateable", function () {
-  testERC1155MintRange(deployFixture("TestERC1155MintRangeUpdateable"));
-  testERC1155MintRangePausable(deployFixture("TestERC1155MintRangeUpdateable"));
-  testERC1155MintRangeUpdateable(deployFixture("TestERC1155MintRangeUpdateable"));
+  testERC1155MintRange(fixture);
+  testERC1155MintRangePausable(fixture);
+  testERC1155MintRangeUpdateable(fixture);
 });
 
 export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixture<TestERC1155MintRangeUpdateable>>) {
@@ -20,11 +36,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
 
     it("should return a hash when successfull", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
+
+      console.log(typeof c.setInitialHolders);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
       await c.mintRange(...input);
       await c.pause();
-      await c.verifyUpdateInitialHolderRangeInput( 1, 1,
+      await c.verifyUpdateInitialHolderRangeInput(1, 1,
         {
           fromAddresses: [account1.address],
           toAddresses: [account2.address],
@@ -229,7 +247,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       })).to.be.rejectedWith("E:07");
     });
 
-    it("should fail when from account balance is less than amount", async function () {
+    it.only("should fail when from account balance is less than amount", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
@@ -261,7 +279,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         initialize: [[]],
         newInitialHolders: [[account1.address]],
         newInitialHoldersRange: [0]
-      })).to.be.rejectedWith("E:08");
+      })).to.be.rejectedWith("E:13");
       await expect(c.verifyUpdateInitialHolderRangeInput(1, 1, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
