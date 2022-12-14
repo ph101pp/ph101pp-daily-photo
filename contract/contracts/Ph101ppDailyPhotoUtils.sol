@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./ERC1155MintRangeUpdateable.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 library Ph101ppDailyPhotoUtils {
     uint256 constant SECONDS_PER_DAY = 1 days;
@@ -344,7 +344,7 @@ library Ph101ppDailyPhotoUtils {
             uint idId = 0;
             uint initId = 0;
 
-            console.log(p.fromTokenId, p.toTokenId);
+            // console.log(p.fromTokenId, p.toTokenId);
 
             for (
                 uint tokenId = p.fromTokenId;
@@ -355,13 +355,12 @@ library Ph101ppDailyPhotoUtils {
                 require(p.caller.exists(tokenId) == true, "E:11");
                 // to address is neither initialized nor has a balance
 
-                console.log(p.caller.balanceOf(to, tokenId));
                 require(p.caller.balanceOf(to, tokenId) == 0, "E:13");
                 require(!p.caller.isBalanceInitialized(tokenId, to), "E:21");
 
                 // if token is to be transferred -> cant be initialized and must have balance.
                 if (idId < p.ids[i].length && p.ids[i][idId] == tokenId) {
-                    console.log("ids", tokenId);
+                    // console.log("ids", tokenId);
 
                     // Ids must be ordered in accenting order
                     if (idId != 0) {
@@ -388,7 +387,7 @@ library Ph101ppDailyPhotoUtils {
                     initId < p.initialize[i].length &&
                     p.initialize[i][initId] == tokenId
                 ) {
-                    console.log("inits", tokenId);
+                    // console.log("inits", tokenId);
 
                     // Ids must be ordered in accenting order
                     if (initId != 0) {
@@ -412,7 +411,7 @@ library Ph101ppDailyPhotoUtils {
                 // else if token is in neither array -> its not initialized and has no balance.
                 // could be manual mint.. either way -> continue
                 else {
-                    console.log("nope", tokenId);
+                    // console.log("nope", tokenId);
 
                     uint balance = p.caller.balanceOf(from, tokenId);
                     if (balance > 0) {

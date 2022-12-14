@@ -247,7 +247,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       })).to.be.rejectedWith("E:07");
     });
 
-    it.only("should fail when from account balance is less than amount", async function () {
+    it("should fail when from account balance is less than amount", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
