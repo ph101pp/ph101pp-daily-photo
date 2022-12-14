@@ -112,7 +112,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         _initialHolders = input.newInitialHolders;
         _initialHoldersRange = input.newInitialHoldersRange;
 
-
         _unpause();
         // for each affected token "transfer"
         for (uint i = 0; i < input.toAddresses.length; i++) {
@@ -144,187 +143,19 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function verifyUpdateInitialHolderRangeInput(
         uint fromTokenId,
         uint toTokenId,
-        UpdateInitialHolderRangeInput memory input
+        UpdateInitialHolderRangeInput memory input,
+        ERC1155MintRangeUpdateable caller,
+        string memory customUpdateInitialHoldersRangeChecksum,
+        uint pauseTimestamp
     ) public view virtual whenPaused returns (bytes32) {
-        // Verify New Initial Holders Range: //////////////////////////////////
-
-        require(
-            input.newInitialHolders.length ==
-                input.newInitialHoldersRange.length,
-            "E:04"
-        );
-
-        // must start with 0
-        require(input.newInitialHoldersRange[0] == 0, "E:05");
-
-        uint currentLastLockedIndex = _findLowerBound(
-            _initialHoldersRange,
-            lastRangeTokenIdWithLockedInitialHolders
-        );
-
-        uint newLastLockedIndex = _findLowerBound(
-            input.newInitialHoldersRange,
-            lastRangeTokenIdWithLockedInitialHolders
-        );
-
-        require(newLastLockedIndex == currentLastLockedIndex, "E:23");
-
-        for (uint k = 0; k < input.newInitialHolders.length; k++) {
-            // ranges must be in accending order
-            if (k > 0) {
-                require(
-                    input.newInitialHoldersRange[k] >
-                        input.newInitialHoldersRange[k - 1],
-                    "E:06"
-                );
-            }
-            // can't change locked ranges
-            bool isLocked = isZeroLocked && k <= currentLastLockedIndex;
-            if (isLocked) {
-                require(
-                    _initialHoldersRange[k] == input.newInitialHoldersRange[k],
-                    "E:18"
-                );
-            }
-
-            address[] memory newInitialHolder = input.newInitialHolders[k];
-            for (uint i = 0; i < newInitialHolder.length; i++) {
-                if (isLocked) {
-                    require(
-                        _initialHolders[k][i] == input.newInitialHolders[k][i],
-                        "E:15"
-                    );
-                }
-
-                // new initial holders cant be address0
-                require(input.newInitialHolders[k][i] != address(0), "E:16");
-            }
-        }
-
-        // Verify transfers: //////////////////////////////////////////////////
-
-        require(input.fromAddresses.length == input.toAddresses.length, "E:01");
-        require(input.fromAddresses.length == input.ids.length, "E:02");
-        require(input.fromAddresses.length == input.amounts.length, "E:03");
-        require(input.fromAddresses.length == input.initialize.length, "E:03");
-
-        // for each affected token: "transfer" from -> to
-        for (uint i = 0; i < input.toAddresses.length; i++) {
-            address from = input.fromAddresses[i];
-            address to = input.toAddresses[i];
-            uint[] memory inits = input.initialize[i];
-            uint[] memory amounts = input.amounts[i];
-            uint[] memory ids = input.ids[i];
-
-            require(ids.length == input.amounts[i].length, "E:07");
-
-            uint idId = 0;
-            uint initId = 0;
-            console.log(fromTokenId, toTokenId);
-            for (uint tokenId = fromTokenId; tokenId <= toTokenId; tokenId++) {
-                console.log(tokenId);
-                // token exists and is not manually minted
-                require(exists(tokenId) == true, "E:11");
-                // to address is neither initialized nor has a balance
-                require(_balances[tokenId][to] == 0, "E:13");
-                require(!isBalanceInitialized[tokenId][to], "E:21");
-
-                // if token is to be transferred -> cant be initialized and must have balance.
-                if (idId < ids.length && ids[idId] == tokenId) {
-                    console.log("in ids");
-
-                    // Ids must be ordered in accenting order
-                    if (idId != 0) {
-                        require(ids[idId - 1] < ids[idId], "E:20");
-                    }
-
-                    uint balance = amounts[idId];
-
-                    require(balance > 0, "E:20");
-                    require(balanceOf(from, tokenId) >= balance, "E:08");
-
-                    require(_balances[tokenId][from] == 0, "E:13");
-                    require(!isBalanceInitialized[tokenId][from], "E:21");
-
-                    // Cant be manually minted
-                    require(isManualMint[tokenId] == false, "E:12");
-
-                    idId++;
-                }
-                // if to address is to be initialized -> from address must be initialized
-                else if (initId < inits.length && inits[initId] == tokenId) {
-                    console.log("in init");
-
-                    // Ids must be ordered in accenting order
-                    if (initId != 0) {
-                        require(inits[initId - 1] < inits[initId], "E:20");
-                    }
-
-                    require(isBalanceInitialized[tokenId][from], "E:21");
-
-                    // Cant be manually minted
-                    require(isManualMint[tokenId] == false, "E:12");
-
-                    initId++;
-                }
-                // else if token is in neither array -> its not initialized and has no balance.
-                // could be manual mint.. either way -> continue
-                else {
-                    console.log("nope");
-
-                    uint balance = balanceOf(from, tokenId);
-                    if(balance > 0) {
-                        require(isManualMint[tokenId] == true, "E:12");
-                    }
-                    else {
-                        require(balance == 0, "E:22");
-                    }
-                    require(!isBalanceInitialized[tokenId][from], "E:21");
-
-                    // nothing is going to happen to this token;
-                    continue;
-                }
-
-                // from is in existing initialHolders
-                address[] memory currentInitialHolders = initialHolders(
-                    tokenId
-                );
-                require(_includesAddress(currentInitialHolders, from), "E:09");
-
-                uint newInitialHoldersIndex = _findLowerBound(
-                    input.newInitialHoldersRange,
-                    tokenId
-                );
-
-                // to is in new initialHolders
-                require(
-                    _includesAddress(
-                        input.newInitialHolders[newInitialHoldersIndex],
-                        to
-                    ),
-                    "E:10"
-                );
-
-                // tokenId is not in locked range
-                if (isZeroLocked) {
-                    require(
-                        tokenId > lastRangeTokenIdWithLockedInitialHolders,
-                        "E:15"
-                    );
-                }
-            }
-        }
-
         return
-            keccak256(
-                abi.encode(
-                    input,
-                    _initialHolders,
-                    _initialHoldersRange,
-                    _pauseTimestamp,
-                    paused(),
-                    _customUpdateInitialHoldersRangeChecksum()
-                )
+            Ph101ppDailyPhotoUtils.verifyUpdateInitialHolderRangeInput(
+                fromTokenId,
+                toTokenId,
+                input,
+                this,
+                _customUpdateInitialHoldersRangeChecksum(),
+                _pauseTimestamp
             );
     }
 }
