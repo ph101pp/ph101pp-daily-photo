@@ -6,7 +6,7 @@ import arweaveStatusAtom from "./_atoms/bundlrStatusAtom";
 
 
 
-const ArweaveProgress = () => {
+const BundlrProgress = () => {
   const status = useRecoilValue(BundlrStatusAtom);
 
   if (status.numberOfSteps === 0) {
@@ -71,4 +71,4 @@ const ArweaveProgress = () => {
   )
 }
 
-export default ArweaveProgress;
+export default BundlrProgress;
