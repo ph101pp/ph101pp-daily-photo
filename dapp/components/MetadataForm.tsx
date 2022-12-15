@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import { Accordion, AccordionDetails, AccordionSummary, Button, Typography } from "@mui/material";
 import defaultTokenMetadataInputAtom from "./_atoms/defaultTokenMetadataInputAtom";
 import { FormContainer, CheckboxElement, TextFieldElement, useFormContext } from "react-hook-form-mui";
+import { useEffect } from "react";
 
 
 const RenderFormElement = ({
@@ -46,6 +47,10 @@ const RenderFormElement = ({
 
 function MetadataForm() {
   const [input, setInput] = useRecoilState(defaultTokenMetadataInputAtom);
+
+  useEffect(()=>{
+    window.scrollTo(0, document.body.scrollHeight);
+  }, [])
 
   if (!input) {
     return null;

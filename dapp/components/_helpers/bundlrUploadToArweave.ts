@@ -1,14 +1,10 @@
-import Arweave from "arweave";
-import { useCallback } from "react";
-import { RecoilState, useSetRecoilState } from "recoil";
-import { ArweaveStatus } from "../_types/ArweaveStatus";
-import { ArwalletType } from "../_types/ArwalletType";
 import WebBundlr from "@bundlr-network/client/build/web"
 import { UploadResponse } from "@bundlr-network/client/build/common/types"
 import { PublicKey } from "@solana/web3.js";
 
 import base64ToArrayBuffer from "./base64ToArrayBuffer";
 import arrayBufferToBase64 from "./arrayBufferToBase64";
+import { BundlrStats } from "../_types/BundlrStats";
 
 if (!process.env.NEXT_PUBLIC_BUNDLR_NETWORK_NODE || !process.env.NEXT_PUBLIC_SOLANA_PUBLIC_KEY) {
   throw new Error("Missing env variables.");
@@ -24,19 +20,20 @@ const provider = {
 };
 const bundlr = new WebBundlr(bundlrNode, "solana", provider);
 
-type Stats = {
-  price: number,
-  bundlrBalance: number,
-  solBalance: number,
-  balanceToppedUp: number
-}
-type BundlrUploadToArweave = (data: ArrayBuffer | string, contentType: string) => Promise<[UploadResponse, Stats]>
+type BundlrUploadToArweave = (data: Uint8Array | string, contentType: string) => Promise<[UploadResponse, BundlrStats]>
 
 const bundlrUploadToArweave: BundlrUploadToArweave = async (data, contentType) => {
 
   await bundlr.ready();
 
-  const transaction = bundlr.createTransaction("Hello");
+  const transaction = bundlr.createTransaction(data, {
+    tags: [
+      { name: "Content-Type", value: contentType },
+      // { name: "author", value: "Ph101pp" },
+      // { name: "project", value: "Daily Photo" },
+      // { name: "website", value: "https://daily-photo.ph101pp.xyz" },
+    ]
+  });
 
   transaction.rawOwner = publicKey.toBuffer();
 
@@ -65,7 +62,7 @@ const bundlrUploadToArweave: BundlrUploadToArweave = async (data, contentType) =
   await transaction.setSignature(Buffer.from(signature));
 
   // check the tx is signed and valid
-  console.log({ isSigned: transaction.isSigned(), isValid: await transaction.isValid() });
+  // console.log({ isSigned: transaction.isSigned(), isValid: await transaction.isValid() });
 
   // upload as normal
   const result = await transaction.upload();

@@ -7,7 +7,7 @@ import contract from "../../../utils/Ph101ppDailyPhoto.json";
 const wallet = ethers.Wallet.createRandom();
 const alchemyProvider = new ethers.providers.AnkrProvider("goerli");
 const signer = new ethers.Wallet(wallet.privateKey, alchemyProvider);
-const Ph101ppDailyPhoto = new ethers.Contract(process.env.GOERLI_CONTRACT_ADDRESS!, contract.abi, signer);
+const Ph101ppDailyPhoto = new ethers.Contract(process.env.NEXT_PUBLIC_GOERLI_CONTRACT_ADDRESS!, contract.abi, signer);
 
 export default async function handler(
   req: NextApiRequest,

@@ -1,4 +1,5 @@
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box, Button } from "@mui/material";
+import { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import getTokenMetadata from "../utils/getTokenMetadata";
 import tokenIdAtom from "./_atoms/tokenIdAtom";
@@ -7,6 +8,10 @@ import tokenMetadataInputAtom from "./_atoms/tokenMetadataAtom";
 const MetadataPreview = () => {
   const tokenId = useRecoilValue(tokenIdAtom);
   const metadataInput = useRecoilValue(tokenMetadataInputAtom);
+  
+  useEffect(()=>{
+    window.scrollTo(0, document.body.scrollHeight);
+  }, [])
 
   if (!tokenId || !metadataInput) {
     return null;

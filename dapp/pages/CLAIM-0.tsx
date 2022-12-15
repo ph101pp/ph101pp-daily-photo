@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import LoadingButton from '@mui/lab/LoadingButton';
 import getClaimMetadata from "../utils/getClaimMetadata";
 import arwalletAtom from "../components/_atoms/arwalletAtom";
-import arweaveStatusAtom from "../components/_atoms/arweaveStatusAtom";
+import arweaveStatusAtom from "../components/_atoms/bundlrStatusAtom";
 import useArweave from "../components/_hooks/useArweave";
 import SaveIcon from '@mui/icons-material/Save';
 import DoneIcon from '@mui/icons-material/Done';

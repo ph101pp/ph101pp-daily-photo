@@ -2,32 +2,39 @@ import { Box } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
 import DoneIcon from '@mui/icons-material/Done';
-import { useRecoilValue } from "recoil";
-import arweaveStatusAtom from "./_atoms/arweaveStatusAtom";
+import { useRecoilState, useRecoilValue } from "recoil";
+import bundlrStatusAtom from "./_atoms/bundlrStatusAtom";
 import imageAtom from "./_atoms/imageAtom";
 import tokenIdAtom from "./_atoms/tokenIdAtom";
 import tokenMetadataInputAtom from "./_atoms/tokenMetadataAtom";
 import manifestAtom from "./_atoms/manifestAtom";
-import useArweave from "./_hooks/useArweave";
 import base64ToArrayBuffer from "./_helpers/base64ToArrayBuffer";
 import getTokenMetadata from "../utils/getTokenMetadata";
 import { CommitPostDataType } from "../utils/CommitPostType";
-import ArweaveProgress from "./ArweaveProgress";
-import { useCallback, useState } from "react";
-import arwalletAtom from "./_atoms/arwalletAtom";
-import bundlrUploadToArweave from "./_helpers/uploadToArweaveBundlr";
+import bundlrUploadToArweave from "./_helpers/bundlrUploadToArweave";
+import BundlrProgress from "./BundlrProgress";
+
+if (!process.env.NEXT_PUBLIC_GOERLI_CONTRACT_ADDRESS) {
+  throw new Error("Missing env variables.");
+}
+
+const contract = process.env.NEXT_PUBLIC_GOERLI_CONTRACT_ADDRESS;
+const baseURI = "https://testnets-api.opensea.io";
+// const baseURI = "https://api.opensea.io";
+const getOSURL = (i: number) => `${baseURI}/api/v1/asset/${contract}/${i}?force_update=true`;
+
+const numberOfSteps = 6;
+
 
 const UploadAndPublish = () => {
   const tokenId = useRecoilValue(tokenIdAtom);
   const metadataInput = useRecoilValue(tokenMetadataInputAtom);
   const image = useRecoilValue(imageAtom);
   const manifest = useRecoilValue(manifestAtom);
-  const arwallet = useRecoilValue(arwalletAtom);
-  const uploadImage = useArweave(arweaveStatusAtom("uploadImage"), arwallet);
-  const uploadMetadata = useArweave(arweaveStatusAtom("uploadMetadata"), arwallet);
-  const uploadManifest = useArweave(arweaveStatusAtom("uploadManifest"), arwallet);
-  const [inProgress, setInProgress] = useState(false);
-  const [isDone, setIsDone] = useState(false);
+  const [progress, setProgress] = useRecoilState(bundlrStatusAtom)
+
+  const inProgress = progress.numberOfSteps > 0 && progress.numberOfSteps < progress.steps.length;
+  const isDone = progress.numberOfSteps > 0 && progress.numberOfSteps === progress.steps.length;
 
   if (!tokenId || !metadataInput || !image || !manifest) {
     return null;
@@ -35,69 +42,117 @@ const UploadAndPublish = () => {
   const [tokenDate, tokenIndex] = tokenId.split("-");
 
   const uploadData = async () => {
-    setInProgress(true);
+    setProgress({
+      numberOfSteps,
+      steps: [{
+        message: "> Upload Image"
+      }]
+    });
 
-    console.log(await bundlrUploadToArweave("hello", "type"));
-    return; 
+    const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
+    const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
 
-    
-    const dataB64 = image.dataURL.replace("data:image/jpeg;base64,", "");
-    const data = base64ToArrayBuffer(dataB64);
-    const [imageTx, executeImageTx] = await uploadImage(data, "image/jpeg");
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: imageResult,
+          stats: imageStats,
+          message: "> Image Uploaded > Uploading Metadata."
+        }
+      ]
+    });
+
     const tokenMetadata = getTokenMetadata({
       ...metadataInput,
       dateString: tokenDate,
       tokenIndex: tokenIndex,
-      imageTx
+      imageTx: imageResult.id
     });
-    const [tokenTx, executeTokenTx] = await uploadMetadata(JSON.stringify(tokenMetadata), "application/json");
+
+
+
+    const [tokenResult, tokenStats] = await bundlrUploadToArweave(JSON.stringify(tokenMetadata), "application/json");
+
+
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: tokenResult,
+          stats: tokenStats,
+          message: "> Metadata Uploaded > Uploading Manifest"
+        }
+      ]
+    });
+
     const newManifest = {
       ...manifest,
       paths: {
         ...manifest.paths,
         [tokenId]: {
-          id: tokenTx
+          id: tokenResult.id
         }
       }
     };
 
-    const [manifestTx, executeManifestTx] = await uploadManifest(JSON.stringify(newManifest), "application/x.arweave-manifest+json");
 
-    console.log("optimistic", { imageTx, tokenTx, manifestTx });
+    const [manifestResult, manifestStats] = await bundlrUploadToArweave(JSON.stringify(newManifest), "application/x.arweave-manifest+json");
 
-    const [finalImageTx, finalTokenTx, finalManifestTx] = await Promise.all([
-      executeImageTx(),
-      executeTokenTx(),
-      executeManifestTx()
-    ]);
-
-    console.log("final", {
-      imageTx: finalImageTx,
-      tokenTx: finalTokenTx,
-      manifestTx: finalManifestTx
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: tokenResult,
+          stats: tokenStats,
+          message: "> Manifest Uploaded > Committing Manifest to Github"
+        }
+      ]
     });
 
     const commitData: CommitPostDataType = {
       message: `Update Manifest: ${tokenMetadata.name}`,
       manifest: JSON.stringify(newManifest, null, 2),
-      manifest_uri: `https://arweave.net/${finalManifestTx}/`,
+      manifest_uri: `https://arweave.net/${manifestResult.id}/`,
       tokenId: tokenId,
       tokenMetadata: JSON.stringify(tokenMetadata, null, 2)
     }
 
-    await fetch("/api/commit", {
+    const commitResult = await fetch("/api/commit", {
       method: "POST",
       body: JSON.stringify(commitData)
     });
 
-    setIsDone(true);
-    console.log("Done");
+
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: commitResult,
+          data: commitData,
+          message: "> Manifest Committed > Refresh Opensea Metadata"
+        }
+      ]
+    });
+
+    const url = getOSURL(parseInt(tokenIndex));
+    const osResult = await fetch(url);
+
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: osResult,
+          url,
+          message: "> Opensea Metadata Refreshed > Done!"
+        }
+      ]
+    });
+
   };
 
   return (<>
-    <ArweaveProgress statusAtomName="uploadImage" label="Image" />
-    <ArweaveProgress statusAtomName="uploadMetadata" label="Metadata" />
-    <ArweaveProgress statusAtomName="uploadManifest" label="Manifest" />
+    <BundlrProgress/>
 
     <Box
       sx={{
