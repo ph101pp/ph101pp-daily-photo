@@ -1,4 +1,4 @@
-// import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 // import { useRecoilValue } from "recoil";
 // import Container from "@mui/material/Container";
 // import ArweaveProgress from "../components/ArweaveProgress";
@@ -97,11 +97,11 @@
 //   </Container>;
 // }
 
-// export default ()=>{
-//   const [isClient, setIsClient] = useState(false);
-//   useEffect(()=>{
-//     setIsClient(true);
-//   })
-
-//   return isClient?<Root />:null;
-// };
+export default ()=>{
+  const [isClient, setIsClient] = useState(false);
+  useEffect(()=>{
+    setIsClient(true);
+  })
+  return null;
+  // return isClient?<Root />:null;
+};
