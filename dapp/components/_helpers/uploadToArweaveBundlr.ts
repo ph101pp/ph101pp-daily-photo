@@ -1,42 +1,76 @@
+import Arweave from "arweave";
+import { useCallback } from "react";
+import { RecoilState, useSetRecoilState } from "recoil";
+import { ArweaveStatus } from "../_types/ArweaveStatus";
+import { ArwalletType } from "../_types/ArwalletType";
+import WebBundlr from "@bundlr-network/client/build/web"
+import { UploadResponse } from "@bundlr-network/client/build/common/types"
+import { PublicKey } from "@solana/web3.js";
+
 import base64ToArrayBuffer from "./base64ToArrayBuffer";
+import arrayBufferToBase64 from "./arrayBufferToBase64";
 
+if (!process.env.NEXT_PUBLIC_BUNDLR_NETWORK_NODE || !process.env.NEXT_PUBLIC_SOLANA_PUBLIC_KEY) {
+  throw new Error("Missing env variables.");
+}
 
-// async function bundlrToArweave() {
-//   // @ts-ignore
-//   await window.ethereum.enable();
-//   // @ts-ignore
-//   const provider = new providers.Web3Provider(window.ethereum)
-//   await provider._ready();
-//   const bundlr = new Bundlr("https://node1.bundlr.network", "ethereum", provider);
-//   await bundlr.ready();
-//   const data = base64ToArrayBuffer(image.dataURL);
-//   const tx = bundlr.createTransaction(new Uint8Array(data), {
-//     tags: [
-//       { name: "Content-Type", value: "image/jpeg" }
-//     ]
-//   })
+const bundlrNode = process.env.NEXT_PUBLIC_BUNDLR_NETWORK_NODE;
+const publicKey = new PublicKey(process.env.NEXT_PUBLIC_SOLANA_PUBLIC_KEY);
+const provider = {
+  publicKey,
+  signMessage: () => {
+    return "serverSignature";
+  }
+};
+const bundlr = new WebBundlr(bundlrNode, "solana", provider);
 
-//   const cost = await bundlr.getPrice(tx.size);
-//   const balance = await bundlr.getLoadedBalance();
+type Stats = {
+  price: number,
+  bundlrBalance: number,
+  solBalance: number,
+  balanceToppedUp: number
+}
+type BundlrUploadToArweave = (data: ArrayBuffer | string, contentType: string) => Promise<[UploadResponse, Stats]>
 
-//   console.log(balance.toNumber(), cost.toNumber());
+const bundlrUploadToArweave: BundlrUploadToArweave = async (data, contentType) => {
 
-//   if (balance.lt(cost)) {
-//     await bundlr.fund(cost.multipliedBy(5));
-//   }
-//   await tx.sign();
+  await bundlr.ready();
 
-//   const uploader = bundlr.uploader.chunkedUploader;
+  const transaction = bundlr.createTransaction("Hello");
 
-//   uploader.on("chunkUpload", (chunkInfo) => {
-//     console.log(`Uploaded Chunk number ${chunkInfo.id}, offset of ${chunkInfo.offset}, size ${chunkInfo.size} Bytes, with a total of ${chunkInfo.totalUploaded} bytes uploaded.`);
-//   })
-//   const result = await uploader.uploadTransaction(tx);
+  transaction.rawOwner = publicKey.toBuffer();
 
+  // get signature data
+  const signatureData = await transaction.getSignatureData();
 
+  // get signed signature
+  const signed = await fetch("/api/signBundlrTransaction", {
+    method: "POST",
+    body: JSON.stringify({
+      signatureData: arrayBufferToBase64(signatureData),
+      size: transaction.size
+    })
+  });
+  const json = await signed.json();
 
-//   console.log(result);
-//   return;
-// };
+  if (!json) {
+    throw signed
+  }
 
-// export default bundlrToArweave;
+  const { signature: b64Signature, ...stats } = json;
+
+  const signature = new Uint8Array(base64ToArrayBuffer(b64Signature));
+
+  // write signed signature to transaction
+  await transaction.setSignature(Buffer.from(signature));
+
+  // check the tx is signed and valid
+  console.log({ isSigned: transaction.isSigned(), isValid: await transaction.isValid() });
+
+  // upload as normal
+  const result = await transaction.upload();
+
+  return [result, stats];
+}
+
+export default bundlrUploadToArweave;

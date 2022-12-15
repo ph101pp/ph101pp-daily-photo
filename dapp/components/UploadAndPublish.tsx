@@ -15,6 +15,7 @@ import { CommitPostDataType } from "../utils/CommitPostType";
 import ArweaveProgress from "./ArweaveProgress";
 import { useCallback, useState } from "react";
 import arwalletAtom from "./_atoms/arwalletAtom";
+import bundlrUploadToArweave from "./_helpers/uploadToArweaveBundlr";
 
 const UploadAndPublish = () => {
   const tokenId = useRecoilValue(tokenIdAtom);
@@ -35,6 +36,11 @@ const UploadAndPublish = () => {
 
   const uploadData = async () => {
     setInProgress(true);
+
+    console.log(await bundlrUploadToArweave("hello", "type"));
+    return; 
+
+    
     const dataB64 = image.dataURL.replace("data:image/jpeg;base64,", "");
     const data = base64ToArrayBuffer(dataB64);
     const [imageTx, executeImageTx] = await uploadImage(data, "image/jpeg");

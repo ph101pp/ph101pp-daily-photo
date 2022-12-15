@@ -30,7 +30,9 @@
     "react-hook-form-mui": "^5.7.2",
     "react-images-uploading": "^3.1.7",
     "recoil": "^0.7.5",
-    "superstruct": "^0.16.5"
+    "superstruct": "^0.16.5",
+    "@bundlr-network/client": "0.9.9",
+    "@solana/web3.js": "1.70.1"
   },
   "devDependencies": {
     "@types/node": "^17",
