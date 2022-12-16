@@ -1,107 +1,121 @@
 import React, { useEffect, useState } from "react";
-// import { useRecoilValue } from "recoil";
-// import Container from "@mui/material/Container";
-// import ArweaveProgress from "../components/ArweaveProgress";
-// import Box from "@mui/material/Box";
-// import LoadingButton from '@mui/lab/LoadingButton';
-// import getClaimMetadata from "../utils/getClaimMetadata";
-// import arwalletAtom from "../components/_atoms/arwalletAtom";
-// import arweaveStatusAtom from "../components/_atoms/bundlrStatusAtom";
-// import useArweave from "../components/_hooks/useArweave";
-// import SaveIcon from '@mui/icons-material/Save';
-// import DoneIcon from '@mui/icons-material/Done';
-// import INITIAL_MANIFEST from "../../INITIAL_MANIFEST.json";
-// import { ManifestType } from "../components/_types/ManifestType";
+import { useRecoilState } from "recoil";
+import Container from "@mui/material/Container";
 
-// function Root() {
-//   const arwallet = useRecoilValue(arwalletAtom);
-//   const uploadClaim = useArweave(arweaveStatusAtom("uploadClaim"), arwallet);
-//   const uploadManifest = useArweave(arweaveStatusAtom("uploadManifest"), arwallet);
-//   const [inProgress, setInProgress] = useState(false);
-//   const [isDone, setIsDone] = useState(false);
+import Box from "@mui/material/Box";
+import LoadingButton from '@mui/lab/LoadingButton';
+import getClaimMetadata from "../utils/getClaimMetadata";
+
+import SaveIcon from '@mui/icons-material/Save';
+import DoneIcon from '@mui/icons-material/Done';
+import INITIAL_MANIFEST from "../../INITIAL_MANIFEST.json";
+import { ManifestType } from "../components/_types/ManifestType";
+import bundlrUploadToArweave from "../components/_helpers/bundlrUploadToArweave";
+import BundlrProgress from "../components/BundlrProgress";
+import bundlrStatusAtom from "../components/_atoms/bundlrStatusAtom";
 
 
-//   const uploadData = async ()=>{
-//     const manifest = INITIAL_MANIFEST as ManifestType;
+const numberOfSteps = 3;
+function Root() {
+  const [progress, setProgress] = useRecoilState(bundlrStatusAtom)
+  const inProgress = progress.numberOfSteps > 0 && progress.numberOfSteps < progress.steps.length;
+  const isDone = progress.numberOfSteps > 0 && progress.numberOfSteps === progress.steps.length;
 
-//     setInProgress(true);
-//     const claimMetadata = getClaimMetadata();
-//     const [claimTx, executeClaimTx] = await uploadClaim(JSON.stringify(claimMetadata), "application/json");
-//     const newManifest = {
-//       ...manifest,
-//       paths: {
-//         ...manifest.paths,
-//         [`CLAIM-0`]: {
-//           id: claimTx
-//         }
-//       }
-//     };
-//     const [manifestTx, executeManifestTx] = await uploadManifest(JSON.stringify(newManifest), "application/x.arweave-manifest+json");
 
+  const uploadData = async ()=>{
+    const manifest = INITIAL_MANIFEST as ManifestType;
+
+    setProgress({
+      numberOfSteps,
+      steps: [{
+        message: "> Upload Claim Metadata"
+      }]
+    });
+
+
+    const claimMetadata = getClaimMetadata();
+
+    const [claimResult, claimStats] = await bundlrUploadToArweave(JSON.stringify(claimMetadata), "application/json");
+
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: claimResult,
+          stats: claimStats,
+          message: "> Claim Uploaded > Uploading Manifest."
+        }
+      ]
+    });
+
+    const newManifest = {
+      ...manifest,
+      paths: {
+        ...manifest.paths,
+        [`CLAIM-0`]: {
+          id: claimResult.id
+        }
+      }
+    };
+
+    const [manifestResult, manifestStats] = await bundlrUploadToArweave(JSON.stringify(newManifest), "application/x.arweave-manifest+json");
+
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: manifestResult,
+          stats: manifestStats,
+          manifest: newManifest,
+          message: "> Manifest Uploaded > Done"
+        }
+      ]
+    });
     
-//     console.log("optimistic", { claimTx, manifestTx });
-    
-//     console.log(newManifest);
+  }
 
-//     const [finalTokenTx, finalManifestTx] = await Promise.all([
-//       executeClaimTx(),
-//       executeManifestTx()
-//     ]);
+  return <Container>
+    <BundlrProgress/>
 
-//     console.log("final", {
-//       tokenTx: finalTokenTx,
-//       manifestTx: finalManifestTx
-//     });
+    <Box
+      sx={{
+        padding: "16px 0"
+      }}
+    >
+      {!isDone && (
+        <LoadingButton
+          fullWidth={true}
+          loading={inProgress}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="contained"
+          onClick={() => confirm("Upload data to Arweave?") && uploadData()}
+        >
+          Upload & Publish
+        </LoadingButton>
+      )}
+      {isDone && (
+        <LoadingButton
+          fullWidth={true}
+          loading={false}
+          loadingPosition="start"
+          startIcon={<DoneIcon />}
+          variant="contained"
+          color="success"
+        >
+          Uploaded & Published
+        </LoadingButton>
+      )}
+    </Box>
 
-//     setInProgress(false);
-//     setIsDone(true);
-
-
-//   }
-
-//   return <Container>
-//     <ArweaveProgress statusAtomName="uploadClaim" label="Claim" />
-//     <ArweaveProgress statusAtomName="uploadManifest" label="Manifest" />
-
-//     <Box
-//       sx={{
-//         padding: "16px 0"
-//       }}
-//     >
-//       {!isDone && (
-//         <LoadingButton
-//           fullWidth={true}
-//           loading={inProgress}
-//           loadingPosition="start"
-//           startIcon={<SaveIcon />}
-//           variant="contained"
-//           onClick={() => confirm("Upload data to Arweave?") && uploadData()}
-//         >
-//           Upload & Publish
-//         </LoadingButton>
-//       )}
-//       {isDone && (
-//         <LoadingButton
-//           fullWidth={true}
-//           loading={false}
-//           loadingPosition="start"
-//           startIcon={<DoneIcon />}
-//           variant="contained"
-//           color="success"
-//         >
-//           Uploaded & Published
-//         </LoadingButton>
-//       )}
-//     </Box>
-
-//   </Container>;
-// }
+  </Container>;
+}
 
 export default ()=>{
   const [isClient, setIsClient] = useState(false);
   useEffect(()=>{
     setIsClient(true);
   })
-  return null;
-  // return isClient?<Root />:null;
+
+  return isClient?<Root />:null;
 };

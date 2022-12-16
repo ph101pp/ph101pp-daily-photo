@@ -103,8 +103,8 @@ const UploadAndPublish = () => {
       numberOfSteps,
       steps: [
         {
-          result: tokenResult,
-          stats: tokenStats,
+          result: manifestResult,
+          stats: manifestStats,
           message: "> Manifest Uploaded > Committing Manifest to Github"
         }
       ]
