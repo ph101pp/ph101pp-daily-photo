@@ -38,7 +38,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     }
 
     // used to check validity of updateInitialHolderRangeInput
-    uint private _pauseTimestamp;
+    uint internal _pauseTimestamp;
 
     uint256 public lastRangeTokenIdWithLockedInitialHolders;
     bool public isZeroLocked;
@@ -69,7 +69,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     }
 
     /**
-     * @dev Return current initial holders
+     * @dev Return current initial holders Range
      */
     function initialHoldersRange()
         public
@@ -96,29 +96,32 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
      * @dev Update initial holders for a range of ids.
      */
     function _updateInitialHoldersRange(
-        UpdateInitialHolderRangeInput memory input,
-        bytes32 inputChecksum
+        UpdateInitialHolderRangeInput memory input
     ) internal virtual whenPaused {
-        bytes32 checksum = keccak256(
-            abi.encode(
-                input,
-                _initialHolders,
-                _initialHoldersRange,
-                _pauseTimestamp,
-                paused(),
-                _customUpdateInitialHoldersRangeChecksum()
-            )
-        );
-        require(
-            inputChecksum == checksum,
-            "Invalid Input. Use verifyUpdateInitialHolderRangeInput()."
+        
+        uint lastLockedIndex = _findLowerBound(
+            _initialHoldersRange,
+            lastRangeTokenIdWithLockedInitialHolders
         );
 
-        // Update initialHoldersAddress Map
+        // Update initialHoldersAddress Map 
+        // && check no locked initial holders were updated
         for (uint k = 0; k < input.newInitialHolders.length; k++) {
-            address[] memory newInitialHolder = input.newInitialHolders[k];
-            for (uint i = 0; i < newInitialHolder.length; i++) {
-                _initialHoldersAddressMap[newInitialHolder[i]] = true;
+            address[] memory newInitialHolders = input.newInitialHolders[k];
+            bool isLocked = isZeroLocked && k <= lastLockedIndex;
+            require(
+                !isLocked ||
+                    _initialHoldersRange[k] == input.newInitialHoldersRange[k],
+                "E:18"
+            );
+
+            for (uint i = 0; i < newInitialHolders.length; i++) {
+                address newInitialHolder = newInitialHolders[i];
+                require(
+                    !isLocked || _initialHolders[k][i] == newInitialHolder,
+                    "E:15"
+                );
+                _initialHoldersAddressMap[newInitialHolder] = true;
             }
         }
 
@@ -131,19 +134,37 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         for (uint i = 0; i < input.toAddresses.length; i++) {
             uint[] memory toInitialize = input.initialize[i];
             address toAddress = input.toAddresses[i];
+            address fromAddress = input.fromAddresses[i];
+            uint[] memory ids = input.ids[i];
 
-            // initialize balances for new to address
+            // initialize balances for new toAddress
             for (uint k = 0; k < toInitialize.length; k++) {
-                isBalanceInitialized[toInitialize[k]][toAddress] = true;
+                uint idToInitialize = toInitialize[k];
+                require(
+                    isBalanceInitialized[idToInitialize][fromAddress] == true
+                );
+                isBalanceInitialized[idToInitialize][toAddress] = true;
+            }
+
+            // check that both account balances are still uninitialized
+            // this means, no transfer == no amount change == no total supply diff
+            for (uint k = 0; k < ids.length; k++) {
+                uint idToTransfer = ids[k];
+                require(
+                    isBalanceInitialized[idToTransfer][fromAddress] == false &&
+                        isBalanceInitialized[idToTransfer][toAddress] ==
+                        false &&
+                        _balances[idToTransfer][toAddress] == 0
+                );
             }
 
             // send transfer events
             if (input.ids.length > 0) {
                 emit TransferBatch(
                     msg.sender,
-                    input.fromAddresses[i],
+                    fromAddress,
                     toAddress,
-                    input.ids[i],
+                    ids,
                     input.amounts[i]
                 );
             }

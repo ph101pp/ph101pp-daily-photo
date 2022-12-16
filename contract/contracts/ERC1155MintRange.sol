@@ -145,7 +145,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         ) {
             uint balance = initialBalanceOf(account, id);
             if (balance > 0) {
-                _balances[id][account] = balance;
+                _balances[id][account] = balance; 
             }
             isBalanceInitialized[id][account] = true;
         }
@@ -275,7 +275,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
             inputChecksum == checksum,
             "Invalid input. Use getMintRangeInput()"
         );
-
         lastRangeTokenIdMinted = ids[ids.length - 1];
 
         if (isZeroMinted == false) {

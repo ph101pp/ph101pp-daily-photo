@@ -111,12 +111,6 @@ contract Ph101ppDailyPhoto is
         return string.concat(base, tokenSlugFromTokenId(tokenId));
     }
 
-    // Returns proxy base Uri that is used for
-    // tokens not included in the permanent Uris yet.
-    function proxyBaseUri() public view returns (string memory) {
-        return _proxyUri;
-    }
-
     // Returns all histoical uris that include tokenId
     function uriHistory(uint tokenId) public view returns (string[] memory) {
         if (tokenId > lastRangeTokenIdWithPermanentUri) {
@@ -134,6 +128,12 @@ contract Ph101ppDailyPhoto is
             );
         }
         return history;
+    }
+
+    // Returns proxy base Uri that is used for
+    // tokens not included in the permanent Uris yet.
+    function proxyBaseUri() public view returns (string memory) {
+        return _proxyUri;
     }
 
     // Returns latest permanent base Uri
@@ -161,7 +161,6 @@ contract Ph101ppDailyPhoto is
                 validUpToTokenId <= lastRangeTokenIdMinted,
             "!(lastIdWithPermanentUri < TokenId <= lastIdMinted)"
         );
-        // require(newUri[newUri.length-1] == "/");
         _permanentUris.push(newUri);
         _permanentUriRange.push(lastRangeTokenIdWithPermanentUri + 1);
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
@@ -290,10 +289,21 @@ contract Ph101ppDailyPhoto is
         bytes32 inputChecksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
-        _updateInitialHoldersRange(
-            input,
-            inputChecksum
+        bytes32 checksum = keccak256(
+            abi.encode(
+                input,
+                _initialHolders,
+                _initialHoldersRange,
+                _pauseTimestamp,
+                paused(),
+                _customUpdateInitialHoldersRangeChecksum()
+            )
         );
+        require(
+            inputChecksum == checksum,
+            "Invalid Input. Use verifyUpdateInitialHolderRangeInput()."
+        );
+        _updateInitialHoldersRange(input);
     }
 
     // Defensive coding: Lock initial holders up to tokenId

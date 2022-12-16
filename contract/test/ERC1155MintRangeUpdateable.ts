@@ -445,9 +445,9 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
           newInitialHoldersRange: example.initial
         };
         const checksum = await c.verifyUpdateInitialHolderRangeInput(0, 0, resetInput);
-        await c.updateInitialHoldersRange(resetInput, checksum);
-        const rangeInput = await _getUpdateInitialHoldersRangeInput(c, example.input[0], example.input[1], [account2.address]);
-        await c.updateInitialHoldersRange(...rangeInput);
+        await c.updateInitialHoldersRange(resetInput);
+        const [input, _checksum] = await _getUpdateInitialHoldersRangeInput(c, example.input[0], example.input[1], [account2.address]);
+        await c.updateInitialHoldersRange(input);
         const [, initialHolderRange] = await c.initialHoldersRange();
 
         expect(example.expected).to.deep.equal(initialHolderRange.map(n => n.toNumber()));
@@ -480,7 +480,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       expect(initialize[0]).to.not.include(1);
       expect(initialize[0]).to.include(5);
 
-      await c.updateInitialHoldersRange({ fromAddresses, toAddresses, ids, amounts, initialize, ...rest }, checksum);
+      await c.updateInitialHoldersRange({ fromAddresses, toAddresses, ids, amounts, initialize, ...rest });
 
       expect(await c.balanceOf(account4.address, 5)).to.equal(0);
       expect(await c.balanceOf(account3.address, 5)).to.equal(3);
@@ -497,14 +497,14 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.mintRange(...mintIntput);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
-      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
-      const tx = await c.updateInitialHoldersRange(...rangeInput);
+      const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      const tx = await c.updateInitialHoldersRange(rangeInput);
       const receipt = await tx.wait();
 
       expect(receipt.events?.filter(e => e.event === "Paused").length).to.equal(1);
       expect(receipt.events?.filter(e => e.event === "Unpaused").length).to.equal(1);
 
-      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(rangeInput[0].ids.length);
+      expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(rangeInput.ids.length);
 
       const balancesAccount1 = await c.balanceOfBatch(ids.map(() => account1.address), ids);
       const balancesAccount2 = await c.balanceOfBatch(ids.map(() => account2.address), ids);
@@ -542,13 +542,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.mintRange(...mintIntput3);
       await c.pause();
 
-      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 1, 4, [account4.address]);
-      const tx = await c.updateInitialHoldersRange(...rangeInput);
+      const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 1, 4, [account4.address]);
+      const tx = await c.updateInitialHoldersRange(rangeInput);
       const receipt = await tx.wait();
 
       const empty = new Array(6).fill(0);
 
-      const fromAddresses = rangeInput[0].fromAddresses;
+      const fromAddresses = rangeInput.fromAddresses;
       expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(fromAddresses.length);
 
       const balancesAccount1 = await c.balanceOfBatch(empty.fill(account1.address), empty.map((x, i) => i));
@@ -592,13 +592,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
 
       await c.pause();
 
-      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 1, Infinity, [account4.address]);
-      const tx = await c.updateInitialHoldersRange(...rangeInput);
+      const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 1, Infinity, [account4.address]);
+      const tx = await c.updateInitialHoldersRange(rangeInput);
       const receipt = await tx.wait();
 
       const empty = new Array(6).fill(0);
 
-      const fromAddresses = rangeInput[0].fromAddresses;
+      const fromAddresses = rangeInput.fromAddresses;
       expect(receipt.events?.filter(e => e.event === "TransferBatch").length).to.equal(fromAddresses.length);
 
       const balancesAccount1 = await c.balanceOfBatch(empty.fill(account1.address), empty.map((x, i) => i));
@@ -620,24 +620,6 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
           expect(balancesAccount4[i]).to.equal(i + 1);
         }
       }
-    });
-
-    it("should fail to update if unpaused between generating input and updating ", async function () {
-      const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
-      const initialHolders = [account1.address, account2.address];
-      await c.setInitialHolders(initialHolders);
-      const mintIntput = await c.getMintRangeInput(5);
-      await c.mintRange(...mintIntput);
-      await c.pause();
-      const newInitialHolders = [account1.address, account3.address];
-      const rangeInput = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
-      await c.unpause();
-      await c.pause();
-
-      await expect(c.updateInitialHoldersRange(...rangeInput)).to.be.rejected;
-
-      const rangeInput2 = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
-      await expect(c.updateInitialHoldersRange(...rangeInput2)).to.not.be.rejected;
     });
 
   });
@@ -721,12 +703,12 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.setLockInitialHoldersUpTo(4);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
-      const inputs = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
-      await expect(c.updateInitialHoldersRange(...inputs)).to.be.rejectedWith("Error: Can't update locked initial holders.");
-      const inputs2 = await _getUpdateInitialHoldersRangeInput(c, 4, 5, newInitialHolders);
-      await expect(c.updateInitialHoldersRange(...inputs2)).to.be.rejectedWith("Error: Can't update locked initial holders.");
-      const inputs3 = await _getUpdateInitialHoldersRangeInput(c, 5, 5, newInitialHolders);
-      await expect(c.updateInitialHoldersRange(...inputs3)).to.not.be.rejected;
+      const [inputs] = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      await expect(c.updateInitialHoldersRange(inputs)).to.be.rejectedWith("Error: Can't update locked initial holders.");
+      const [inputs2] = await _getUpdateInitialHoldersRangeInput(c, 4, 5, newInitialHolders);
+      await expect(c.updateInitialHoldersRange(inputs2)).to.be.rejectedWith("Error: Can't update locked initial holders.");
+      const [inputs3] = await _getUpdateInitialHoldersRangeInput(c, 5, 5, newInitialHolders);
+      await expect(c.updateInitialHoldersRange(inputs3)).to.not.be.rejected;
     });
   })
 };

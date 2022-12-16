@@ -426,7 +426,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const maxSupply = [1, 2];
       await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);
-
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
       const tx = await c.mintPhotos(...input);
@@ -688,6 +687,26 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
       expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
     })
+
+    it("should fail to update if unpaused between generating input and updating ", async function () {
+      const { c, vault, account1 } = await loadFixture(deployFixture);
+      const photos = 10;
+      const maxSupply = [1, 5];
+      await c.setInitialSupply(maxSupply);
+      const input = await c.getMintRangeInput(photos);
+      await c.mintPhotos(...input);
+
+      await c.pause();
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
+      await c.unpause();
+      await c.pause();
+
+
+      await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
+
+      const updateInitialHoldersInput2 = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
+      await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput2)).to.not.be.rejected;
+    });
   });
 
   describe("ERC2981 Token Royalties", function () {
