@@ -213,11 +213,10 @@ contract Ph101ppDailyPhoto is
     // Lazy mint a new batch of unrevealed / future photos.
     // Use getMintRangeInput(uint numberOfTokens) to generate input.
     function mintPhotos(
-        uint[] memory ids,
-        uint[][] memory amounts,
-        bytes32 checkSum
+        MintRangeInput memory input,
+        bytes32 checksum
     ) public onlyRole(PHOTO_MINTER_ROLE) {
-        _mintRange(ids, amounts, checkSum);
+        _mintRangeSafe(input, checksum);
     }
 
     // ensures MintRangeInput get invalidated when initial supply changes
@@ -286,24 +285,10 @@ contract Ph101ppDailyPhoto is
     // have been sold or transfered before can't ever be affected by this method.
     function updateInitialHoldersRange(
         UpdateInitialHolderRangeInput memory input,
-        bytes32 inputChecksum
+        bytes32 checksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
-        bytes32 checksum = keccak256(
-            abi.encode(
-                input,
-                _initialHolders,
-                _initialHoldersRange,
-                _pauseTimestamp,
-                paused(),
-                _customUpdateInitialHoldersRangeChecksum()
-            )
-        );
-        require(
-            inputChecksum == checksum,
-            "Invalid Input. Use verifyUpdateInitialHolderRangeInput()."
-        );
-        _updateInitialHoldersRange(input);
+        _updateInitialHoldersRangeSafe(input, checksum);
     }
 
     // Defensive coding: Lock initial holders up to tokenId

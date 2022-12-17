@@ -30,11 +30,16 @@ contract TestERC1155MintRangePausable is ERC1155MintRangePausable {
     }
 
     function mintRange(
-        uint256[] memory ids,
-        uint256[][] memory amounts,
-        bytes32 checkSum
+        MintRangeInput memory input
     ) public virtual {
-        _mintRange(ids, amounts, checkSum);
+        _mintRange(input);
+    }
+
+    function mintRangeSafe(
+        MintRangeInput memory input,
+        bytes32 checksum
+    ) public virtual {
+        _mintRangeSafe(input, checksum);
     }
 
     function pause() public {

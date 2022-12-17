@@ -40,7 +40,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       console.log(typeof c.setInitialHolders);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await c.verifyUpdateInitialHolderRangeInput(1, 1,
         {
@@ -82,7 +82,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
         fromAddresses: [account1.address],
@@ -108,7 +108,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
         fromAddresses: [account1.address],
@@ -145,7 +145,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
         fromAddresses: [account1.address],
@@ -180,7 +180,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
         fromAddresses: [account1.address],
@@ -251,7 +251,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
         fromAddresses: [account1.address],
@@ -295,7 +295,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(1, 1, {
         fromAddresses: [account1.address],
@@ -321,7 +321,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address, account2.address]);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.connect(account1).safeTransferFrom(account1.address, account3.address, 1, 1, []);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(1, 1, {
@@ -340,7 +340,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.setInitialHolders([account1.address]);
       await c.mint(account1.address, 1, 1, []);
       const input = await c.getMintRangeInput(3);
-      await c.mintRange(...input);
+      await c.mintRange(input[0]);
       await c.pause();
       await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
         fromAddresses: [account1.address],
@@ -460,7 +460,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.setInitialHolders(initialHolders);
       await c.mintBatch(account2.address, [0, 1], [10, 10], []);
       const mintIntput = await c.getMintRangeInput(5);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
       // console.log(await c.balanceOf(account1.address, 5))
       await c.connect(account1).safeTransferFrom(account1.address, account3.address, 5, 3, []);
       await c.pause();
@@ -493,8 +493,8 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const initialHolders = [account1.address, account2.address];
       await c.setInitialHolders(initialHolders);
       const mintIntput = await c.getMintRangeInput(5);
-      const ids = mintIntput[0];
-      await c.mintRange(...mintIntput);
+      const ids = mintIntput[0][0];
+      await c.mintRange(mintIntput[0]);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
       const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
@@ -533,13 +533,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const mintIntput = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
       await c.setInitialHolders([account2.address]);
       const mintIntput2 = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput2);
+      await c.mintRange(mintIntput2[0]);
       await c.setInitialHolders([account3.address]);
       const mintIntput3 = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput3);
+      await c.mintRange(mintIntput3[0]);
       await c.pause();
 
       const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 1, 4, [account4.address]);
@@ -582,13 +582,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
       const mintIntput = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
       await c.setInitialHolders([account2.address]);
       const mintIntput2 = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput2);
+      await c.mintRange(mintIntput2[0]);
       await c.setInitialHolders([account3.address]);
       const mintIntput3 = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput3);
+      await c.mintRange(mintIntput3[0]);
 
       await c.pause();
 
@@ -633,7 +633,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const initialHolders = [account1.address, account2.address];
       await c.setInitialHolders(initialHolders);
       const mintIntput = await c.getMintRangeInput(5);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
 
       await expect(c.setLockInitialHoldersUpTo(7)).to.be.rejectedWith("Unminted tokens.")
       await expect(c.setLockInitialHoldersUpTo(4)).to.not.be.rejected;
@@ -646,7 +646,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const initialHolders = [account1.address, account2.address];
       await c.setInitialHolders(initialHolders);
       const mintIntput = await c.getMintRangeInput(5);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
       await c.pause();
       await expect(c.setLockInitialHoldersUpTo(4)).to.be.rejectedWith("Pausable: paused");
     });
@@ -657,7 +657,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const initialHolders2 = [account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
       const mintIntput = await c.getMintRangeInput(5);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
       await c.pause();
       const newInitialHolders = [ethers.constants.AddressZero, account3.address];
       const newInitialHolders2 = [account1.address, ethers.constants.AddressZero];
@@ -672,13 +672,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const initialHolders3 = [account2.address, account1.address];
       await c.setInitialHolders(initialHolders);
       const mintIntput = await c.getMintRangeInput(3);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
       await c.setInitialHolders(initialHolders2);
       const mintIntput2 = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput2);
+      await c.mintRange(mintIntput2[0]);
       await c.setInitialHolders(initialHolders3);
       const mintIntput3 = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput3);
+      await c.mintRange(mintIntput3[0]);
       await c.setLockInitialHoldersUpTo(6);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
@@ -696,10 +696,10 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const initialHolders2 = [account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
       const mintIntput = await c.getMintRangeInput(3);
-      await c.mintRange(...mintIntput);
+      await c.mintRange(mintIntput[0]);
       await c.setInitialHolders(initialHolders2);
       const mintIntput2 = await c.getMintRangeInput(2);
-      await c.mintRange(...mintIntput2);
+      await c.mintRange(mintIntput2[0]);
       await c.setLockInitialHoldersUpTo(4);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];

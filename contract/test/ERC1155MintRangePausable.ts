@@ -20,7 +20,7 @@ export function testERC1155MintRangePausable(deployFixture: ()=>Promise<Fixture<
       await c.setInitialHolders(initialHolders);
       await c.pause();
       const inputs = await c.getMintRangeInput(10);
-      await expect(c.mintRange(...inputs)).to.be.rejectedWith("Pausable: paused");
+      await expect(c.mintRange(inputs[0])).to.be.rejectedWith("Pausable: paused");
     });
 
     it("should fail to setInitialHolders()", async function () {

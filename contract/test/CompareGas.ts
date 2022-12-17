@@ -164,10 +164,10 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     await c1.setInitialHolders([account1.address]);
     await c2.setInitialHolders([account1.address]);
 
-    const input1 = await c1.getMintRangeInput(100);
-    await c1.mintRange(...input1);
-    const input2 = await c2.getMintRangeInput(100);
-    await c2.mintRange(...input2);
+    const [input1] = await c1.getMintRangeInput(100);
+    await c1.mintRange(input1);
+    const [input2] = await c2.getMintRangeInput(100);
+    await c2.mintRange(input2);
     const input3 = await pdp.getMintRangeInput(100);
     await pdp.mintPhotos(...input3);
 

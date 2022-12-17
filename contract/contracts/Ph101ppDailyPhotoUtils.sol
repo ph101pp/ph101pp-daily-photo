@@ -473,7 +473,6 @@ library Ph101ppDailyPhotoUtils {
                     ),
                     _initialHolders,
                     _initialHoldersRange,
-                    p.pauseTimestamp,
                     p.caller.paused(),
                     p.customUpdateInitialHoldersRangeChecksum
                 )

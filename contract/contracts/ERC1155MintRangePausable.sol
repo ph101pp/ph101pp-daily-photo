@@ -24,11 +24,9 @@ abstract contract ERC1155MintRangePausable is ERC1155MintRange, Pausable {
      * @dev Lazy-mint a range of new tokenIds to initial holders
      */
     function _mintRange(
-        uint[] memory ids,
-        uint[][] memory amounts,
-        bytes32 inputChecksum
+        MintRangeInput memory input
     ) internal virtual override whenNotPaused {
-        super._mintRange(ids, amounts, inputChecksum);
+        super._mintRange(input);
     }
 
     /**

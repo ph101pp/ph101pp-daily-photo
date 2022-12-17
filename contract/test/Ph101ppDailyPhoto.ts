@@ -351,7 +351,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.mintPhotos(...inputs);
 
       for (let i = 0; i < inputs[0].length; i++) {
-        cIS = await c.initialSupply(inputs[0][i]);
+        cIS = await c.initialSupply(inputs[0].ids[i]);
         expect(cIS[0].eq(initialSupply[0]));
         expect(cIS[1].eq(initialSupply[1]));
       }
@@ -370,7 +370,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const inputs2 = await c.getMintRangeInput(5);
       await c.mintPhotos(...inputs2);
       for (let i = 0; i < inputs2[0].length; i++) {
-        cIS = await c.initialSupply(inputs2[0][i]);
+        cIS = await c.initialSupply(inputs2[0].ids[i]);
         expect(cIS[0].eq(initialSupply2[0]));
         expect(cIS[1].eq(initialSupply2[1]));
       }
@@ -388,7 +388,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
         const supply = [10, 10 + i];
         await c.setInitialSupply(supply);
         const inputs = await c.getMintRangeInput(mints);
-        const treasuryBalances = inputs[1][0];
+        const treasuryBalances = inputs[0].amounts[0];
         const balanceDistribution: { [key: number]: number } = {};
 
         for (let k = 0; k < mints; k++) {
@@ -425,11 +425,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const photos = 1000;
       const maxSupply = [1, 2];
       await c.setInitialSupply(maxSupply);
-      const input = await c.getMintRangeInput(photos);
+      const [input, checksum] = await c.getMintRangeInput(photos);
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
-      const tx = await c.mintPhotos(...input);
-      const receipt = await tx.wait();;
+      const tx = await c.mintPhotos(input, checksum);
+      const receipt = await tx.wait();
       const ids = input[0];
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
@@ -552,7 +552,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
       await c.mintPhotos(...input);
-      const ids = input[0];
+      const ids = input[0].ids;
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
 
@@ -606,7 +606,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
       await c.mintPhotos(...input);
-      const ids = input[0];
+      const ids = input[0].ids;
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
 
@@ -648,7 +648,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
       await c.mintPhotos(...input);
-      const ids = input[0];
+      const ids = input[0].ids;
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
 
@@ -688,7 +688,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
     })
 
-    it("should fail to update if unpaused between generating input and updating ", async function () {
+    // this is not verified anymore
+    it.skip("should fail to update if unpaused between generating input and updating ", async function () {
       const { c, vault, account1 } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = [1, 5];

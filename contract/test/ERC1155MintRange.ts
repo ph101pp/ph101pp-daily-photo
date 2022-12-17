@@ -19,7 +19,9 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      const [ids, amounts] = await c.getMintRangeInput(newTokens);
+
+      const [input] = await c.getMintRangeInput(newTokens);
+      const {ids, amounts} = input;
 
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
@@ -36,7 +38,9 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      const [ids, amounts] = await c.getMintRangeInput(newTokens);
+      
+      const [input] = await c.getMintRangeInput(newTokens);
+      const {ids, amounts} = input;
 
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
@@ -54,8 +58,10 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
       const input = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...input);
-      const [ids2, amounts2] = await c.getMintRangeInput(newTokens);
+      await c.mintRange(input[0]);
+
+      const [input2] = await c.getMintRangeInput(newTokens);
+      const {ids: ids2, amounts: amounts2} = input2;
 
       expect(ids2.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
@@ -76,7 +82,8 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.mintBatch(account1.address, [0, 1, 2, 3, 4, 5], [1, 1, 1, 1, 1, 1], []);
       await c.mint(account1.address, 8, 8, []);
 
-      const [ids, amounts, checkSum] = await c.getMintRangeInput(newTokens);
+      const [input, checkSum] = await c.getMintRangeInput(newTokens);
+      const {ids, amounts} = input;
 
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < 6; i++) {
@@ -84,10 +91,12 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       }
       expect(ids).to.not.include(8);
 
-      await c.mintRange(ids, amounts, checkSum);
+      await c.mintRange(input);
       await c.mintBatch(account1.address, [15, 17], [1, 1], []);
 
-      const [ids2] = await c.getMintRangeInput(newTokens);
+      const [input2] = await c.getMintRangeInput(newTokens);
+      const {ids:ids2} = input2;
+
       expect(Number(ids[ids.length - 1]) + 1).to.equal(ids2[0]);
 
       expect(ids2.length).to.equal(newTokens);
@@ -103,8 +112,8 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      const inputs = await c.getMintRangeInput(newTokens);
-      const tx: ContractTransaction = await c.mintRange(...inputs);
+      const [inputs] = await c.getMintRangeInput(newTokens);
+      const tx: ContractTransaction = await c.mintRange(inputs);
       const receipt = await tx.wait();
       const transferEvents = receipt.events?.filter(e => e.event === "TransferBatch");
 
@@ -134,11 +143,11 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.mint(account1.address, 3, 1, []);
 
       const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
       const initialHolders2 = [account5.address, account6.address, account7.address, account8.address];
       await c.setInitialHolders(initialHolders2);
       const inputs2 = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs2);
+      await c.mintRange(inputs2[0]);
 
       // ids 0-20 exist (21) 
       for (let i = 0; i <= 30; i++) {
@@ -181,7 +190,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const initialHolders = [account1.address];
       await c.setInitialHolders(initialHolders);
       const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
 
       const balances1 = await c.balanceOfBatch([account1.address, account1.address, account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
       for (let i = 0; i < initialHolders.length; i++) {
@@ -199,7 +208,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       }
     });
 
-    it("Should fail when a token was minted since getMintRangeInput was called", async function () {
+    it("mintRangeSafe Should fail when a token was minted since getMintRangeInput was called", async function () {
       const newTokens = 5;
       const { c, account1 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address];
@@ -207,14 +216,42 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
 
       const inputs = await c.getMintRangeInput(5);
       await c.mint(account1.address, 1, 1, []);
-      await expect(c.mintRange(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+      await expect(c.mintRangeSafe(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
 
       const inputs2 = await c.getMintRangeInput(5);
-      await expect(c.mintRange(...inputs2)).to.not.be.rejected;
+      await expect(c.mintRangeSafe(...inputs2)).to.not.be.rejected;
 
       const inputs3 = await c.getMintRangeInput(5);
       await c.mintBatch(account1.address, [20, 21], [1, 1], []);
-      await expect(c.mintRange(...inputs3)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+      await expect(c.mintRangeSafe(...inputs3)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+    });
+
+    it("mintRangeSafe should fail when initial holders were updated since getMintRangeInput was called", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      const newTokens = 5;
+      const initialHolders = [account1.address];
+      const initialHolders2 = [account2.address];
+      await c.setInitialHolders(initialHolders);
+
+      const inputs = await c.getMintRangeInput(5);
+      await c.setInitialHolders(initialHolders2);
+      await expect(c.mintRangeSafe(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+
+      const inputs2 = await c.getMintRangeInput(5);
+      await expect(c.mintRangeSafe(...inputs2)).to.not.be.rejected;
+    });
+
+    it("mintRangeSafe should fail when another mintRange was exectued since getMintRangeInput was called", async function () {
+      const { c, account1, account2 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address];
+      await c.setInitialHolders(initialHolders);
+
+      const inputs = await c.getMintRangeInput(5);
+      
+      const inputs2 = await c.getMintRangeInput(5);
+      await expect(c.mintRangeSafe(...inputs2)).to.not.be.rejected;
+
+      await expect(c.mintRangeSafe(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
     });
 
   });
@@ -227,7 +264,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
       const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(9999)
 
@@ -249,7 +286,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
       const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(9999)
       expect(await c.balanceOf(account1.address, 1)).to.equal(2)
@@ -282,7 +319,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       expect(await c.initialHolders(1000)).to.deep.equal(initialHolders);
 
       const inputs = await c.getMintRangeInput(5);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
       await c.setInitialHolders(initialHolders2);
       expect(await c.initialHolders(1000)).to.deep.equal(initialHolders2);
     });
@@ -295,10 +332,10 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.setInitialHolders(initialHolders);
 
       const inputs = await c.getMintRangeInput(5);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
       await c.setInitialHolders(initialHolders2);
       const inputs2 = await c.getMintRangeInput(5);
-      await c.mintRange(...inputs2);
+      await c.mintRange(inputs2[0]);
       expect(await c.initialHolders(1000)).to.deep.equal(initialHolders2);
 
       for (let i = 0; i < 10; i++) {
@@ -332,7 +369,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.mint(account1.address, 3, 1, []);
 
       const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
 
       expect(await c.totalSupply(0)).to.equal(9999 * initialHolders.length);
       expect(await c.totalSupply(3)).to.equal(1);
@@ -371,7 +408,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.setInitialHolders(initialHolders);
 
       const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
 
       c.mint(account1.address, 0, 30, []);
       c.mint(account2.address, 0, 30, []);
@@ -396,7 +433,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.setInitialHolders(initialHolders);
 
       const inputs = await c.getMintRangeInput(newTokens);
-      await c.mintRange(...inputs);
+      await c.mintRange(inputs[0]);
 
       await c.burn(account1.address, 0, 30);
       await c.burn(account2.address, 0, 30);
