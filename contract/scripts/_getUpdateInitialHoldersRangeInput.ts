@@ -52,7 +52,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
         }
 
         const balance = balances[a].toNumber();
-        const isBalanceInitialized = await c.isBalanceInitialized(i, fromAddress)
+        const isBalanceInitialized = await c.isBalanceInitialized(fromAddress, i)
 
         if ((balance > 0 || isBalanceInitialized)) {
           let addressIndex = fromAddresses.indexOf(fromAddress);

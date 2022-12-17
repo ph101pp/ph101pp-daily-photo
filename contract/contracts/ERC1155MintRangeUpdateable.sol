@@ -131,9 +131,9 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             for (uint k = 0; k < toInitialize.length; k++) {
                 uint idToInitialize = toInitialize[k];
                 require(
-                    isBalanceInitialized[idToInitialize][fromAddress] == true
+                    isBalanceInitialized[fromAddress][idToInitialize] == true
                 );
-                isBalanceInitialized[idToInitialize][toAddress] = true;
+                isBalanceInitialized[toAddress][idToInitialize] = true;
             }
 
             // check that both account balances are still uninitialized
@@ -141,8 +141,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             for (uint k = 0; k < ids.length; k++) {
                 uint idToTransfer = ids[k];
                 require(
-                    isBalanceInitialized[idToTransfer][fromAddress] == false &&
-                        isBalanceInitialized[idToTransfer][toAddress] ==
+                    isBalanceInitialized[fromAddress][idToTransfer] == false &&
+                        isBalanceInitialized[toAddress][idToTransfer] ==
                         false &&
                         _balances[idToTransfer][toAddress] == 0
                 );

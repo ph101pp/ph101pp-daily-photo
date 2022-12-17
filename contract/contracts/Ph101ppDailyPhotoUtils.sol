@@ -356,7 +356,7 @@ library Ph101ppDailyPhotoUtils {
                 // to address is neither initialized nor has a balance
 
                 require(p.caller.balanceOf(to, tokenId) == 0, "E:13");
-                require(!p.caller.isBalanceInitialized(tokenId, to), "E:21");
+                require(!p.caller.isBalanceInitialized(to, tokenId), "E:21");
 
                 // if token is to be transferred -> cant be initialized and must have balance.
                 if (idId < p.ids[i].length && p.ids[i][idId] == tokenId) {
@@ -373,7 +373,7 @@ library Ph101ppDailyPhotoUtils {
                         "E:08"
                     );
                     require(
-                        !p.caller.isBalanceInitialized(tokenId, from),
+                        !p.caller.isBalanceInitialized(from, tokenId),
                         "E:21"
                     );
 
@@ -399,7 +399,7 @@ library Ph101ppDailyPhotoUtils {
                     }
 
                     require(
-                        p.caller.isBalanceInitialized(tokenId, from),
+                        p.caller.isBalanceInitialized(from, tokenId),
                         "E:21"
                     );
 
@@ -420,7 +420,7 @@ library Ph101ppDailyPhotoUtils {
                         require(balance == 0, "E:22");
                     }
                     require(
-                        !p.caller.isBalanceInitialized(tokenId, from),
+                        !p.caller.isBalanceInitialized(from, tokenId),
                         "E:21"
                     );
 

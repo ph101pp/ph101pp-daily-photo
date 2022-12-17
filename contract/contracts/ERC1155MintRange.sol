@@ -16,7 +16,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     // Mapping from token ID to balancesInitialzed flag
-    mapping(uint => mapping(address => bool)) public isBalanceInitialized;
+    mapping(address => mapping(uint => bool)) public isBalanceInitialized;
 
     // Mapping from token ID to totalSupplyDelta
     mapping(uint => int256) private _totalSupplyDelta;
@@ -66,7 +66,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
 
         if (
             _maybeInitialHolder(account) &&
-            !isBalanceInitialized[id][account] &&
+            !isBalanceInitialized[account][id] &&
             !isManualMint[id] &&
             _inRange(id)
         ) {
@@ -143,7 +143,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         if (
             _maybeInitialHolder(account) &&
             account != address(0) &&
-            !isBalanceInitialized[id][account] &&
+            !isBalanceInitialized[account][id] &&
             !isManualMint[id] &&
             _inRange(id)
         ) {
@@ -151,7 +151,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
             if (balance > 0) {
                 _balances[id][account] = balance;
             }
-            isBalanceInitialized[id][account] = true;
+            isBalanceInitialized[account][id] = true;
         }
     }
 
