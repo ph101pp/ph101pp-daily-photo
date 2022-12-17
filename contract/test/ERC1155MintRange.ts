@@ -2,12 +2,12 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ContractTransaction } from "ethers";
-import _getUpdateInitialHoldersRangeInput from "../scripts/_getUpdateInitialHoldersRangeInput";
+import _getUpdateInitialHolderRangesInput from "../scripts/_getUpdateInitialHolderRangesInput";
 import { TestERC1155MintRange } from "../typechain-types";
 import { deployFixture, Fixture } from "./fixture";
 import integrityCheck from "./integrityCheck";
 
-describe.only("ERC1155MintRange", function () {
+describe("ERC1155MintRange", function () {
   testERC1155MintRange(deployFixture("TestERC1155MintRange"));
 });
 
@@ -107,7 +107,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
   });
 
-  describe.only("mintRange", function () {
+  describe("mintRange", function () {
     it("Should mint 100 nfts to 4 initial holders and emit 4 TransferBatch events", async function () {
       const newTokens = 100;
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
@@ -323,7 +323,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
     });
 
-    it.only("should batch transfer existing tokens that are minted with mintRange", async function () {
+    it("should batch transfer existing tokens that are minted with mintRange", async function () {
       const newTokens = 10;
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];

@@ -3,7 +3,7 @@ import { EtherscanConfig } from "@nomiclabs/hardhat-etherscan/dist/src/types";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 import { BaseContract } from "ethers";
-import getPh101ppDailyPhotoUpdateInitialHoldersRangeInput from "../scripts/getPh101ppDailyPhotoUpdateInitialHoldersRangeInput";
+import getPh101ppDailyPhotoUpdateInitialHolderRangesInput from "../scripts/getPh101ppDailyPhotoUpdateInitialHolderRangesInput";
 import { Ph101ppDailyPhoto, TestOperatorFilterRegistry, TestIPh101ppDailyPhotoListener } from "../typechain-types";
 import { Fixture, SignerWithAddress } from "./fixture";
 
@@ -538,7 +538,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
   });
 
-  describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHoldersRangeInput", function () {
+  describe("Update initial holders / getPh101ppDailyPhotoUpdateInitialHolderRangesInput", function () {
     it("should correcly update vault address only", async function () {
       const { c, vault, treasury, account1, account2 } = await loadFixture(deployFixture);
       const photos = 10;
@@ -566,7 +566,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.connect(vault).safeTransferFrom(vault.address, account2.address, 3, 1, []);
 
       await c.pause();
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, treasury.address, account1.address);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, treasury.address, account1.address);
 
       const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
       const receipt = await tx.wait();
@@ -616,7 +616,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       }
 
       await c.pause();
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account1.address, vault.address);
 
       const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
       const receipt = await tx.wait();
@@ -658,7 +658,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       }
 
       await c.pause();
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, vault.address, treasury.address);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, vault.address, treasury.address);
       console.log(updateInitialHoldersInput);
       return; 
       await c.updateInitialHoldersRange(...updateInitialHoldersInput);
@@ -683,7 +683,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.permanentlyDisableInitialHoldersRangeUpdate();
       await c.pause();
 
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account2.address, account1.address,);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account2.address, account1.address,);
       await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
       expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
     })
@@ -698,14 +698,14 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.mintPhotos(...input);
 
       await c.pause();
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account1.address, vault.address);
       await c.unpause();
       await c.pause();
 
 
       await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
 
-      const updateInitialHoldersInput2 = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, Infinity, account1.address, vault.address);
+      const updateInitialHoldersInput2 = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account1.address, vault.address);
       await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput2)).to.not.be.rejected;
     });
   });
@@ -774,7 +774,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should fail to execute access guarded functions without role", async function () {
       const { c, account1 } = await loadFixture(deployFixture);
       await c.pause();
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, 100, account1.address, account1.address);
       await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
       await c.unpause();
       await c.setInitialSupply([1, 4]);
@@ -801,7 +801,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.grantRole(await c.DEFAULT_ADMIN_ROLE(), account1.address);
       await c.pause();
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersRangeInput(c, 0, 100, account1.address, account1.address);
+      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, 100, account1.address, account1.address);
       await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
       await c.unpause();
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");

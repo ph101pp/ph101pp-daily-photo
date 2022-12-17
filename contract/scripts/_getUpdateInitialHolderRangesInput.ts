@@ -9,13 +9,13 @@ function findInRange(range: number[], needle: number) {
   return 0;
 }
 
-export default async function _getUpdateInitialHoldersRangeInput(
+export default async function _getUpdateInitialHolderRangesInput(
   c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
   from: number,
   to: number,
   newInitialHolders: string[]
 ): Promise<[
-  ERC1155MintRangeUpdateable.UpdateInitialHolderRangeInputStruct,
+  ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct,
   string
 ]> {
   if (from < 0 || from > to) {
@@ -80,7 +80,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
   const newInitialHoldersArray: string[][] = [];
   const newInitialHoldersRange: number[] = [];
 
-  const [currentInitialHolders, currentInitialHoldersRangeBig] = await c.initialHoldersRange();
+  const [currentInitialHolders, currentInitialHoldersRangeBig] = await c.initialHolderRanges();
 
   for (let i = 0; i < currentInitialHolders.length; i++) {
     if (currentInitialHolders[0].length !== newInitialHolders.length) {
@@ -137,7 +137,7 @@ export default async function _getUpdateInitialHoldersRangeInput(
     newInitialHolders: newInitialHoldersArray,
     newInitialHoldersRange
   };
-  const checksum = await c.verifyUpdateInitialHolderRangeInput(from, too, input);
+  const checksum = await c.verifyUpdateInitialHolderRangesInput(from, too, input);
 
   return [
     input,

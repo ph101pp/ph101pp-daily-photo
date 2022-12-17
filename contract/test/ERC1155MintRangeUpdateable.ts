@@ -1,7 +1,7 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import _getUpdateInitialHoldersRangeInput from "../scripts/_getUpdateInitialHoldersRangeInput";
+import _getUpdateInitialHolderRangesInput from "../scripts/_getUpdateInitialHolderRangesInput";
 import { testERC1155MintRange } from "./ERC1155MintRange";
 import { testERC1155MintRangePausable } from "./ERC1155MintRangePausable";
 import { TestERC1155MintRangeUpdateable, Ph101ppDailyPhoto, ERC1155MintRangeUpdateable } from "../typechain-types";
@@ -32,7 +32,7 @@ describe("TestERC1155MintRangeUpdateable", function () {
 
 export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixture<TestERC1155MintRangeUpdateable>>) {
 
-  describe("verifyUpdateInitialHoldersRangeInput", function () {
+  describe("verifyUpdateInitialHolderRangesInput", function () {
 
     it("should return a hash when successfull", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
@@ -42,7 +42,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await c.verifyUpdateInitialHolderRangeInput(1, 1,
+      await c.verifyUpdateInitialHolderRangesInput(1, 1,
         {
           fromAddresses: [account1.address],
           toAddresses: [account2.address],
@@ -57,7 +57,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
     it("should fail when contract is not paused", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address]);
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[1]],
@@ -67,7 +67,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("Pausable: not paused");
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[1]],
@@ -84,7 +84,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -93,7 +93,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -110,7 +110,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -120,7 +120,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
 
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -130,7 +130,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("E:04");
 
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -147,7 +147,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -156,7 +156,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -165,7 +165,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [1]
       })).to.be.rejectedWith("E:05");
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -182,7 +182,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -191,7 +191,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -200,7 +200,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("E:03");
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0], [0]],
@@ -209,7 +209,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("E:02");
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address, account3.address],
         ids: [[0]],
@@ -218,7 +218,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("E:01");
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address, account3.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -227,7 +227,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("E:01");
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0, 1]],
@@ -236,7 +236,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[]],
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("E:07");
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -253,7 +253,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -262,7 +262,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -271,7 +271,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account2.address],
         toAddresses: [account1.address],
         ids: [[0]],
@@ -280,7 +280,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account1.address]],
         newInitialHoldersRange: [0]
       })).to.be.rejectedWith("E:13");
-      await expect(c.verifyUpdateInitialHolderRangeInput(1, 1, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(1, 1, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[1]],
@@ -297,7 +297,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(1, 1, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(1, 1, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[1]],
@@ -306,7 +306,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
-      await expect(c.verifyUpdateInitialHolderRangeInput(3, 3, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(3, 3, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[3]],
@@ -324,7 +324,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.mintRange(input[0]);
       await c.connect(account1).safeTransferFrom(account1.address, account3.address, 1, 1, []);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(1, 1, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(1, 1, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[1]],
@@ -342,7 +342,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const input = await c.getMintRangeInput(3);
       await c.mintRange(input[0]);
       await c.pause();
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[0]],
@@ -351,7 +351,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         newInitialHolders: [[account2.address]],
         newInitialHoldersRange: [0]
       })).to.not.be.rejected;
-      await expect(c.verifyUpdateInitialHolderRangeInput(0, 0, {
+      await expect(c.verifyUpdateInitialHolderRangesInput(0, 0, {
         fromAddresses: [account1.address],
         toAddresses: [account2.address],
         ids: [[1]],
@@ -364,7 +364,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
 
   });
 
-  describe("updateInitialHoldersRangeInput / _getUpdateInitialHoldersRangeInput / verifyUpdateInitialHoldersRangeInput", function () {
+  describe("updateInitialHoldersRangeInput / _getUpdateInitialHolderRangesInput / verifyUpdateInitialHolderRangesInput", function () {
     const exampleRanges = [
       {
         initial: [0, 4, 5],
@@ -412,17 +412,17 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2 } = await loadFixture(deployFixture);
       await c.setInitialHolders([account1.address, account2.address]);
 
-      await expect(_getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])).to.be.rejectedWith("Pausable: not paused");
+      await expect(_getUpdateInitialHolderRangesInput(c, 1, 300, [account1.address, account2.address])).to.be.rejectedWith("Pausable: not paused");
       await c.pause();
-      await _getUpdateInitialHoldersRangeInput(c, 1, 300, [account1.address, account2.address])
+      await _getUpdateInitialHolderRangesInput(c, 1, 300, [account1.address, account2.address])
         .catch((e) => { expect(true).to.equal(false) });
-      await _getUpdateInitialHoldersRangeInput(c, -1, 300, [account1.address, account2.address])
+      await _getUpdateInitialHolderRangesInput(c, -1, 300, [account1.address, account2.address])
         .then(() => { expect(true).to.equal(false) })
         .catch((e) => { expect(e.message).to.equal("Error: from < 0 || from > to") });
-      await _getUpdateInitialHoldersRangeInput(c, 1, 0, [account1.address, account2.address])
+      await _getUpdateInitialHolderRangesInput(c, 1, 0, [account1.address, account2.address])
         .then(() => { expect(true).to.equal(false) })
         .catch((e) => { expect(e.message).to.equal("Error: from < 0 || from > to") });
-      await _getUpdateInitialHoldersRangeInput(c, 0, 1, [account1.address])
+      await _getUpdateInitialHolderRangesInput(c, 0, 1, [account1.address])
         .then(() => { expect(true).to.equal(false) })
         .catch((e) => { expect(e.message).to.equal("Error: newInitialHolders.length does not match") });
     })
@@ -435,7 +435,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       for (let i = 0; i < exampleRanges.length; i++) {
         const example = exampleRanges[i];
         const initialHolders = new Array(example.initial.length).fill([account1.address]);
-        const resetInput: ERC1155MintRangeUpdateable.UpdateInitialHolderRangeInputStruct = {
+        const resetInput: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct = {
           fromAddresses: [account1.address],
           toAddresses: [account2.address],
           ids: [[]],
@@ -444,11 +444,11 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
           newInitialHolders: initialHolders,
           newInitialHoldersRange: example.initial
         };
-        const checksum = await c.verifyUpdateInitialHolderRangeInput(0, 0, resetInput);
+        const checksum = await c.verifyUpdateInitialHolderRangesInput(0, 0, resetInput);
         await c.updateInitialHoldersRange(resetInput);
-        const [input, _checksum] = await _getUpdateInitialHoldersRangeInput(c, example.input[0], example.input[1], [account2.address]);
+        const [input, _checksum] = await _getUpdateInitialHolderRangesInput(c, example.input[0], example.input[1], [account2.address]);
         await c.updateInitialHoldersRange(input);
-        const [, initialHolderRange] = await c.initialHoldersRange();
+        const [, initialHolderRange] = await c.initialHolderRanges();
 
         expect(example.expected).to.deep.equal(initialHolderRange.map(n => n.toNumber()));
       }
@@ -465,7 +465,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.connect(account1).safeTransferFrom(account1.address, account3.address, 5, 3, []);
       await c.pause();
 
-      const [{ fromAddresses, toAddresses, ids, amounts, initialize, ...rest }, checksum] = await _getUpdateInitialHoldersRangeInput(c, 0, Infinity, [account4.address]);
+      const [{ fromAddresses, toAddresses, ids, amounts, initialize, ...rest }, checksum] = await _getUpdateInitialHolderRangesInput(c, 0, Infinity, [account4.address]);
 
       expect(fromAddresses.length).to.equal(1);
       expect(toAddresses.length).to.equal(1);
@@ -497,7 +497,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.mintRange(mintIntput[0]);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
-      const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      const [rangeInput] = await _getUpdateInitialHolderRangesInput(c, 0, 3, newInitialHolders);
       const tx = await c.updateInitialHoldersRange(rangeInput);
       const receipt = await tx.wait();
 
@@ -542,7 +542,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.mintRange(mintIntput3[0]);
       await c.pause();
 
-      const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 1, 4, [account4.address]);
+      const [rangeInput] = await _getUpdateInitialHolderRangesInput(c, 1, 4, [account4.address]);
       const tx = await c.updateInitialHoldersRange(rangeInput);
       const receipt = await tx.wait();
 
@@ -592,7 +592,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
 
       await c.pause();
 
-      const [rangeInput] = await _getUpdateInitialHoldersRangeInput(c, 1, Infinity, [account4.address]);
+      const [rangeInput] = await _getUpdateInitialHolderRangesInput(c, 1, Infinity, [account4.address]);
       const tx = await c.updateInitialHoldersRange(rangeInput);
       const receipt = await tx.wait();
 
@@ -661,8 +661,8 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.pause();
       const newInitialHolders = [ethers.constants.AddressZero, account3.address];
       const newInitialHolders2 = [account1.address, ethers.constants.AddressZero];
-      await expect(_getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders)).to.be.rejectedWith("E:16");
-      await expect(_getUpdateInitialHoldersRangeInput(c, 4, 5, newInitialHolders2)).to.be.rejectedWith("E:16");
+      await expect(_getUpdateInitialHolderRangesInput(c, 0, 3, newInitialHolders)).to.be.rejectedWith("E:16");
+      await expect(_getUpdateInitialHolderRangesInput(c, 4, 5, newInitialHolders2)).to.be.rejectedWith("E:16");
     });
 
     it("should fail to create update initialHolders input of locked range", async function () {
@@ -682,15 +682,15 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.setLockInitialHoldersUpTo(6);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
-      await expect(_getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders)).to.be.rejectedWith("E:15");
-      await expect(_getUpdateInitialHoldersRangeInput(c, 2, 5, newInitialHolders)).to.be.rejectedWith("E:18");
-      await expect(_getUpdateInitialHoldersRangeInput(c, 4, 5, newInitialHolders)).to.be.rejectedWith("E:23");
-      await expect(_getUpdateInitialHoldersRangeInput(c, 7, 7, newInitialHolders)).to.not.be.rejected;
+      await expect(_getUpdateInitialHolderRangesInput(c, 0, 3, newInitialHolders)).to.be.rejectedWith("E:15");
+      await expect(_getUpdateInitialHolderRangesInput(c, 2, 5, newInitialHolders)).to.be.rejectedWith("E:18");
+      await expect(_getUpdateInitialHolderRangesInput(c, 4, 5, newInitialHolders)).to.be.rejectedWith("E:23");
+      await expect(_getUpdateInitialHolderRangesInput(c, 7, 7, newInitialHolders)).to.not.be.rejected;
     });
 
 
     it.skip("should fail to update initialHolders of locked range", async function () {
-      // to test this comment-out the E:15 check in verifyUpdateInitialHolderRangeInput;
+      // to test this comment-out the E:15 check in verifyUpdateInitialHolderRangesInput;
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address];
       const initialHolders2 = [account3.address, account4.address];
@@ -703,11 +703,11 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.setLockInitialHoldersUpTo(4);
       await c.pause();
       const newInitialHolders = [account1.address, account3.address];
-      const [inputs] = await _getUpdateInitialHoldersRangeInput(c, 0, 3, newInitialHolders);
+      const [inputs] = await _getUpdateInitialHolderRangesInput(c, 0, 3, newInitialHolders);
       await expect(c.updateInitialHoldersRange(inputs)).to.be.rejectedWith("Error: Can't update locked initial holders.");
-      const [inputs2] = await _getUpdateInitialHoldersRangeInput(c, 4, 5, newInitialHolders);
+      const [inputs2] = await _getUpdateInitialHolderRangesInput(c, 4, 5, newInitialHolders);
       await expect(c.updateInitialHoldersRange(inputs2)).to.be.rejectedWith("Error: Can't update locked initial holders.");
-      const [inputs3] = await _getUpdateInitialHoldersRangeInput(c, 5, 5, newInitialHolders);
+      const [inputs3] = await _getUpdateInitialHolderRangesInput(c, 5, 5, newInitialHolders);
       await expect(c.updateInitialHoldersRange(inputs3)).to.not.be.rejected;
     });
   })

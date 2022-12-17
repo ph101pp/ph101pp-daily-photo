@@ -26,9 +26,9 @@ contract Ph101ppDailyPhoto is
     uint private constant VAULT_ID = 1;
 
     uint[][] private _initialSupplies;
-    uint[] private _initialSupplyRange;
+    uint[] private _initialSupplyRanges;
     string[] private _permanentUris;
-    uint[] private _permanentUriRange;
+    uint[] private _permanentUriRanges;
     string private _proxyUri;
 
     uint public lastRangeTokenIdWithPermanentUri;
@@ -52,11 +52,11 @@ contract Ph101ppDailyPhoto is
         _grantRole(URI_UPDATER_ROLE, msg.sender);
 
         // set initial max supply to 2-3;
-        _initialSupplyRange.push(0);
+        _initialSupplyRanges.push(0);
         _initialSupplies.push([2, 3]);
 
+        _permanentUriRanges.push(0);
         _permanentUris.push(newPermanentUri);
-        _permanentUriRange.push(0);
 
         _proxyUri = newProxyUri;
         _owner = msg.sender;
@@ -116,7 +116,7 @@ contract Ph101ppDailyPhoto is
         if (tokenId > lastRangeTokenIdWithPermanentUri) {
             return new string[](0);
         }
-        uint permanentUriIndex = _findLowerBound(_permanentUriRange, tokenId);
+        uint permanentUriIndex = _findLowerBound(_permanentUriRanges, tokenId);
         string memory slug = tokenSlugFromTokenId(tokenId);
         string[] memory history = new string[](
             _permanentUris.length - permanentUriIndex
@@ -147,7 +147,7 @@ contract Ph101ppDailyPhoto is
         view
         returns (string[] memory, uint256[] memory)
     {
-        return (_permanentUris, _permanentUriRange);
+        return (_permanentUris, _permanentUriRanges);
     }
 
     // Updates latest permanent base Uri.
@@ -162,7 +162,7 @@ contract Ph101ppDailyPhoto is
             "!(lastIdWithPermanentUri < TokenId <= lastIdMinted)"
         );
         _permanentUris.push(newUri);
-        _permanentUriRange.push(lastRangeTokenIdWithPermanentUri + 1);
+        _permanentUriRanges.push(lastRangeTokenIdWithPermanentUri + 1);
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
     }
 
@@ -242,11 +242,11 @@ contract Ph101ppDailyPhoto is
                 newInitialSupply[0] <= newInitialSupply[1]
         );
         uint firstId = lastRangeTokenIdMinted + 1;
-        uint lastId = _initialSupplyRange[_initialSupplyRange.length - 1];
+        uint lastId = _initialSupplyRanges[_initialSupplyRanges.length - 1];
         if (lastId == firstId) {
             _initialSupplies[_initialSupplies.length - 1] = newInitialSupply;
         } else {
-            _initialSupplyRange.push(firstId);
+            _initialSupplyRanges.push(firstId);
             _initialSupplies.push(newInitialSupply);
         }
     }
@@ -254,11 +254,11 @@ contract Ph101ppDailyPhoto is
     // Returns initial supply range that was used for a tokenId.
     function initialSupply(uint tokenId) public view returns (uint[] memory) {
         // optimization for mintRange
-        uint lastIndex = _initialSupplyRange.length - 1;
-        if (_initialSupplyRange[lastIndex] <= tokenId) {
+        uint lastIndex = _initialSupplyRanges.length - 1;
+        if (_initialSupplyRanges[lastIndex] <= tokenId) {
             return _initialSupplies[lastIndex];
         }
-        uint supplyIndex = _findLowerBound(_initialSupplyRange, tokenId);
+        uint supplyIndex = _findLowerBound(_initialSupplyRanges, tokenId);
         return _initialSupplies[supplyIndex];
     }
 
@@ -284,7 +284,7 @@ contract Ph101ppDailyPhoto is
     // This method doesnt affect ERC1155.balances, so tokens that
     // have been sold or transfered before can't ever be affected by this method.
     function updateInitialHoldersRange(
-        UpdateInitialHolderRangeInput memory input,
+        UpdateInitialHolderRangesInput memory input,
         bytes32 checksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!isInitialHoldersRangeUpdatePermanentlyDisabled);

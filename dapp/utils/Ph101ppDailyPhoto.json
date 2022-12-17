@@ -523,7 +523,7 @@
     },
     {
       "inputs": [],
-      "name": "initialHoldersRange",
+      "name": "initialHolderRanges",
       "outputs": [
         {
           "internalType": "address[][]",
@@ -1426,7 +1426,7 @@
           "type": "uint256[]"
         }
       ],
-      "name": "verifyUpdateInitialHolderRangeInput",
+      "name": "verifyUpdateInitialHolderRangesInput",
       "outputs": [
         {
           "internalType": "bytes32",

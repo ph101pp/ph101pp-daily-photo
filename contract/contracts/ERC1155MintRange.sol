@@ -28,7 +28,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
 
     // Track initial holders across tokenID ranges + lookup mapping;
     address[][] internal _initialHolders;
-    uint[] internal _initialHoldersRange;
+    uint[] internal _initialHolderRanges;
     mapping(address => bool) internal _initialHoldersAddressMap;
 
     // last tokenId minted via mintRange.
@@ -36,7 +36,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     bool public isZeroMinted;
 
     constructor(address[] memory initialInitialHolders) {
-        _initialHoldersRange.push(0);
+        _initialHolderRanges.push(0);
         _initialHolders.push(initialInitialHolders);
         for (uint i = 0; i < initialInitialHolders.length; i++) {
             _initialHoldersAddressMap[initialInitialHolders[i]] = true;
@@ -164,11 +164,11 @@ abstract contract ERC1155MintRange is ERC1155_ {
     function _setInitialHolders(address[] memory addresses) internal virtual {
         uint256 firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
         uint256 lastIndex = _initialHolders.length - 1;
-        uint256 lastId = _initialHoldersRange[lastIndex];
+        uint256 lastId = _initialHolderRanges[lastIndex];
         if (lastId == firstId) {
             _initialHolders[lastId] = addresses;
         } else {
-            _initialHoldersRange.push(firstId);
+            _initialHolderRanges.push(firstId);
             _initialHolders.push(addresses);
         }
         for (uint i = 0; i < addresses.length; i++) {
@@ -183,24 +183,24 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint tokenId
     ) public view virtual returns (address[] memory) {
         // optimization for mintRange
-        uint lastIndex = _initialHoldersRange.length - 1;
-        if (_initialHoldersRange[lastIndex] <= tokenId) {
+        uint lastIndex = _initialHolderRanges.length - 1;
+        if (_initialHolderRanges[lastIndex] <= tokenId) {
             return _initialHolders[lastIndex];
         }
-        uint index = _findLowerBound(_initialHoldersRange, tokenId);
+        uint index = _findLowerBound(_initialHolderRanges, tokenId);
         return _initialHolders[index];
     }
 
     /**
      * @dev Return current initial holders Range
      */
-    function initialHoldersRange()
+    function initialHolderRanges()
         public
         view
         virtual
         returns (address[][] memory, uint[] memory)
     {
-        return (_initialHolders, _initialHoldersRange);
+        return (_initialHolders, _initialHolderRanges);
     }
 
     /**

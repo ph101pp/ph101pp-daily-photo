@@ -37,13 +37,13 @@ contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
     }
 
     function updateInitialHoldersRange(
-        UpdateInitialHolderRangeInput memory input
+        UpdateInitialHolderRangesInput memory input
     ) public virtual {
         _updateInitialHoldersRange(input);
     }
 
     function updateInitialHoldersRangeSafe(
-        UpdateInitialHolderRangeInput memory input,
+        UpdateInitialHolderRangesInput memory input,
         bytes32 checksum
     ) public virtual {
         _updateInitialHoldersRangeSafe(input, checksum);

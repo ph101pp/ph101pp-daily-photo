@@ -261,14 +261,14 @@ library Ph101ppDailyPhotoUtils {
     /**
      * @dev Verify and hash input updateInitialHolderRange method.
      */
-    function verifyUpdateInitialHolderRangeInput(
-        ERC1155MintRangeUpdateable.VerifyUpdateInitialHolderRangeInput memory p
+    function verifyUpdateInitialHolderRangesInput(
+        ERC1155MintRangeUpdateable.VerifyUpdateInitialHolderRangesInput memory p
     ) external view returns (bytes32) {
         // Verify New Initial Holders Range: //////////////////////////////////
         (
             address[][] memory _initialHolders,
-            uint[] memory _initialHoldersRange
-        ) = p.caller.initialHoldersRange();
+            uint[] memory _initialHolderRanges
+        ) = p.caller.initialHolderRanges();
 
         require(
             p.newInitialHolders.length == p.newInitialHoldersRange.length,
@@ -283,7 +283,7 @@ library Ph101ppDailyPhotoUtils {
             .lastRangeTokenIdWithLockedInitialHolders();
 
         uint currentLastLockedIndex = _findLowerBound(
-            _initialHoldersRange,
+            _initialHolderRanges,
             lastRangeTokenIdWithLockedInitialHolders
         );
 
@@ -309,7 +309,7 @@ library Ph101ppDailyPhotoUtils {
                 k <= currentLastLockedIndex;
             if (isLocked) {
                 require(
-                    _initialHoldersRange[k] == p.newInitialHoldersRange[k],
+                    _initialHolderRanges[k] == p.newInitialHoldersRange[k],
                     "E:18"
                 );
             }
@@ -462,7 +462,7 @@ library Ph101ppDailyPhotoUtils {
         return
             keccak256(
                 abi.encode(
-                    ERC1155MintRangeUpdateable.UpdateInitialHolderRangeInput(
+                    ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInput(
                         p.fromAddresses,
                         p.toAddresses,
                         p.ids,
@@ -472,9 +472,9 @@ library Ph101ppDailyPhotoUtils {
                         p.newInitialHoldersRange
                     ),
                     _initialHolders,
-                    _initialHoldersRange,
+                    _initialHolderRanges,
                     p.caller.paused(),
-                    p.customUpdateInitialHoldersRangeChecksum
+                    p.customUpdateInitialHolderRangesChecksum
                 )
             );
     }

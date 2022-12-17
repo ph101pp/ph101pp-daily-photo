@@ -9,7 +9,7 @@ type CheckTransfers = (fromAddresses: string[], toAddresses: string[], ids: numb
 type CheckTransferSingle = (fromAddress: string, toAddress: string, id: number, amount: number) => Promise<TransferCheck>
 type CheckTransferBatch = (fromAddresses: string, toAddresses: string, ids: number[], amounts: number[]) => Promise<TransferCheck>
 type CheckTransfersMintRange = (initialHolders: string[], input: ERC1155MintRange.MintRangeInputStructOutput) => Promise<TransferCheck>
-type CheckTransfersUpdateInitialHolderRanges = (input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangeInputStructOutput) => Promise<TransferCheck>
+type CheckTransfersUpdateInitialHolderRangess = (input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStructOutput) => Promise<TransferCheck>
 
 type IntegrityChecks = {
   range: CheckRange,
@@ -18,7 +18,7 @@ type IntegrityChecks = {
   transferSingle: CheckTransferSingle
   transferBatch: CheckTransferBatch
   transfersMintRange: CheckTransfersMintRange
-  transfersUpdateInitialHolderRanges: CheckTransfersUpdateInitialHolderRanges
+  transfersUpdateInitialHolderRangess: CheckTransfersUpdateInitialHolderRangess
 }
 
 type BalancesRangeResults = { [address: string]: number[] };
@@ -80,7 +80,7 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
     return checkTransfers(c)(from, initialHolders, new Array(amounts.length).fill(ids), amounts);
   }
 
-  const transfersUpdateInitialHolderRanges = (c: Contracts): CheckTransfersUpdateInitialHolderRanges => (input) => {
+  const transfersUpdateInitialHolderRangess = (c: Contracts): CheckTransfersUpdateInitialHolderRangess => (input) => {
     const ids = input.ids.map(BNs => BNs.map(bn => bn.toNumber()));
     const amounts = input.amounts.map(BNs => BNs.map(bn => bn.toNumber()));
     return checkTransfers(c)(input.fromAddresses, input.toAddresses, ids, amounts);
@@ -100,7 +100,7 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
     transferSingle: transferSingle(c),
     transferBatch: transferBatch(c),
     transfersMintRange: transfersMintRange(c),
-    transfersUpdateInitialHolderRanges: transfersUpdateInitialHolderRanges(c),
+    transfersUpdateInitialHolderRangess: transfersUpdateInitialHolderRangess(c),
   }
 }
 
