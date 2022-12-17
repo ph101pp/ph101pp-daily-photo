@@ -5,12 +5,13 @@ import { ContractTransaction } from "ethers";
 import _getUpdateInitialHoldersRangeInput from "../scripts/_getUpdateInitialHoldersRangeInput";
 import { TestERC1155MintRange } from "../typechain-types";
 import { deployFixture, Fixture } from "./fixture";
+import integrityCheck from "./integrityCheck";
 
 describe("ERC1155MintRange", function () {
   testERC1155MintRange(deployFixture("TestERC1155MintRange"));
 });
 
-export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1155MintRange>>) {
+export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestERC1155MintRange>>) {
 
   describe("getRangeMintInput", function () {
 
@@ -21,7 +22,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.setInitialHolders(initialHolders);
 
       const [input] = await c.getMintRangeInput(newTokens);
-      const {ids, amounts} = input;
+      const { ids, amounts } = input;
 
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
@@ -38,9 +39,9 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
       await c.setInitialHolders(initialHolders);
-      
+
       const [input] = await c.getMintRangeInput(newTokens);
-      const {ids, amounts} = input;
+      const { ids, amounts } = input;
 
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
@@ -61,7 +62,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.mintRange(input[0]);
 
       const [input2] = await c.getMintRangeInput(newTokens);
-      const {ids: ids2, amounts: amounts2} = input2;
+      const { ids: ids2, amounts: amounts2 } = input2;
 
       expect(ids2.length).to.equal(newTokens);
       for (let i = 0; i < newTokens; i++) {
@@ -83,7 +84,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.mint(account1.address, 8, 8, []);
 
       const [input, checkSum] = await c.getMintRangeInput(newTokens);
-      const {ids, amounts} = input;
+      const { ids, amounts } = input;
 
       expect(ids.length).to.equal(newTokens);
       for (let i = 0; i < 6; i++) {
@@ -95,7 +96,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.mintBatch(account1.address, [15, 17], [1, 1], []);
 
       const [input2] = await c.getMintRangeInput(newTokens);
-      const {ids:ids2} = input2;
+      const { ids: ids2 } = input2;
 
       expect(Number(ids[ids.length - 1]) + 1).to.equal(ids2[0]);
 
@@ -106,7 +107,7 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
 
   });
 
-  describe("mintRange", function () {
+  describe.only("mintRange", function () {
     it("Should mint 100 nfts to 4 initial holders and emit 4 TransferBatch events", async function () {
       const newTokens = 100;
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
@@ -218,40 +219,70 @@ export function testERC1155MintRange(deployFixture: ()=>Promise<Fixture<TestERC1
       await c.mint(account1.address, 1, 1, []);
       await expect(c.mintRangeSafe(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
 
-      const inputs2 = await c.getMintRangeInput(5);
-      await expect(c.mintRangeSafe(...inputs2)).to.not.be.rejected;
+      const integrity = await integrityCheck(c, initialHolders).ids([20, 21])
 
-      const inputs3 = await c.getMintRangeInput(5);
+      await expect(c.mintRange(inputs[0])).to.not.be.rejected;
+
+      await integrity.all();
+    });
+
+
+    it("mintRangeSafe Should fail when a batch of tokens was minted since getMintRangeInput was called", async function () {
+      const newTokens = 5;
+      const { c, account1 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address];
+      await c.setInitialHolders(initialHolders);
+
+      const inputs = await c.getMintRangeInput(5);
       await c.mintBatch(account1.address, [20, 21], [1, 1], []);
-      await expect(c.mintRangeSafe(...inputs3)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+      await expect(c.mintRangeSafe(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+
+
+      const integrity = await integrityCheck(c, initialHolders).ids([20, 21])
+
+      await expect(c.mintRange(inputs[0])).to.not.be.rejected;
+
+      await integrity.all();
     });
 
     it("mintRangeSafe should fail when initial holders were updated since getMintRangeInput was called", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       const newTokens = 5;
-      const initialHolders = [account1.address];
+      const initialHolders1 = [account1.address];
       const initialHolders2 = [account2.address];
-      await c.setInitialHolders(initialHolders);
+      await c.setInitialHolders(initialHolders1);
 
       const inputs = await c.getMintRangeInput(5);
       await c.setInitialHolders(initialHolders2);
       await expect(c.mintRangeSafe(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
 
-      const inputs2 = await c.getMintRangeInput(5);
-      await expect(c.mintRangeSafe(...inputs2)).to.not.be.rejected;
+      // should not affect initialHolders1
+      const integrity = await integrityCheck(c, initialHolders1).range(0, 4)
+      await integrity.balances([[0, 0, 0, 0, 0]]);
+      await integrity.supply([[0, 0, 0, 0, 0]]);
+
+      await expect(c.mintRange(inputs[0])).to.not.be.rejected;
+
+      await integrity.balances()
+      await integrity.supply([[9999, 2, 3, 4, 5]]);
+
     });
 
-    it("mintRangeSafe should fail when another mintRange was exectued since getMintRangeInput was called", async function () {
+    it("mintRangeSafe should fail when another mintRange was executed since getMintRangeInput was called", async function () {
       const { c, account1, account2 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address];
       await c.setInitialHolders(initialHolders);
 
       const inputs = await c.getMintRangeInput(5);
-      
-      const inputs2 = await c.getMintRangeInput(5);
-      await expect(c.mintRangeSafe(...inputs2)).to.not.be.rejected;
 
-      await expect(c.mintRangeSafe(...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
+      await expect(c.mintRangeSafe(...inputs)).to.not.be.rejected;
+
+      const integrity = await integrityCheck(c, initialHolders).range(0, 4)
+      await integrity.all();
+
+      await expect(c.mintRange(inputs[0])).to.not.be.rejected;
+
+      await integrity.all();
     });
 
   });
