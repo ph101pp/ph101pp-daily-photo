@@ -85,7 +85,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.proxyBaseUri()).to.equal(mutableUri2);
     });
 
-    it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriHistory + uriHistory to reflect this.", async function () {
+    it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriRanges + uriHistory to reflect this.", async function () {
       const immutableUri2 = "immutable.uri.2/";
       const immutableUri3 = "immutable.uri.3/";
       const { c, immutableUri } = await loadFixture(deployFixture);
@@ -98,7 +98,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
       expect(await c.permanentBaseUri()).to.equal(immutableUri2);
 
-      const history = await c.permanentBaseUriHistory();
+      const history = await c.permanentBaseUriRanges();
       expect(history.length).to.equal(2);
       const urls = history[0];
       expect(urls.length).to.equal(2);
@@ -111,7 +111,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
 
-      const history2 = await c.permanentBaseUriHistory();
+      const history2 = await c.permanentBaseUriRanges();
       expect(history2.length).to.equal(2);
       const urls2 = history2[0];
       expect(urls2.length).to.equal(3);

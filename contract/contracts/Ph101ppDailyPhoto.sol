@@ -141,8 +141,8 @@ contract Ph101ppDailyPhoto is
         return _permanentUris[_permanentUris.length - 1];
     }
 
-    // Returns all historical permanent base Uris for the record.
-    function permanentBaseUriHistory()
+    // Returns permanent base uris ranges for the record.
+    function permanentBaseUriRanges()
         public
         view
         returns (string[] memory, uint256[] memory)
@@ -260,6 +260,17 @@ contract Ph101ppDailyPhoto is
         }
         uint supplyIndex = _findLowerBound(_initialSupplyRanges, tokenId);
         return _initialSupplies[supplyIndex];
+    }
+
+    /**
+     * @dev Return current initial supply Ranges
+     */
+    function initialSupplyRanges()
+        public
+        view
+        returns (uint[][] memory, uint[] memory)
+    {
+        return (_initialSupplies, _initialSupplyRanges);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

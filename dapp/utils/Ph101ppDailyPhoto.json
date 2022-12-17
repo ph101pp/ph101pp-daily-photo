@@ -855,7 +855,7 @@
     },
     {
       "inputs": [],
-      "name": "permanentBaseUriHistory",
+      "name": "permanentBaseUriRanges",
       "outputs": [
         {
           "internalType": "string[]",
