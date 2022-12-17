@@ -6,15 +6,19 @@ import { ethers } from "hardhat";
 type CheckRange = (addresses: string[], from: number, to: number) => Promise<RangeChecks>
 type CheckIds = (addresses: string[], ids: number[]) => Promise<RangeChecks>
 type CheckTransfers = (fromAddresses: string[], toAddresses: string[], ids: number[][], amounts: number[][]) => Promise<TransferCheck>
+type CheckTransferSingle = (fromAddress: string, toAddress: string, id: number, amount: number) => Promise<TransferCheck>
 type CheckTransferBatch = (fromAddresses: string, toAddresses: string, ids: number[], amounts: number[]) => Promise<TransferCheck>
 type CheckTransfersMintRange = (initialHolders: string[], input: ERC1155MintRange.MintRangeInputStructOutput) => Promise<TransferCheck>
+type CheckTransfersUpdateInitialHolderRanges = (input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangeInputStructOutput) => Promise<TransferCheck>
 
 type IntegrityChecks = {
   range: CheckRange,
   ids: CheckIds,
   transfers: CheckTransfers
-  transfersMintRange: CheckTransfersMintRange
+  transferSingle: CheckTransferSingle
   transferBatch: CheckTransferBatch
+  transfersMintRange: CheckTransfersMintRange
+  transfersUpdateInitialHolderRanges: CheckTransfersUpdateInitialHolderRanges
 }
 
 type BalancesRangeResults = { [address: string]: number[] };
@@ -76,16 +80,27 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
     return checkTransfers(c)(from, initialHolders, new Array(amounts.length).fill(ids), amounts);
   }
 
+  const transfersUpdateInitialHolderRanges = (c: Contracts): CheckTransfersUpdateInitialHolderRanges => (input) => {
+    const ids = input.ids.map(BNs => BNs.map(bn => bn.toNumber()));
+    const amounts = input.amounts.map(BNs => BNs.map(bn => bn.toNumber()));
+    return checkTransfers(c)(input.fromAddresses, input.toAddresses, ids, amounts);
+  }
+
   const transferBatch = (c: Contracts): CheckTransferBatch => (from, to, ids, amounts) => {
     return checkTransfers(c)([from], [to], [ids], [amounts]);
+  }
+  const transferSingle = (c: Contracts): CheckTransferSingle => (from, to, id, amount) => {
+    return checkTransfers(c)([from], [to], [[id]], [[amount]]);
   }
 
   return {
     ids: checkIds,
     range: checkRange,
     transfers: checkTransfers(c),
+    transferSingle: transferSingle(c),
     transferBatch: transferBatch(c),
-    transfersMintRange: transfersMintRange(c)
+    transfersMintRange: transfersMintRange(c),
+    transfersUpdateInitialHolderRanges: transfersUpdateInitialHolderRanges(c),
   }
 }
 
@@ -168,8 +183,7 @@ const suppliesRangeCheck = (c: Contracts, ids: number[]) => async (expected?: nu
   }
 };
 
-
-async function getSupplies(c: Contracts, ids: number[]): Promise<number[]> {
+const getSupplies = async (c: Contracts, ids: number[]): Promise<number[]> => {
   const totalSupplies = await Promise.all(
     ids.map((id) => {
       return c.totalSupply(id);
@@ -179,7 +193,7 @@ async function getSupplies(c: Contracts, ids: number[]): Promise<number[]> {
   return totalSupplies.map((bn) => bn.toNumber());;
 };
 
-async function getBalances(c: Contracts, addresses: string[], ids: number[]): Promise<{ [address: string]: number[] }> {
+const getBalances = async (c: Contracts, addresses: string[], ids: number[]): Promise<{ [address: string]: number[] }> => {
   const balances: { [address: string]: number[] } = {};
 
   await Promise.all(addresses.map(async (address) => {
@@ -196,7 +210,6 @@ async function getBalances(c: Contracts, addresses: string[], ids: number[]): Pr
   return balances
 }
 
-
 const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddresses: string[], ids: number[][], amounts: number[][]): Promise<TransferCheck> => {
   const uniqueAddresses = [...new Set(fromAddresses.concat(toAddresses))];
   const uniqueIds = [...new Set(ids.flat())]
@@ -208,7 +221,6 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
     balances: beforeBalances,
     supplies: beforeSupplies,
     expectSuccess: async (transaction) => {
-
       const receipt = await transaction.wait();
       const expectedTransfers: NormalizedTransfer[] = fromAddresses.map((from, i) => ({ from, to: toAddresses[i], ids: ids[i], amounts: amounts[i] }));
       const receivedTransferEvents = normalizeTransferEvents(receipt.events);
