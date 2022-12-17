@@ -192,6 +192,18 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
+     * @dev Return current initial holders Range
+     */
+    function initialHoldersRange()
+        public
+        view
+        virtual
+        returns (address[][] memory, uint[] memory)
+    {
+        return (_initialHolders, _initialHoldersRange);
+    }
+
+    /**
      * @dev Returns true if address is an initial holder of tokenId
      */
     function _maybeInitialHolder(address account) internal view returns (bool) {

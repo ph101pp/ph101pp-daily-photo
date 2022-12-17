@@ -60,18 +60,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     }
 
     /**
-     * @dev Return current initial holders Range
-     */
-    function initialHoldersRange()
-        public
-        view
-        virtual
-        returns (address[][] memory, uint[] memory)
-    {
-        return (_initialHolders, _initialHoldersRange);
-    }
-
-    /**
      * @dev Implement: May be overwritten to add custom values to checksum test.
      */
     function _customUpdateInitialHoldersRangeChecksum()
