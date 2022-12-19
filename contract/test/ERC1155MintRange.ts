@@ -218,8 +218,8 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
       const inputs = await c.getMintRangeInput(5);
       await verified.mint(c, account1.address, 1, 1, []);
       await expect(verified.mintRangeSafe(c, ...inputs)).to.be.rejectedWith("Invalid input. Use getMintRangeInput()");
-      
-      
+
+
       const integrity = await integrityCheck(c).ids(initialHolders, [1])
       const balances = await integrity.balances();
       const supplies = await integrity.supplies();
@@ -276,7 +276,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       await balances.expectEqual()
       await integrity.supplies([9999, 2, 3, 4, 5]);
-      await transfers.expectSuccess(tx);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
     });
 
     it("mintRangeSafe should fail when another mintRange was executed since getMintRangeInput was called", async function () {
@@ -432,29 +432,29 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       let transfers = await integrityCheck(c).transferSingle(ethers.constants.AddressZero, account1.address, 2, 1);
       let tx = await verified.mint(c, account1.address, 2, 1, []);
-      await transfers.expectSuccess(tx);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
- 
+
       transfers = await integrityCheck(c).transferSingle(ethers.constants.AddressZero, account1.address, 3, 1);
-      tx= await verified.mint(c, account1.address, 3, 1, []);
-      await transfers.expectSuccess(tx);
+      tx = await verified.mint(c, account1.address, 3, 1, []);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
       transfers = await integrityCheck(c).transferBatch(ethers.constants.AddressZero, account1.address, [3, 4, 5], [2, 2, 2]);
-      tx= await verified.mintBatch(c, account1.address, [3, 4, 5], [2, 2, 2], []);
-      await transfers.expectSuccess(tx);
+      tx = await verified.mintBatch(c, account1.address, [3, 4, 5], [2, 2, 2], []);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
 
       transfers = await integrityCheck(c).transferSingle(ethers.constants.AddressZero, account2.address, 2, 1);
-      tx= await verified.mint(c, account2.address, 2, 1, []);
-      await transfers.expectSuccess(tx);
-      
+      tx = await verified.mint(c, account2.address, 2, 1, []);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
+
       transfers = await integrityCheck(c).transferSingle(ethers.constants.AddressZero, account2.address, 3, 1);
-      tx= await verified.mint(c, account2.address, 3, 1, []);
-      await transfers.expectSuccess(tx);
+      tx = await verified.mint(c, account2.address, 3, 1, []);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
       transfers = await integrityCheck(c).transferBatch(ethers.constants.AddressZero, account2.address, [3, 4, 5], [2, 2, 2]);
-      tx= await verified.mintBatch(c, account2.address, [3, 4, 5], [2, 2, 2], []);
-      await transfers.expectSuccess(tx);
+      tx = await verified.mintBatch(c, account2.address, [3, 4, 5], [2, 2, 2], []);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
       expect(await c.totalSupply(0)).to.equal(0);
       expect(await c.totalSupply(1)).to.equal(0);
@@ -474,21 +474,21 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       let transfers = await integrityCheck(c).transfersMintRange(initialHolders, inputs[0]);
       let tx = await verified.mintRange(c, inputs[0]);
-      await transfers.expectSuccess(tx);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
       transfers = await integrityCheck(c).transferSingle(ethers.constants.AddressZero, account1.address, 0, 30);
       tx = await verified.mint(c, account1.address, 0, 30, []);
-      await transfers.expectSuccess(tx);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
       transfers = await integrityCheck(c).transferSingle(ethers.constants.AddressZero, account2.address, 0, 30);
       tx = await verified.mint(c, account2.address, 0, 30, []);
-      await transfers.expectSuccess(tx);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
       expect(await c.totalSupply(0)).to.equal(9999 * initialHolders.length + 60);
 
       transfers = await integrityCheck(c).transferBatch(ethers.constants.AddressZero, account3.address, [1, 2, 3, 4, 5, 6, 7, 8, 9], [3, 3, 3, 3, 3, 3, 3, 3, 3]);
       tx = await verified.mintBatch(c, account3.address, [1, 2, 3, 4, 5, 6, 7, 8, 9], [3, 3, 3, 3, 3, 3, 3, 3, 3], []);
-      await transfers.expectSuccess(tx);
+      await transfers.expectSuccess(tx, { expectSupplyChange: true });
 
       for (let i = 0; i < newTokens; i++) {
         if (i !== 0) {
