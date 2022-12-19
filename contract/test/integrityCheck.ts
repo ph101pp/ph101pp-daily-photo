@@ -1,6 +1,6 @@
-import { ERC1155MintRange, ERC1155MintRangePausable, ERC1155MintRangeUpdateable, IERC1155, Ph101ppDailyPhoto } from "../typechain-types";
+import { ERC1155MintRange, ERC1155MintRangePausable, ERC1155MintRangeUpdateable, IERC1155, Ph101ppDailyPhoto, TestERC1155MintRange, TestERC1155MintRangePausable, TestERC1155MintRangeUpdateable } from "../typechain-types";
 import { expect } from "chai";
-import { ContractTransaction, Event, BigNumber } from "ethers";
+import { ContractTransaction, Event,  BigNumber } from "ethers";
 import { ethers } from "hardhat";
 
 type CheckRange = (addresses: string[], from: number, to: number) => Promise<RangeChecks>
@@ -9,7 +9,7 @@ type CheckTransfers = (fromAddresses: string[], toAddresses: string[], ids: numb
 type CheckTransferSingle = (fromAddress: string, toAddress: string, id: number, amount: number) => Promise<TransferCheck>
 type CheckTransferBatch = (fromAddresses: string, toAddresses: string, ids: number[], amounts: number[]) => Promise<TransferCheck>
 type CheckTransfersMintRange = (initialHolders: string[], input: ERC1155MintRange.MintRangeInputStructOutput) => Promise<TransferCheck>
-type CheckTransfersUpdateInitialHolderRangess = (input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStructOutput) => Promise<TransferCheck>
+type CheckTransfersUpdateInitialHolderRanges = (input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct) => Promise<TransferCheck>
 
 type IntegrityChecks = {
   range: CheckRange,
@@ -18,17 +18,17 @@ type IntegrityChecks = {
   transferSingle: CheckTransferSingle
   transferBatch: CheckTransferBatch
   transfersMintRange: CheckTransfersMintRange
-  transfersUpdateInitialHolderRangess: CheckTransfersUpdateInitialHolderRangess
+  transfersUpdateInitialHolderRanges: CheckTransfersUpdateInitialHolderRanges
 }
 
-type BalancesRangeResults = { [address: string]: number[] };
+type BalancesRangeResults = { [address: string]: { [id: string]: number } };
 type BalancesRangeDelta = { [address: string]: { [id: string]: number } };
 type BalancesRangeCheck = {
   balances: BalancesRangeResults
   expectEqual: () => Promise<void>
   expectDelta: (delta: BalancesRangeDelta) => Promise<void>
 }
-type SuppliesRangeResults = number[];
+type SuppliesRangeResults = { [id: string]: number };
 type SuppliesRangeDelta = { [id: string]: number };
 type SuppliesRangeCheck = {
   supplies: SuppliesRangeResults
@@ -54,7 +54,7 @@ type TransferCheck = {
   expectSuccess: (transactions: ContractTransaction) => Promise<void>
 }
 
-type Contracts = ERC1155MintRange | ERC1155MintRangePausable | ERC1155MintRangeUpdateable | Ph101ppDailyPhoto;
+type Contracts = TestERC1155MintRange | TestERC1155MintRangePausable | TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto;
 
 export default function integrityCheck(c: Contracts): IntegrityChecks {
 
@@ -80,10 +80,10 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
     return checkTransfers(c)(from, initialHolders, new Array(amounts.length).fill(ids), amounts);
   }
 
-  const transfersUpdateInitialHolderRangess = (c: Contracts): CheckTransfersUpdateInitialHolderRangess => (input) => {
-    const ids = input.ids.map(BNs => BNs.map(bn => bn.toNumber()));
-    const amounts = input.amounts.map(BNs => BNs.map(bn => bn.toNumber()));
-    return checkTransfers(c)(input.fromAddresses, input.toAddresses, ids, amounts);
+  const transfersUpdateInitialHolderRanges = (c: Contracts): CheckTransfersUpdateInitialHolderRanges => (input) => {
+    const ids = input.ids.map(BNs => BNs.map(bn => BigNumber.from(bn).toNumber()));
+    const amounts = input.amounts.map(BNs => BNs.map(bn => BigNumber.from(bn).toNumber()));
+    return checkTransfers(c)(input.fromAddresses as string[], input.toAddresses as string[], ids, amounts);
   }
 
   const transferBatch = (c: Contracts): CheckTransferBatch => (from, to, ids, amounts) => {
@@ -100,7 +100,7 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
     transferSingle: transferSingle(c),
     transferBatch: transferBatch(c),
     transfersMintRange: transfersMintRange(c),
-    transfersUpdateInitialHolderRangess: transfersUpdateInitialHolderRangess(c),
+    transfersUpdateInitialHolderRanges: transfersUpdateInitialHolderRanges(c),
   }
 }
 
@@ -108,9 +108,11 @@ const balancesRangeCheck = (c: Contracts, addresses: string[], ids: number[]) =>
   const currBalances = await getBalances(c, addresses, ids);
 
   if (expected) {
-    expect(addresses.length).to.be.equal(expected.length);
+    // expect(addresses.length).to.be.equal(expected.length);
     addresses.forEach((address, i) => {
-      expect(expected[i]).to.deep.equal(currBalances[address]);
+      ids.forEach((id, k)=>{
+        expect(expected[i][k]).to.be.equal(currBalances[address][id]);
+      })
     })
   }
 
@@ -150,7 +152,9 @@ const suppliesRangeCheck = (c: Contracts, ids: number[]) => async (expected?: nu
   const currSupplies = await getSupplies(c, ids);
 
   if (expected) {
-    expect(expected).to.deep.equal(currSupplies);
+    ids.forEach((id, k)=>{
+      expect(expected[k]).to.be.equal(currSupplies[id]);
+    })
   }
 
   return {
@@ -183,18 +187,22 @@ const suppliesRangeCheck = (c: Contracts, ids: number[]) => async (expected?: nu
   }
 };
 
-const getSupplies = async (c: Contracts, ids: number[]): Promise<number[]> => {
+const getSupplies = async (c: Contracts, ids: number[]): Promise<SuppliesRangeResults> => {
   const totalSupplies = await Promise.all(
     ids.map((id) => {
       return c.totalSupply(id);
     })
   );
+  const result: SuppliesRangeResults = {};
+  totalSupplies.forEach((supply, i) => {
+    result[ids[i]] = supply.toNumber()
+  })
 
-  return totalSupplies.map((bn) => bn.toNumber());;
+  return result;
 };
 
-const getBalances = async (c: Contracts, addresses: string[], ids: number[]): Promise<{ [address: string]: number[] }> => {
-  const balances: { [address: string]: number[] } = {};
+const getBalances = async (c: Contracts, addresses: string[], ids: number[]): Promise<BalancesRangeResults> => {
+  const balances: BalancesRangeResults = {};
 
   await Promise.all(addresses.map(async (address) => {
     if (address === ethers.constants.AddressZero) {
@@ -204,7 +212,10 @@ const getBalances = async (c: Contracts, addresses: string[], ids: number[]): Pr
     const addresses = new Array(ids.length).fill(address);
     const addressBalances = await c.balanceOfBatch(addresses, ids);
 
-    balances[address] = addressBalances.map((bn) => bn.toNumber());
+    balances[address] = balances[address] ?? {};
+    addressBalances.forEach((balance, i) => {
+      balances[address][ids[i]] = balance.toNumber()
+    })
   }));
 
   return balances
@@ -231,6 +242,8 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
       const afterBalances = await afterIntegrity.balances();
       const afterSupplies = await afterIntegrity.supplies();
 
+      const supplyChange: { [id: string]: number } = {};
+
       expectedTransfers.forEach((transfer) => {
         const transferEvent = receivedTransferEvents.find((event) => {
           return (
@@ -245,25 +258,31 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
         expect(transferEvent).to.not.be.undefined;
 
         transfer.ids.forEach((id, i) => {
+          supplyChange[id] = supplyChange[id] ?? 0;
+
           const amount = transfer.amounts[i];
           if (transfer.from !== ethers.constants.AddressZero) {
             expect(beforeBalances.balances[transfer.from][id] - amount).to.equal(afterBalances.balances[transfer.from][id]);
           }
           else {
-            expect(beforeSupplies.supplies[id] + amount).to.equal(afterSupplies.supplies[id]);
+            supplyChange[id] += amount;
           }
 
           if (transfer.to !== ethers.constants.AddressZero) {
             expect(beforeBalances.balances[transfer.to][id] + amount).to.equal(afterBalances.balances[transfer.to][id])
           }
           else {
-            expect(beforeSupplies.supplies[id] - amount).to.equal(afterSupplies.supplies[id])
+            supplyChange[id] -= amount;
           }
 
           if (transfer.to !== ethers.constants.AddressZero && transfer.from !== ethers.constants.AddressZero) {
             expect(beforeSupplies.supplies[id]).to.equal(afterSupplies.supplies[id])
           }
         })
+
+      });
+      Object.entries(supplyChange).forEach(([id, amount]) => {
+        expect(beforeSupplies.supplies[id] + amount).to.equal(afterSupplies.supplies[id]);
       })
     }
   }

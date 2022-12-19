@@ -61,7 +61,7 @@ contract Ph101ppDailyPhoto is
         _proxyUri = newProxyUri;
         _owner = msg.sender;
         _setDefaultRoyalty(msg.sender, 500);
-        mintClaims(initialHolders[TREASURY_ID], 10);
+        mintClaims(initialHolders[TREASURY_ID], 10, "");
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -181,9 +181,10 @@ contract Ph101ppDailyPhoto is
     // Mint new claims to a wallet.
     function mintClaims(
         address to,
-        uint amount
+        uint amount,
+        bytes memory data
     ) public onlyRole(CLAIM_MINTER_ROLE) {
-        _mint(to, CLAIM_TOKEN_ID, amount, "");
+        _mint(to, CLAIM_TOKEN_ID, amount, data);
     }
 
     // Redeem multiple claim tokens for photo nfts (n:n).
@@ -294,23 +295,23 @@ contract Ph101ppDailyPhoto is
     // wallets without having to transfer them through ERC1155.
     // This method doesnt affect ERC1155.balances, so tokens that
     // have been sold or transfered before can't ever be affected by this method.
-    function updateInitialHoldersRange(
+    function updateInitialHolderRanges(
         UpdateInitialHolderRangesInput memory input,
         bytes32 checksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
-        _updateInitialHoldersRangeSafe(input, checksum);
+        _updateInitialHolderRangesSafe(input, checksum);
     }
 
     // Defensive coding: Lock initial holders up to tokenId
-    // so they cant be updated via updateInitialHoldersRange.
+    // so they cant be updated via updateInitialHolderRanges.
     function setLockInitialHoldersUpTo(
         uint256 tokenId
     ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _setLockInitialHoldersUpTo(tokenId);
     }
 
-    // Defensive coding: Permanently disable updateInitialHoldersRange.
+    // Defensive coding: Permanently disable updateInitialHolderRanges.
     function permanentlyDisableInitialHoldersRangeUpdate()
         public
         whenNotPaused

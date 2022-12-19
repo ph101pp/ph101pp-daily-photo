@@ -6,6 +6,7 @@ import { BaseContract } from "ethers";
 import getPh101ppDailyPhotoUpdateInitialHolderRangesInput from "../scripts/getPh101ppDailyPhotoUpdateInitialHolderRangesInput";
 import { Ph101ppDailyPhoto, TestOperatorFilterRegistry, TestIPh101ppDailyPhotoListener } from "../typechain-types";
 import { Fixture, SignerWithAddress } from "./fixture";
+import verified from "./verified";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const nowTimestamp = Math.ceil(Date.now() / 1000) + SECONDS_PER_DAY * 3;
@@ -92,7 +93,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setInitialSupply([1, 1]);
       const input = await c.getMintRangeInput(101);
-      await c.mintPhotos(...input);
+      await verified.mintPhotos(c, ...input);
 
       expect(await c.permanentBaseUri()).to.equal(immutableUri);
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
@@ -153,7 +154,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setInitialSupply([1, 1]);
       const input = await c.getMintRangeInput(101);
-      await c.mintPhotos(...input);
+      await verified.mintPhotos(c, ...input);
 
       await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
@@ -281,7 +282,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
-      await c.mintPhotos(...inputs);
+      await verified.mintPhotos(c, ...inputs);
       await c.setPermanentBaseUriUpTo(immutableUri, 50);
 
       for (let i = 1; i < 100; i++) {
@@ -295,7 +296,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
-      await c.mintPhotos(...inputs);
+      await verified.mintPhotos(c, ...inputs);
       await c.setPermanentBaseUriUpTo(immutableUri, 10);
 
       for (let i = 1; i < 50; i++) {
@@ -332,7 +333,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       const inputs = await c.getMintRangeInput(5);
       await c.setInitialSupply(initialSupply2);
-      await expect(c.mintPhotos(...inputs)).to.be.revertedWith("Invalid input. Use getMintRangeInput()");
+      await expect(verified.mintPhotos(c, ...inputs)).to.be.revertedWith("Invalid input. Use getMintRangeInput()");
     });
 
     it("Should correctly update initial supply via setInitialSupply", async function () {
@@ -348,7 +349,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(cIS[1].eq(initialSupply[1]));
 
       const inputs = await c.getMintRangeInput(5);
-      await c.mintPhotos(...inputs);
+      await verified.mintPhotos(c, ...inputs);
 
       for (let i = 0; i < inputs[0].length; i++) {
         cIS = await c.initialSupply(inputs[0].ids[i]);
@@ -368,7 +369,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(cIS[1].eq(initialSupply2[1]));
 
       const inputs2 = await c.getMintRangeInput(5);
-      await c.mintPhotos(...inputs2);
+      await verified.mintPhotos(c, ...inputs2);
       for (let i = 0; i < inputs2[0].length; i++) {
         cIS = await c.initialSupply(inputs2[0].ids[i]);
         expect(cIS[0].eq(initialSupply2[0]));
@@ -417,7 +418,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.getMintRangeInput(-1)).to.be.rejected;
 
       const input = await c.getMintRangeInput(0);
-      await expect(c.mintPhotos(...input)).to.be.rejected;
+      await expect(verified.mintPhotos(c, ...input)).to.be.rejected;
     });
 
     it("should mint 1 vault and up to max supply to treasury ", async function () {
@@ -428,7 +429,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const [input, checksum] = await c.getMintRangeInput(photos);
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
-      const tx = await c.mintPhotos(input, checksum);
+      const tx = await verified.mintPhotos(c, input, checksum);
       const receipt = await tx.wait();
       const ids = input[0];
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
@@ -467,7 +468,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     it("should mint claim tokens to any wallet ", async function () {
       const { c, treasury, account1 } = await loadFixture(deployFixture);
 
-      await c.mintClaims(account1.address, 2);
+      await verified.mintClaims(c, account1.address, 2, []);
 
       expect(await c.totalSupply(0)).to.equal(12);
       expect(await c.balanceOf(treasury.address, 0)).to.equal(10);
@@ -481,15 +482,15 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setInitialSupply([1, 1]);
       const input1 = await c.getMintRangeInput(5);
-      await c.mintPhotos(...input1);
+      await verified.mintPhotos(c, ...input1);
 
       const newTreasury = account2.address
       await c.setInitialHolders(newTreasury, vault.address);
 
       const input2 = await c.getMintRangeInput(5);
-      await c.mintPhotos(...input2);
+      await verified.mintPhotos(c, ...input2);
 
-      await c.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
+      await verified.connect(treasury).safeTransferFrom(c, treasury.address, account1.address, 0, 2, []);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(2);
 
@@ -513,15 +514,15 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setInitialSupply([1, 1]);
 
       const input1 = await c.getMintRangeInput(5);
-      await c.mintPhotos(...input1);
+      await verified.mintPhotos(c, ...input1);
 
       const newTreasury = account2.address
       await c.setInitialHolders(newTreasury, vault.address);
 
       const input2 = await c.getMintRangeInput(5);
-      await c.mintPhotos(...input2);
+      await verified.mintPhotos(c, ...input2);
 
-      await c.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 2, []);
+      await verified.connect(treasury).safeTransferFrom(c, treasury.address, account1.address, 0, 2, []);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(2);
 
@@ -551,7 +552,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-      await c.mintPhotos(...input);
+      await verified.mintPhotos(c, ...input);
       const ids = input[0].ids;
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
@@ -563,12 +564,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
 
       // transfer token 3
-      await c.connect(vault).safeTransferFrom(vault.address, account2.address, 3, 1, []);
+      await verified.connect(vault).safeTransferFrom(c, vault.address, account2.address, 3, 1, []);
 
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, treasury.address, account1.address);
 
-      const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
+      const tx = await verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput);
       const receipt = await tx.wait();
 
       const newVaultAddresses = new Array(photos).fill(account1.address);
@@ -605,7 +606,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-      await c.mintPhotos(...input);
+      await verified.mintPhotos(c, ...input);
       const ids = input[0].ids;
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
@@ -618,7 +619,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account1.address, vault.address);
 
-      const tx = await c.updateInitialHoldersRange(...updateInitialHoldersInput);
+      const tx = await verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput);
       const receipt = await tx.wait();
 
       const newTreasuryAddresses = new Array(photos).fill(account1.address);
@@ -647,7 +648,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const vaultAddresses = new Array(photos).fill(vault.address);
       const treasuryAddresses = new Array(photos).fill(treasury.address);
 
-      await c.mintPhotos(...input);
+      await verified.mintPhotos(c, ...input);
       const ids = input[0].ids;
       const vaultBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const treasuryBalances = await c.balanceOfBatch(treasuryAddresses, ids);
@@ -659,9 +660,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, vault.address, treasury.address);
-      console.log(updateInitialHoldersInput);
-      return; 
-      await c.updateInitialHoldersRange(...updateInitialHoldersInput);
+
+      await verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput);
 
       const newTreasuryBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const newVaultBalances = await c.balanceOfBatch(treasuryAddresses, ids);
@@ -679,12 +679,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);
-      await c.mintPhotos(...input);
+      await verified.mintPhotos(c, ...input);
       await c.permanentlyDisableInitialHoldersRangeUpdate();
       await c.pause();
 
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account2.address, account1.address,);
-      await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
+      await expect(verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput)).to.be.rejected;
       expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
     })
 
@@ -695,7 +695,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const maxSupply = [1, 5];
       await c.setInitialSupply(maxSupply);
       const input = await c.getMintRangeInput(photos);
-      await c.mintPhotos(...input);
+      await verified.mintPhotos(c, ...input);
 
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account1.address, vault.address);
@@ -703,10 +703,10 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.pause();
 
 
-      await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejected;
+      await expect(verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput)).to.be.rejected;
 
       const updateInitialHoldersInput2 = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, Infinity, account1.address, vault.address);
-      await expect(c.updateInitialHoldersRange(...updateInitialHoldersInput2)).to.not.be.rejected;
+      await expect(verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput2)).to.not.be.rejected;
     });
   });
 
@@ -775,12 +775,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const { c, account1 } = await loadFixture(deployFixture);
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, 100, account1.address, account1.address);
-      await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).updateInitialHolderRanges(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
       await c.unpause();
       await c.setInitialSupply([1, 4]);
       const mintInput = await c.getMintRangeInput(4);
       await expect(c.connect(account1).mintPhotos(...mintInput)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).mintClaims(account1.address, 5)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).mintClaims(account1.address, 5, [])).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).pause()).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
@@ -802,7 +802,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.grantRole(await c.DEFAULT_ADMIN_ROLE(), account1.address);
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, 0, 100, account1.address, account1.address);
-      await expect(c.connect(account1).updateInitialHoldersRange(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).updateInitialHolderRanges(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
       await c.unpause();
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.not.be.rejectedWith("AccessControl");
@@ -825,7 +825,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account2).mintPhotos(...mintInput)).to.not.be.rejectedWith("AccessControl");
 
       await c.grantRole(await c.CLAIM_MINTER_ROLE(), account3.address);
-      await expect(c.connect(account3).mintClaims(account1.address, 5)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account3).mintClaims(account1.address, 5, [])).to.not.be.rejectedWith("AccessControl");
 
       await c.grantRole(await c.URI_UPDATER_ROLE(), account4.address);
       await expect(c.connect(account4).setPermanentBaseUriUpTo("", 100)).to.not.be.rejectedWith("AccessControl");
@@ -853,9 +853,9 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.setApprovalForAll(account1.address, true)).to.be.rejectedWith("paused");
 
       await expect(c.setInitialSupply([1, 2])).to.be.rejectedWith("paused");
-      await expect(c.mintPhotos(...mintInput)).to.be.rejectedWith("paused");
+      await expect(verified.mintPhotos(c, ...mintInput)).to.be.rejectedWith("paused");
 
-      await expect(c.mintClaims(account1.address, 5)).to.be.rejectedWith("paused");
+      await expect(verified.mintClaims(c, account1.address, 5, [])).to.be.rejectedWith("paused");
       // await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
       await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
 
@@ -894,25 +894,25 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       // set approve operator
       await c.connect(treasury).setApprovalForAll(account1.address, true);
-      await expect(c.connect(treasury).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.rejected;
-      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.rejected;
+      await expect(verified.connect(treasury).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.not.be.rejected;
+      await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.not.be.rejected;
 
       // filter operator
       await ofr.updateOperator(c.address, account1.address, true);
       expect(await ofr.filteredOperators(c.address)).to.include(account1.address);
 
-      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
+      await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.be.reverted;
 
       // disable operator filter by setting operator filter to address();
       await c.setOperatorFilterRegistry(ethers.constants.AddressZero);
-      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
+      await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
       await c.setOperatorFilterRegistry("0x000000000000AAeB6D7670E522A718067333cd4E");
-      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.be.reverted;
+      await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.be.reverted;
 
       // permanently disable operator filter
       await c.setOperatorFilterRegistry(ethers.constants.AddressZero);
       await c.permanentlyFreezeOperatorFilterRegistryAddress();
-      await expect(c.connect(account1).safeTransferFrom(treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
+      await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
       await expect(c.setOperatorFilterRegistry(ethers.constants.AddressZero)).to.be.revertedWith("Permanently frozen");
     });
 
@@ -946,10 +946,10 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       await c.setTransferEventListenerAddress(pdpl.address);
 
-      await expect(c.connect(treasury).safeTransferFrom(treasury.address, treasury.address, 0, 1, [])).to.be.revertedWith("Test Revert");
-      await expect(c.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 1, [])).to.not.be.reverted;
+      await expect(verified.connect(treasury).safeTransferFrom(c, treasury.address, treasury.address, 0, 1, [])).to.be.revertedWith("Test Revert");
+      await expect(verified.connect(treasury).safeTransferFrom(c, treasury.address, account1.address, 0, 1, [])).to.not.be.reverted;
 
-      const tx = await c.connect(treasury).safeTransferFrom(treasury.address, account1.address, 0, 1, []);
+      const tx = await verified.connect(treasury).safeTransferFrom(c, treasury.address, account1.address, 0, 1, []);
       const receipt = await tx.wait();
 
       let event;

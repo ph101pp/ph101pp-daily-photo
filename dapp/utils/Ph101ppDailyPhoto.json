@@ -1369,7 +1369,7 @@
           "type": "bytes32"
         }
       ],
-      "name": "updateInitialHoldersRange",
+      "name": "updateInitialHolderRanges",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
