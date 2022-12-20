@@ -198,7 +198,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         public
         view
         virtual
-        returns (address[][] memory, uint[] memory)
+        returns (address[][] memory holders, uint[] memory ranges)
     {
         return (_initialHolders, _initialHolderRanges);
     }

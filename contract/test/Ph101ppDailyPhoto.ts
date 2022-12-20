@@ -96,7 +96,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await verified.mintPhotos(c, ...input);
 
       expect(await c.permanentBaseUri()).to.equal(immutableUri);
-      await c.setPermanentBaseUriUpTo(immutableUri2, 100);
+      await c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri2, 100);
       expect(await c.permanentBaseUri()).to.equal(immutableUri2);
 
       const history = await c.permanentBaseUriRanges();
@@ -110,7 +110,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(history[1][1]).to.equal(1)
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(100);
 
-      await c.setPermanentBaseUriUpTo(immutableUri3, 101);
+      await c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri3, 101);
 
       const history2 = await c.permanentBaseUriRanges();
       expect(history2.length).to.equal(2);
@@ -156,11 +156,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const input = await c.getMintRangeInput(101);
       await verified.mintPhotos(c, ...input);
 
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
-      await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
-      await c.setPermanentBaseUriUpTo(immutableUri3, 101);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
+      await expect(c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri2, 0)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
+      await c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri2, 100);
+      await expect(c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri3, 100)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
+      await c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri3, 101);
+      await expect(c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri2, 102)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
     });
   });
 
@@ -283,7 +283,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await verified.mintPhotos(c, ...inputs);
-      await c.setPermanentBaseUriUpTo(immutableUri, 50);
+      await c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri, 50);
 
       for (let i = 1; i < 100; i++) {
         if (i > 50) expect(await c.uri(i)).to.include(mutableUri);
@@ -297,7 +297,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await verified.mintPhotos(c, ...inputs);
-      await c.setPermanentBaseUriUpTo(immutableUri, 10);
+      await c["setPermanentBaseUriUpTo(string,uint256)"](immutableUri, 10);
 
       for (let i = 1; i < 50; i++) {
         if (i > 10) expect(await c.uri(i)).to.include(mutableUri);
@@ -784,7 +784,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).pause()).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1)["setPermanentBaseUriUpTo(string,uint256)"]("", 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setProxyBaseUri("")).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
@@ -828,7 +828,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account3).mintClaims(account1.address, 5, [])).to.not.be.rejectedWith("AccessControl");
 
       await c.grantRole(await c.URI_UPDATER_ROLE(), account4.address);
-      await expect(c.connect(account4).setPermanentBaseUriUpTo("", 100)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account4)["setPermanentBaseUriUpTo(string,uint256)"]("", 100)).to.not.be.rejectedWith("AccessControl");
       await expect(c.connect(account4).setProxyBaseUri("")).to.not.be.rejectedWith("AccessControl");
     });
 
@@ -859,7 +859,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       // await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
       await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
 
-      await expect(c.setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("paused");
+      await expect(c["setPermanentBaseUriUpTo(string,uint256)"]("", 100)).to.be.rejectedWith("paused");
       await expect(c.setProxyBaseUri("")).to.be.rejectedWith("paused");
     });
 

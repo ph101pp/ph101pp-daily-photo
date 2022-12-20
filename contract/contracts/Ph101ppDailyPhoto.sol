@@ -29,6 +29,8 @@ contract Ph101ppDailyPhoto is
     uint[] private _initialSupplyRanges;
     string[] private _permanentUris;
     uint[] private _permanentUriRanges;
+    string[] private _periods;
+    uint[] private _periodRanges;
     string private _proxyUri;
 
     uint public lastRangeTokenIdWithPermanentUri;
@@ -57,6 +59,9 @@ contract Ph101ppDailyPhoto is
 
         _permanentUriRanges.push(0);
         _permanentUris.push(newPermanentUri);
+
+        _periodRanges.push(0);
+        _periods.push("Genesis");
 
         _proxyUri = newProxyUri;
         _owner = msg.sender;
@@ -111,6 +116,29 @@ contract Ph101ppDailyPhoto is
         return string.concat(base, tokenSlugFromTokenId(tokenId));
     }
 
+    function periodUri(
+        uint tokenId,
+        uint periodId
+    ) public view returns (string memory) {
+        require(periodId < _periods.length, "Period doesn't exist.");
+        uint lastPeriodTokenId = periodId + 1 < _periodRanges.length
+            ? _periodRanges[periodId + 1] - 1
+            : lastRangeTokenIdMinted;
+
+        require(tokenId <= lastPeriodTokenId, "Token did not exist in period.");
+
+        uint permanentUriIndex = _findLowerBound(
+            _permanentUriRanges,
+            lastPeriodTokenId
+        );
+
+        return
+            string.concat(
+                _permanentUris[permanentUriIndex],
+                tokenSlugFromTokenId(tokenId)
+            );
+    }
+
     // Returns all histoical uris that include tokenId
     function uriHistory(uint tokenId) public view returns (string[] memory) {
         if (tokenId > lastRangeTokenIdWithPermanentUri) {
@@ -145,9 +173,23 @@ contract Ph101ppDailyPhoto is
     function permanentBaseUriRanges()
         public
         view
-        returns (string[] memory, uint256[] memory)
+        returns (string[] memory permanentBaseUris, uint256[] memory ranges)
     {
         return (_permanentUris, _permanentUriRanges);
+    }
+
+    // Returns current Period.
+    function period() public view returns (string memory) {
+        return _periods[_periods.length - 1];
+    }
+
+    // Returns all period ranges.
+    function periodRanges()
+        public
+        view
+        returns (string[] memory periods, uint256[] memory ranges)
+    {
+        return (_periods, _periodRanges);
     }
 
     // Updates latest permanent base Uri.
@@ -164,6 +206,19 @@ contract Ph101ppDailyPhoto is
         _permanentUris.push(newUri);
         _permanentUriRanges.push(lastRangeTokenIdWithPermanentUri + 1);
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
+    }
+
+    // Updates latest permanent base Uri.
+    // And begins a new Period
+    function setPermanentBaseUriUpTo(
+        string memory newUri,
+        uint validUpToTokenId,
+        string memory newPeriodName
+    ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
+        uint periodRangeStart = lastRangeTokenIdWithPermanentUri + 1;
+        setPermanentBaseUriUpTo(newUri, validUpToTokenId);
+        _periods.push(newPeriodName);
+        _periodRanges.push(periodRangeStart);
     }
 
     // Update proxy base Uri that is used for
@@ -269,7 +324,7 @@ contract Ph101ppDailyPhoto is
     function initialSupplyRanges()
         public
         view
-        returns (uint[][] memory, uint[] memory)
+        returns (uint[][] memory supplies, uint[] memory ranges)
     {
         return (_initialSupplies, _initialSupplyRanges);
     }
