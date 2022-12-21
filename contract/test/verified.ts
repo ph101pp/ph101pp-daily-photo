@@ -4,8 +4,6 @@ import { SignerWithAddress } from "./fixture";
 import integrityCheck from "./integrityCheck"
 
 export type Contracts = TestERC1155MintRange | TestERC1155MintRangePausable | TestERC1155MintRangeUpdateable;
-// type CheckTransfersMintRange = (initialHolders: string[], input: ERC1155MintRange.MintRangeInputStructOutput) => Promise<TransferCheck>
-// type CheckTransfersUpdateInitialHolderRangess = (input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStructOutput) => Promise<TransferCheck>
 
 const verified = {
   mint: async (c: Contracts, to: string, tokenId: number, amount: number, data: []) => {

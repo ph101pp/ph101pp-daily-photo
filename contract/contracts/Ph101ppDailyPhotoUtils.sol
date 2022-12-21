@@ -270,55 +270,28 @@ library Ph101ppDailyPhotoUtils {
             uint[] memory _initialHolderRanges
         ) = p.caller.initialHolderRanges();
 
-        require(
-            p.newInitialHolders.length == p.newInitialHoldersRange.length,
-            "E:04"
-        );
-
-        // must start with 0
-        require(p.newInitialHoldersRange[0] == 0, "E:05");
-
         uint lastRangeTokenIdWithLockedInitialHolders = p
             .caller
             .lastRangeTokenIdWithLockedInitialHolders();
 
-        uint currentLastLockedIndex = _findLowerBound(
+        uint currentLastLockedRangeIndex = _findLowerBound(
             _initialHolderRanges,
             lastRangeTokenIdWithLockedInitialHolders
         );
 
-        require(
-            _findLowerBound(
-                p.newInitialHoldersRange,
-                lastRangeTokenIdWithLockedInitialHolders
-            ) == currentLastLockedIndex,
-            "E:23"
-        );
-
         for (uint k = 0; k < p.newInitialHolders.length; k++) {
-            // ranges must be in accending order
-            if (k > 0) {
-                require(
-                    p.newInitialHoldersRange[k] >
-                        p.newInitialHoldersRange[k - 1],
-                    "E:06"
-                );
-            }
             // can't change locked ranges
             bool isLocked = p.caller.isZeroLocked() &&
-                k <= currentLastLockedIndex;
-            if (isLocked) {
-                require(
-                    _initialHolderRanges[k] == p.newInitialHoldersRange[k],
-                    "E:18"
-                );
-            }
-
+                k <= currentLastLockedRangeIndex;
+            require(
+                _initialHolders[k].length == p.newInitialHolders[k].length,
+                "E:23"
+            );
             for (uint i = 0; i < p.newInitialHolders[k].length; i++) {
                 if (isLocked) {
                     require(
                         _initialHolders[k][i] == p.newInitialHolders[k][i],
-                        "E:15"
+                        "E:18"
                     );
                 }
 
@@ -344,11 +317,9 @@ library Ph101ppDailyPhotoUtils {
             uint idId = 0;
             uint initId = 0;
 
-            // console.log(p.fromTokenId, p.toTokenId);
-
             for (
-                uint tokenId = p.fromTokenId;
-                tokenId <= p.toTokenId;
+                uint tokenId = 0;
+                tokenId <= p.caller.lastRangeTokenIdMinted();
                 tokenId++
             ) {
                 // token exists and is not manually minted
@@ -357,6 +328,19 @@ library Ph101ppDailyPhotoUtils {
 
                 require(p.caller.balanceOf(to, tokenId) == 0, "E:13");
                 require(!p.caller.isBalanceInitialized(to, tokenId), "E:21");
+
+                // from is in existing initialHolders
+                address[] memory currentInitialHolders = p
+                    .caller
+                    .initialHolders(tokenId);
+
+                uint newInitialHoldersIndex = _findLowerBound(
+                    _initialHolderRanges,
+                    tokenId
+                );
+                address[] memory newInitialHolders = p.newInitialHolders[
+                    newInitialHoldersIndex
+                ];
 
                 // if token is to be transferred -> cant be initialized and must have balance.
                 if (idId < p.ids[i].length && p.ids[i][idId] == tokenId) {
@@ -378,7 +362,7 @@ library Ph101ppDailyPhotoUtils {
                     );
 
                     // Cant be manually minted
-                    require(p.caller.isManualMint(tokenId) == false, "E:12");
+                    require(p.caller.isManualMint(tokenId) == false, "E:12-3");
 
                     idId++;
                 }
@@ -404,7 +388,7 @@ library Ph101ppDailyPhotoUtils {
                     );
 
                     // Cant be manually minted
-                    require(p.caller.isManualMint(tokenId) == false, "E:12");
+                    require(p.caller.isManualMint(tokenId) == false, "E:12-2");
 
                     initId++;
                 }
@@ -414,10 +398,13 @@ library Ph101ppDailyPhotoUtils {
                     // console.log("nope", tokenId);
 
                     uint balance = p.caller.balanceOf(from, tokenId);
+
                     if (balance > 0) {
-                        require(p.caller.isManualMint(tokenId) == true, "E:12");
-                    } else {
-                        require(balance == 0, "E:22");
+                        if(!p.caller.isManualMint(tokenId)) {
+                            for(uint m = 0; m<currentInitialHolders.length; m++) {
+                                require(currentInitialHolders[m]==newInitialHolders[m], "E:19");
+                            }
+                        }
                     }
                     require(
                         !p.caller.isBalanceInitialized(from, tokenId),
@@ -428,25 +415,9 @@ library Ph101ppDailyPhotoUtils {
                     continue;
                 }
 
-                // from is in existing initialHolders
-                address[] memory currentInitialHolders = p
-                    .caller
-                    .initialHolders(tokenId);
-                require(_includesAddress(currentInitialHolders, from), "E:09");
-
-                uint newInitialHoldersIndex = _findLowerBound(
-                    p.newInitialHoldersRange,
-                    tokenId
-                );
-
                 // to is in new initialHolders
-                require(
-                    _includesAddress(
-                        p.newInitialHolders[newInitialHoldersIndex],
-                        to
-                    ),
-                    "E:10"
-                );
+                require(_includesAddress(newInitialHolders, to), "E:10");
+                require(_includesAddress(currentInitialHolders, from), "E:09");
 
                 // tokenId is not in locked range
                 if (p.caller.isZeroLocked()) {
@@ -468,8 +439,7 @@ library Ph101ppDailyPhotoUtils {
                         p.ids,
                         p.amounts,
                         p.initialize,
-                        p.newInitialHolders,
-                        p.newInitialHoldersRange
+                        p.newInitialHolders
                     ),
                     _initialHolders,
                     _initialHolderRanges,

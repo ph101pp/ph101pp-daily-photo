@@ -2,7 +2,6 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ContractTransaction } from "ethers";
-import _getUpdateInitialHolderRangesInput from "../scripts/_getUpdateInitialHolderRangesInput";
 import { TestERC1155MintRange } from "../typechain-types";
 import { deployFixture, Fixture } from "./fixture";
 import integrityCheck from "./integrityCheck";

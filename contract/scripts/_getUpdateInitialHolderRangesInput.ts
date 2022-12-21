@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers";
 import { TestERC1155MintRangeUpdateable, Ph101ppDailyPhoto, ERC1155MintRangeUpdateable } from "../typechain-types";
 
 function findInRange(range: number[], needle: number) {
@@ -9,33 +10,56 @@ function findInRange(range: number[], needle: number) {
   return 0;
 }
 
-export default async function _getUpdateInitialHolderRangesInput(
+export default async function _getUpdateInitialHolderRangesInputSafe(
   c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
-  from: number,
-  to: number,
-  newInitialHolders: string[]
+
+  newInitialHolders: string[][]
 ): Promise<[
   ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct,
   string
 ]> {
-  if (from < 0 || from > to) {
-    throw Error("Error: from < 0 || from > to");
-  };
+  const [currentInitialHolders] = await c.initialHolderRanges();
 
+  if (currentInitialHolders.length !== newInitialHolders.length) {
+    throw Error("Error: newInitialHolders.length does not match");
+  }
+  for (let i = 0; i < currentInitialHolders.length; i++) {
+    if (currentInitialHolders[i].length !== newInitialHolders[i].length) {
+      throw Error("Error: newInitialHolders.length does not match");
+    }
+  }
+  const input = await _getUpdateInitialHolderRangesInput(c, newInitialHolders);
+
+  const checksum = await c.verifyUpdateInitialHolderRangesInput(input);
+  return [
+    input,
+    checksum
+  ]
+}
+
+export async function _getUpdateInitialHolderRangesInput(
+  c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
+  newInitialHolders: string[][]
+): Promise<ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct> {
   const toAddresses: string[] = [];
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
   const initialize: number[][] = [];
   const amounts: number[][] = [];
   const lastTokenId = await c.lastRangeTokenIdMinted();
+  const [, currentInitialHoldersRangeBig] = await c.initialHolderRanges();
+  const currentInitialHoldersRange = currentInitialHoldersRangeBig.map(n => n.toNumber());
 
-  const too = to == Infinity ? lastTokenId : to;
+  const from = 0;
+  const too = lastTokenId.toNumber();
 
   const zeroMinted = await c.isZeroMinted();
 
   if (zeroMinted) {
     for (let i = from; i <= too; i++) {
       const currentInitialHolders = await c.initialHolders(i);
+      const newHolderIndex = findInRange(currentInitialHoldersRange, i);
+      const newHolders = newInitialHolders[newHolderIndex];
 
       const balances = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
       const isManuallyMinted = await c.isManualMint(i);
@@ -45,7 +69,7 @@ export default async function _getUpdateInitialHolderRangesInput(
 
       for (let a = 0; a < currentInitialHolders.length; a++) {
         const fromAddress = currentInitialHolders[a];
-        const toAddress = newInitialHolders[a];
+        const toAddress = newHolders[a];
 
         if (fromAddress === toAddress) {
           continue;
@@ -77,70 +101,15 @@ export default async function _getUpdateInitialHolderRangesInput(
       }
     }
   }
-  const newInitialHoldersArray: string[][] = [];
-  const newInitialHoldersRange: number[] = [];
-
-  const [currentInitialHolders, currentInitialHoldersRangeBig] = await c.initialHolderRanges();
-
-  for (let i = 0; i < currentInitialHolders.length; i++) {
-    if (currentInitialHolders[0].length !== newInitialHolders.length) {
-      throw Error("Error: newInitialHolders.length does not match");
-    }
-  }
-
-  const currentInitialHoldersRange = currentInitialHoldersRangeBig.map(n => n.toNumber());
-  const toIndex = findInRange(currentInitialHoldersRange, to);
-  let newRangeIndex = 0;
-  let rangeSet = false;
-
-  for (let i = 0; i < currentInitialHoldersRange.length; i++) {
-    const current = currentInitialHoldersRange[i];
-
-    if (current < from || current > to) {
-      newInitialHoldersRange[newRangeIndex] = currentInitialHoldersRange[i];
-      newInitialHoldersArray[newRangeIndex] = currentInitialHolders[i];
-      newRangeIndex++;
-
-    } else if (current >= from && current <= to) {
-      if (rangeSet) {
-        continue;
-      }
-      newInitialHoldersRange[newRangeIndex] = from;
-      newInitialHoldersArray[newRangeIndex] = newInitialHolders;
-      newRangeIndex++;
-      rangeSet = true;
-
-      if (to === Infinity) {
-        break;
-      }
-      if (!currentInitialHoldersRange.includes(to + 1)) {
-        newInitialHoldersRange[newRangeIndex] = to + 1;
-        newInitialHoldersArray[newRangeIndex] = currentInitialHolders[toIndex];
-        newRangeIndex++;
-      }
-    }
-  }
-  if (!rangeSet) {
-    newInitialHoldersRange.push(from);
-    newInitialHoldersArray.push(newInitialHolders);
-    if (to !== Infinity) {
-      newInitialHoldersRange.push(to + 1);
-      newInitialHoldersArray.push(currentInitialHolders[toIndex]);
-    }
-  }
-  const input = {
+  
+  const input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct = {
     fromAddresses,
     toAddresses,
     ids,
     amounts,
     initialize,
-    newInitialHolders: newInitialHoldersArray,
-    newInitialHoldersRange
+    newInitialHolders,
   };
-  const checksum = await c.verifyUpdateInitialHolderRangesInput(from, too, input);
 
-  return [
-    input,
-    checksum
-  ];
+  return input;
 }

@@ -121,6 +121,7 @@ contract Ph101ppDailyPhoto is
         uint periodId
     ) public view returns (string memory) {
         require(periodId < _periods.length, "Period doesn't exist.");
+        
         uint lastPeriodTokenId = periodId + 1 < _periodRanges.length
             ? _periodRanges[periodId + 1] - 1
             : lastRangeTokenIdMinted;
@@ -182,6 +183,11 @@ contract Ph101ppDailyPhoto is
     function period() public view returns (string memory) {
         return _periods[_periods.length - 1];
     }
+
+    // // Returns period by id.
+    // function periodName(uint periodId) public view returns (string memory) {
+    //     return _periods[periodId];
+    // }
 
     // Returns all period ranges.
     function periodRanges()
