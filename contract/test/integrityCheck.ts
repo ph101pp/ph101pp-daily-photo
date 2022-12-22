@@ -27,6 +27,7 @@ type BalancesRangeCheck = {
   balances: BalancesRangeResults
   expectEqual: () => Promise<void>
   expectDelta: (delta: BalancesRangeDelta) => Promise<void>
+  getBalances: () => Promise<BalancesRangeResults>
 }
 type SuppliesRangeResults = { [id: string]: number };
 type SuppliesRangeDelta = { [id: string]: number };
@@ -34,6 +35,7 @@ type SuppliesRangeCheck = {
   supplies: SuppliesRangeResults
   expectEqual: () => Promise<void>
   expectDelta: (delta: SuppliesRangeDelta) => Promise<void>
+  getSupplies: () => Promise<SuppliesRangeResults>
 }
 
 type RangeChecks = {
@@ -69,7 +71,7 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
   async function checkIds(addresses: string[], ids: number[]) {
     return {
       balances: balancesRangeCheck(c, addresses, ids),
-      supplies: suppliesRangeCheck(c, ids),
+      supplies: suppliesRangeCheck(c, addresses, ids),
     };
   }
 
@@ -120,7 +122,7 @@ const balancesRangeCheck = (c: Contracts, addresses: string[], ids: number[]) =>
     balances: currBalances,
     expectEqual: async () => {
       const newBalances = await getBalances(c, addresses, ids);
-      expect(currBalances).to.deep.equal(newBalances);
+      expect(currBalances).to.deep.equal(newBalances, "Unexpected Balance Change");
     },
     expectDelta: async (delta: BalancesRangeDelta) => {
       const currBalancesCopy = JSON.parse(JSON.stringify(currBalances));
@@ -144,12 +146,13 @@ const balancesRangeCheck = (c: Contracts, addresses: string[], ids: number[]) =>
         });
       });
       expect(currBalancesCopy).to.deep.equal(newBalances);
-    }
+    },
+    getBalances: async () => await getBalances(c, addresses, ids)
   }
 };
 
-const suppliesRangeCheck = (c: Contracts, ids: number[]) => async (expected?: number[]): Promise<SuppliesRangeCheck> => {
-  const currSupplies = await getSupplies(c, ids);
+const suppliesRangeCheck = (c: Contracts, addresses: string[], ids: number[]) => async (expected?: number[]): Promise<SuppliesRangeCheck> => {
+  const currSupplies = await getSupplies(c, addresses, ids);
 
   if (expected) {
     ids.forEach((id, k) => {
@@ -160,12 +163,12 @@ const suppliesRangeCheck = (c: Contracts, ids: number[]) => async (expected?: nu
   return {
     supplies: currSupplies,
     expectEqual: async () => {
-      const newBalances = await getSupplies(c, ids);
-      expect(currSupplies).to.deep.equal(newBalances);
+      const newBalances = await getSupplies(c, addresses, ids);
+      expect(currSupplies).to.deep.equal(newBalances, "Unexpected supply Difference");
     },
     expectDelta: async (delta: SuppliesRangeDelta) => {
       const currSuppliesCopy = JSON.parse(JSON.stringify(currSupplies));
-      const newSupplies = await getSupplies(c, ids);
+      const newSupplies = await getSupplies(c, addresses, ids);
 
       const changedIds = Object.keys(delta);
 
@@ -183,22 +186,28 @@ const suppliesRangeCheck = (c: Contracts, ids: number[]) => async (expected?: nu
         delete newSupplies[index];
       });
       expect(currSuppliesCopy).to.deep.equal(newSupplies);
-    }
+    },
+    getSupplies: async () => await getSupplies(c, addresses, ids)
   }
 };
 
-const getSupplies = async (c: Contracts, ids: number[]): Promise<SuppliesRangeResults> => {
-  const totalSupplies = await Promise.all(
-    ids.map((id) => {
-      return c.totalSupply(id);
-    })
-  );
-  const result: SuppliesRangeResults = {};
-  totalSupplies.forEach((supply, i) => {
-    result[ids[i]] = supply.toNumber()
-  })
+const getSupplies = async (c: Contracts, addresses: string[], ids: number[]): Promise<SuppliesRangeResults> => {
+  const balances: SuppliesRangeResults = {};
 
-  return result;
+  await Promise.all(addresses.map(async (address) => {
+    if (address === ethers.constants.AddressZero) {
+      return new Array(ids.length).fill(0);
+    }
+    const addresses = new Array(ids.length).fill(address);
+    const addressBalances = await c.balanceOfBatch(addresses, ids);
+
+    addressBalances.forEach((balance, i) => {
+      balances[ids[i]] = balances[ids[i]] ?? 0;
+      balances[ids[i]] += balance.toNumber()
+    })
+  }));
+
+  return balances
 };
 
 const getBalances = async (c: Contracts, addresses: string[], ids: number[]): Promise<BalancesRangeResults> => {
