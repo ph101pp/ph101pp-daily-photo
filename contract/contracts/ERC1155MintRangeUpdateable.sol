@@ -7,6 +7,8 @@ import "./ERC1155MintRangePausable.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
+// import "hardhat/console.sol";
+
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
  */
@@ -81,7 +83,10 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         // Update initialHoldersAddress Map
         // && check no locked initial holders were updated
 
-        require(input.newInitialHolders.length == _initialHolders.length, "E:10");
+        require(
+            input.newInitialHolders.length == _initialHolders.length,
+            "E:01"
+        );
 
         for (uint k = 0; k < input.newInitialHolders.length; k++) {
             address[] memory newInitialHolders = input.newInitialHolders[k];
@@ -89,61 +94,52 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
             bool isLocked = isZeroLocked && k <= lastLockedIndex;
             require(
                 currentInitialHolders.length == newInitialHolders.length,
-                "E:19"
+                "E:02"
             );
+            bool isChanged = false;
+
             for (uint i = 0; i < newInitialHolders.length; i++) {
                 address newInitialHolder = newInitialHolders[i];
-                require(
-                    !isLocked || currentInitialHolders[i] == newInitialHolder,
-                    "E:15"
-                );
-                require(currentInitialHolders[i] != address(0), "E:16");
-                _initialHoldersAddressMap[newInitialHolder] = true;
+                if (currentInitialHolders[i] != newInitialHolder) {
+                    require(!isLocked, "E:03");
+                    require(newInitialHolder != address(0), "E:04");
+                    require(!_ownersAddressMap[newInitialHolder], "E:05");
+                    isChanged = true;
+                    _initialHoldersAddressMap[newInitialHolder] = true;
+                }
+            }
+
+            if (isChanged) {
+                uint fromId = _initialHolderRanges[k];
+                uint toId = k + 1 < _initialHolderRanges.length
+                    ? _initialHolderRanges[k + 1] - 1
+                    : lastRangeTokenIdMinted;
+                for (uint i = 0; i < newInitialHolders.length; i++) {
+                    address fromAddress = currentInitialHolders[i];
+                    address toAddress = newInitialHolders[i];
+                    for (uint id = fromId; id <= toId; id++) {
+                        require(_balances[id][toAddress] == 0, "E:07");
+                        if (isBalanceInitialized[fromAddress][id]) {
+                            isBalanceInitialized[toAddress][id] = true;
+                        }
+                    }
+                }
             }
         }
-
         // Set new initial holders (ranges cannot be changed)
         _initialHolders = input.newInitialHolders;
 
+        // Send events
         _unpause();
-        // for each affected token "transfer"
+        // emit "transfer" events
         for (uint i = 0; i < input.toAddresses.length; i++) {
-            uint[] memory toInitialize = input.initialize[i];
-            address toAddress = input.toAddresses[i];
-            address fromAddress = input.fromAddresses[i];
-            uint[] memory ids = input.ids[i];
-
-            // initialize balances for new toAddress
-            for (uint k = 0; k < toInitialize.length; k++) {
-                uint idToInitialize = toInitialize[k];
-                require(
-                    isBalanceInitialized[fromAddress][idToInitialize] == true
-                );
-                isBalanceInitialized[toAddress][idToInitialize] = true;
-            }
-
-            // check that both account balances are still uninitialized
-            // this means, no transfer == no amount change == no total supply diff
-            for (uint k = 0; k < ids.length; k++) {
-                uint idToTransfer = ids[k];
-                require(
-                    isBalanceInitialized[fromAddress][idToTransfer] == false &&
-                        isBalanceInitialized[toAddress][idToTransfer] ==
-                        false &&
-                        _balances[idToTransfer][toAddress] == 0
-                );
-            }
-
-            // send transfer events
-            if (input.ids.length > 0) {
-                emit TransferBatch(
-                    msg.sender,
-                    fromAddress,
-                    toAddress,
-                    ids,
-                    input.amounts[i]
-                );
-            }
+            emit TransferBatch(
+                msg.sender,
+                input.fromAddresses[i],
+                input.toAddresses[i],
+                input.ids[i],
+                input.amounts[i]
+            );
         }
         _pause();
     }
@@ -166,7 +162,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         );
         require(
             inputChecksum == checksum,
-            "Invalid Input. Use verifyUpdateInitialHolderRangesInput()."
+            "Invalid. Use verifyUpdateInitialHolderRangesInput()."
         );
         _updateInitialHolderRanges(input);
     }
