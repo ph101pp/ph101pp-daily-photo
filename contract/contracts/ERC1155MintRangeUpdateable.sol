@@ -125,8 +125,14 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 for (uint i = 0; i < newInitialHolders.length; i++) {
                     address fromAddress = currentInitialHolders[i];
                     address toAddress = newInitialHolders[i];
+
                     for (uint id = fromId; id <= toId; id++) {
-                        require(_balances[id][toAddress] == 0, "E:07");
+                        // try to initialize from-address if there are already funds
+                        // or if to-address was initialized.
+                        if (isBalanceInitialized[toAddress][id] || _balances[id][toAddress] > 0) {
+                            _maybeInitializeBalance(fromAddress, id);
+                        } 
+                        // initialize to-balance if from-address is initialized
                         if (isBalanceInitialized[fromAddress][id]) {
                             isBalanceInitialized[toAddress][id] = true;
                         }
