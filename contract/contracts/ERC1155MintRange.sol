@@ -143,7 +143,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     /**
      * @dev Writes dynamic initial Balance to state if uninitialized.
      */
-    function _maybeInitializeBalance(address account, uint id) private {
+    function _maybeInitializeBalance(address account, uint id) internal {
         if (
             _maybeInitialHolder(account) &&
             account != address(0) &&
@@ -153,7 +153,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         ) {
             uint balance = initialBalanceOf(account, id);
             if (balance > 0) {
-                _balances[id][account] = balance;
+                _balances[id][account] = _balances[id][account]+balance;
             }
             isBalanceInitialized[account][id] = true;
         }
@@ -177,7 +177,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
         for (uint i = 0; i < addresses.length; i++) {
             address initialHolder = addresses[i];
-            require(!_ownersAddressMap[initialHolder], "E:22");
+            // require(!_ownersAddressMap[initialHolder], "E:22");
             _initialHoldersAddressMap[initialHolder] = true;
         }
     }
