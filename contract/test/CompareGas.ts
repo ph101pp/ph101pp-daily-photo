@@ -1,6 +1,8 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { ethers } from "hardhat";
 import { ContractTransaction } from "ethers";
+import _getUpdateInitialHolderRangesInputSafe, { _getUpdateInitialHolderRangesInput } from "../scripts/_getUpdateInitialHolderRangesInput";
+import integrityCheck from "./integrityCheck";
 
 const interations = 100;
 async function cost(tx: Promise<ContractTransaction>): Promise<number> {
@@ -15,7 +17,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     const mutableUri = "mutable_.uri/";
     const immutableUri = "immutable.uri/";
     // Contracts are deplodyed using the first signer/account by default
-    const [owner, treasury, vault, account1, account2, account3, account4] = await ethers.getSigners();
+    const [owner, treasury, vault, account1, account2, account3, account4, account5, account6] = await ethers.getSigners();
 
     const ERC = await ethers.getContractFactory("TestERC1155");
     const erc = await ERC.deploy();
@@ -34,12 +36,49 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     const C1 = await ethers.getContractFactory("TestERC1155MintRange");
     const c1 = await C1.deploy([]);
 
-    const C2 = await ethers.getContractFactory("TestERC1155MintRangeUpdateable");
+    const C2 = await ethers.getContractFactory("TestERC1155MintRangeUpdateable", {
+      libraries: {
+        Ph101ppDailyPhotoUtils: dt.address
+      }
+    });
     const c2 = await C2.deploy([]);
 
 
-    return { erc, c1, c2, pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4 };
+    return { erc, c1, c2, pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6 };
   }
+
+  it("updateInitialHolderRanges() vs transferBatch()", async function () {
+    const numberOfTokens = 100;
+    const { c2, account1, account2, account3, account4, account5, account6 } = await loadFixture(deployFixture);
+    await c2.setInitialHolders([account1.address, account2.address]);
+
+    const input = await c2.getMintRangeInput(numberOfTokens);
+    await c2.mintRangeSafe(...input);
+
+    const inputUpdate = await _getUpdateInitialHolderRangesInput(c2, [[account3.address, account4.address]]);
+
+    await c2.pause();
+    const tx = await c2.updateInitialHolderRanges(inputUpdate);
+
+    const receipt = await tx.wait();
+    console.log(receipt.cumulativeGasUsed.toNumber());
+
+    await c2.unpause();
+
+    const integrity = await integrityCheck(c2).range([account3.address, account4.address], 0, numberOfTokens-1);
+    const { balances } = await integrity.balances();
+
+    const tx2 = await c2.connect(account3).safeBatchTransferFrom(account3.address, account5.address, Object.keys(balances[account3.address]), Object.values(balances[account3.address]), [])
+    const tx3 = await c2.connect(account4).safeBatchTransferFrom(account4.address, account6.address, Object.keys(balances[account4.address]), Object.values(balances[account4.address]), [])
+
+    const receipt2 = await tx2.wait();
+    const receipt3 = await tx3.wait();
+    console.log(receipt2.cumulativeGasUsed.toNumber()+receipt3.cumulativeGasUsed.toNumber());
+
+    await c2.connect(account3).safeBatchTransferFrom(account3.address, account5.address, Object.keys(balances[account3.address]), Object.values(balances[account3.address]), [])
+    await c2.connect(account4).safeBatchTransferFrom(account4.address, account6.address, Object.keys(balances[account4.address]), Object.values(balances[account4.address]), [])
+
+  })
 
   it("mint() transfer() burn()", async function () {
     const { erc, c1, c2, pdp, account1, account2 } = await loadFixture(deployFixture);
@@ -68,7 +107,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
       report.mint.TestERC1155 += await cost(erc.mint(account1.address, i, 10, []));
       report.mint.TestERC1155MintRange += await cost(c1.mint(account1.address, i, 10, []));
       report.mint.TestERC1155MintRangeUpdateable += await cost(c2.mint(account1.address, i, 10, []));
-      report.mint.Ph101ppDailyPhoto += await cost(pdp.mintClaims(account1.address, 1));
+      report.mint.Ph101ppDailyPhoto += await cost(pdp.mintClaims(account1.address, 1, []));
     }
 
     for (let i = 0; i < interations; i++) {

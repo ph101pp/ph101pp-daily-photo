@@ -128,7 +128,8 @@ const balancesRangeCheck = (c: Contracts, addresses: string[], ids: number[]) =>
       const currBalancesCopy = JSON.parse(JSON.stringify(currBalances));
       const newBalances = await getBalances(c, addresses, ids);
 
-      addresses.forEach((address, i) => {
+      const deltaAddresses = Object.keys(delta);
+      deltaAddresses.forEach((address, i) => {
         const changedIds = Object.keys(delta[address]);
 
         changedIds.forEach((id) => {

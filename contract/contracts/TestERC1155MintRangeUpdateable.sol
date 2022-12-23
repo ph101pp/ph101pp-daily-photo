@@ -3,6 +3,8 @@ pragma solidity ^0.8.12;
 
 import "./ERC1155MintRangeUpdateable.sol";
 
+import "hardhat/console.sol";
+
 contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
     constructor(
         address[] memory initialHolders
@@ -12,17 +14,23 @@ contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
         address account,
         uint256 tokenId
     ) internal view override returns (uint256) {
-        if (_includesAddress(initialHolders(tokenId), account)) {
-            // tokenId 0 -> everyone gets 99
-            if (tokenId == 0) {
-                return 9999;
-            }
-            // other tokens -> dynamic by token id
-            else {
-                return (tokenId % 10) + 1;
+        address[] memory holders = initialHolders(tokenId);
+        uint sum = 0;
+        for (uint i = 0; i < holders.length; i++) {
+            address holder = holders[i];
+
+            if (holder == account) {
+                // tokenId 0 -> everyone gets 99
+                if (tokenId == 0) {
+                    sum = sum + 9999;
+                }
+                // other tokens -> dynamic by token id
+                else {
+                    sum = sum + (tokenId % 10);
+                }
             }
         }
-        return 0;
+        return sum;
     }
 
     function setInitialHolders(address[] memory addresses) public {
@@ -49,9 +57,7 @@ contract TestERC1155MintRangeUpdateable is ERC1155MintRangeUpdateable {
         _updateInitialHolderRangesSafe(input, checksum);
     }
 
-    function mintRange(
-        MintRangeInput memory input
-    ) public virtual {
+    function mintRange(MintRangeInput memory input) public virtual {
         _mintRange(input);
     }
 
