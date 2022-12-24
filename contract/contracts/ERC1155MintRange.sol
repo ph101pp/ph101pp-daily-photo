@@ -30,7 +30,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
     address[][] internal _initialHolders;
     uint[] internal _initialHolderRanges;
     mapping(address => bool) internal _initialHoldersAddressMap;
-    mapping(address => bool) internal _ownersAddressMap;
 
     // last tokenId minted via mintRange.
     uint public lastRangeTokenIdMinted;
@@ -134,9 +133,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
             _maybeInitializeBalance(from, id);
             _maybeInitializeBalance(to, id);
         }
-        if(!_ownersAddressMap[to]) {
-            _ownersAddressMap[to]=true;
-        }
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
@@ -177,7 +173,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
         for (uint i = 0; i < addresses.length; i++) {
             address initialHolder = addresses[i];
-            // require(!_ownersAddressMap[initialHolder], "E:22");
             _initialHoldersAddressMap[initialHolder] = true;
         }
     }

@@ -101,7 +101,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 if (currentInitialHolders[i] != newInitialHolder) {
                     require(!isLocked, "E:03");
                     require(newInitialHolder != address(0), "E:04");
-                    // require(!_ownersAddressMap[newInitialHolder], "E:05");
                     for (uint j = 0; j < newInitialHolders.length; j++) {
                         if (j != i) {
                             require(
