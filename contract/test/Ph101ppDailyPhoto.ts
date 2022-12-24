@@ -7,6 +7,7 @@ import getPh101ppDailyPhotoUpdateInitialHolderRangesInput from "../scripts/getPh
 import { Ph101ppDailyPhoto, TestOperatorFilterRegistry, TestIPh101ppDailyPhotoListener } from "../typechain-types";
 import { Fixture, SignerWithAddress } from "./fixture";
 import verified from "./verified";
+import integrityCheck from "./integrityCheck";
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 const nowTimestamp = Math.ceil(Date.now() / 1000) + SECONDS_PER_DAY * 3;
@@ -638,7 +639,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
 
     // this is not possible anymore with new valid check     
-    it.skip("should correcly swap treasury and vault addresses", async function () {
+    it("should correcly swap treasury and vault addresses", async function () {
       const { c, vault, treasury } = await loadFixture(deployFixture);
       const photos = 10;
       const maxSupply = [1, 5];
@@ -661,7 +662,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, vault.address, treasury.address);
 
-      await verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput);
+      const integrity = await integrityCheck(c).range([treasury.address, vault.address], 0, 9)
+      const supplyCheck = await integrity.supplies()
+      const balancesCheck = await integrity.balances()
+
+      // await verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput);
+      await expect(c.updateInitialHolderRanges(...updateInitialHoldersInput)).to.not.be.rejected;
 
       const newTreasuryBalances = await c.balanceOfBatch(vaultAddresses, ids);
       const newVaultBalances = await c.balanceOfBatch(treasuryAddresses, ids);
@@ -670,6 +676,14 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
         expect(newVaultBalances[i]).to.equal(vaultBalances[i]);
         expect(newTreasuryBalances[i]).to.equal(treasuryBalances[i]);
       }
+      
+      await supplyCheck.expectEqual();
+
+      const updateInitialHoldersInput2 = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, treasury.address, vault.address);
+      await expect(c.updateInitialHolderRanges(...updateInitialHoldersInput2)).to.not.be.rejected;
+
+      await balancesCheck.expectEqual();
+      await supplyCheck.expectEqual();
     });
 
     it("should fail to updated initialHolders if isInitialHoldersRangeUpdatePermanentlyDisabled", async function () {
@@ -687,27 +701,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput)).to.be.rejected;
       expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
     })
-
-    // this is not verified anymore
-    it.skip("should fail to update if unpaused between generating input and updating ", async function () {
-      const { c, vault, account1 } = await loadFixture(deployFixture);
-      const photos = 10;
-      const maxSupply = [1, 5];
-      await c.setInitialSupply(maxSupply);
-      const input = await c.getMintRangeInput(photos);
-      await verified.mintPhotos(c, ...input);
-
-      await c.pause();
-      const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, account1.address, vault.address);
-      await c.unpause();
-      await c.pause();
-
-
-      await expect(verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput)).to.be.rejected;
-
-      const updateInitialHoldersInput2 = await getPh101ppDailyPhotoUpdateInitialHolderRangesInput(c, account1.address, vault.address);
-      await expect(verified.pdpUpdateInitialHolderRanges(c, ...updateInitialHoldersInput2)).to.not.be.rejected;
-    });
   });
 
   describe("ERC2981 Token Royalties", function () {
@@ -915,7 +908,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
       await expect(c.setOperatorFilterRegistry(ethers.constants.AddressZero)).to.be.revertedWith("Permanently frozen");
     });
-
   });
 
   describe("Transfer Listener", function () {
