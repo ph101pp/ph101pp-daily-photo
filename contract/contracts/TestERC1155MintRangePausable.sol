@@ -19,7 +19,7 @@ contract TestERC1155MintRangePausable is ERC1155MintRangePausable {
             }
             // other tokens -> dynamic by token id
             else {
-                return (tokenId % 10) + 1;
+                return (tokenId % 10);
             }
         }
         return 0;

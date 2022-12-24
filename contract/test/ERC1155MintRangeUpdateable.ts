@@ -412,15 +412,14 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const balancesCheck = await integrity.balances();
       const supplyCheck = await integrity.supplies();
 
-      await verified.updateInitialHolderRanges(c, { fromAddresses, toAddresses, ids, amounts, initialize, ...rest });
+      await verified.updateInitialHolderRanges(c, { fromAddresses, toAddresses, ids, amounts, ...rest });
 
       await balancesCheck.expectEqual()
       await supplyCheck.expectEqual()
 
       expect(await c.balanceOf(account4.address, 5)).to.equal(0);
       expect(await c.balanceOf(account3.address, 5)).to.equal(3);
-      expect(await c.balanceOf(account1.address, 5)).to.equal(3);
-
+      expect(await c.balanceOf(account1.address, 5)).to.equal(2);
     });
 
     it("should correcly update initialHolders of a simple range", async function () {
@@ -454,9 +453,9 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
           expect(balancesAccount3[i]).to.equal(9999);
         }
         else {
-          expect(balancesAccount1[i]).to.equal(i + 1);
+          expect(balancesAccount1[i]).to.equal(i);
           expect(balancesAccount2[i]).to.equal(0);
-          expect(balancesAccount3[i]).to.equal(i + 1);
+          expect(balancesAccount3[i]).to.equal(i);
         }
       }
     });
@@ -496,7 +495,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
           expect(balancesAccount4[i]).to.equal(0);
         }
         else if (i < 2) {
-          expect(balancesAccount1[i]).to.equal(i + 1);
+          expect(balancesAccount1[i]).to.equal(i);
           expect(balancesAccount2[i]).to.equal(0);
           expect(balancesAccount3[i]).to.equal(0);
           expect(balancesAccount4[i]).to.equal(0);
@@ -505,7 +504,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
           expect(balancesAccount1[i]).to.equal(0);
           expect(balancesAccount2[i]).to.equal(0);
           expect(balancesAccount3[i]).to.equal(0);
-          expect(balancesAccount4[i]).to.equal(i + 1);
+          expect(balancesAccount4[i]).to.equal(i);
         }
       }
     });

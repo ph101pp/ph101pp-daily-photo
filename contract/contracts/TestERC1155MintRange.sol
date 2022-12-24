@@ -20,7 +20,7 @@ contract TestERC1155MintRange is ERC1155MintRange {
             }
             // other tokens -> dynamic by token id
             else {
-                return (tokenId % 10) + 1;
+                return (tokenId % 10);
             }
         }
         return 0;

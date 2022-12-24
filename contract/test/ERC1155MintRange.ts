@@ -178,10 +178,10 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
       expect(balances2n[1].toNumber()).to.equal(0);
       expect(balances2n[2].toNumber()).to.equal(0);
       expect(balances2n[3].toNumber()).to.equal(0);
-      expect(balances2n[4].toNumber()).to.equal((14 % 10) + 1);
-      expect(balances2n[5].toNumber()).to.equal((15 % 10) + 1);
-      expect(balances2n[6].toNumber()).to.equal((18 % 10) + 1);
-      expect(balances2n[7].toNumber()).to.equal((19 % 10) + 1);
+      expect(balances2n[4].toNumber()).to.equal((14 % 10));
+      expect(balances2n[5].toNumber()).to.equal((15 % 10));
+      expect(balances2n[6].toNumber()).to.equal((18 % 10));
+      expect(balances2n[7].toNumber()).to.equal((19 % 10));
     });
 
     it("should be possible to increase supply of dynamically minted tokens (_mintRange) via _mint|_mintBatch", async function () {
@@ -194,7 +194,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       const balances1 = await c.balanceOfBatch([account1.address, account1.address, account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
       for (let i = 0; i < initialHolders.length; i++) {
-        expect(balances1[i].toNumber()).to.equal((i + 1 % 10) + 1);
+        expect(balances1[i].toNumber()).to.equal((i + 1 % 10));
       }
 
       await verified.mint(c, account1.address, 1, 5, []);
@@ -202,7 +202,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       const balances2 = await c.balanceOfBatch([account1.address, account1.address, account1.address, account1.address, account1.address], [1, 2, 3, 4, 5]);
       for (let i = 0; i < initialHolders.length; i++) {
-        const balance = (i + 1 % 10) + 1 + 5;
+        const balance = (i + 1 % 10) + 5;
         expect(balances2[i].toNumber()).to.equal(balance);
         expect(await c.totalSupply(i + 1)).to.equal(balance);
       }
@@ -265,6 +265,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       // should not affect initialHolders1
       const integrity = await integrityCheck(c).range(initialHolders1, 0, 4);
+      const integrity2 = await integrityCheck(c).range(initialHolders2, 0, 4);
       // should correcly mint for initialHolder2
       const transfers = await integrityCheck(c).transfersMintRange(initialHolders2, inputs[0]);
 
@@ -272,10 +273,13 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
       await integrity.supplies([0, 0, 0, 0, 0]);
 
       const tx = await verified.mintRange(c, inputs[0]);
-
+      
       await balances.expectEqual()
-      await integrity.supplies([9999, 2, 3, 4, 5]);
       await transfers.expectSuccess(tx, { expectSupplyChange: true });
+      
+      await integrity.supplies([0, 0, 0, 0, 0]);
+      await integrity2.supplies([9999, 1, 2, 3, 4]);
+
     });
 
     it("mintRangeSafe should fail when another mintRange was executed since getMintRangeInput was called", async function () {
@@ -332,8 +336,8 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
       const inputs = await c.getMintRangeInput(newTokens);
       await verified.mintRange(c, inputs[0]);
       expect(await c.balanceOf(account1.address, 0)).to.equal(9999)
-      expect(await c.balanceOf(account1.address, 1)).to.equal(2)
-      expect(await c.balanceOf(account1.address, 2)).to.equal(3)
+      expect(await c.balanceOf(account1.address, 1)).to.equal(1)
+      expect(await c.balanceOf(account1.address, 2)).to.equal(2)
 
       expect(await c.balanceOf(account5.address, 0)).to.equal(0)
       expect(await c.balanceOf(account5.address, 1)).to.equal(0)
@@ -342,8 +346,8 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
       await verified.connect(account1).safeBatchTransferFrom(c, account1.address, account5.address, [0, 1, 2], [1, 1, 1], []);
 
       expect(await c.balanceOf(account1.address, 0)).to.equal(9998)
-      expect(await c.balanceOf(account1.address, 1)).to.equal(1)
-      expect(await c.balanceOf(account1.address, 2)).to.equal(2)
+      expect(await c.balanceOf(account1.address, 1)).to.equal(0)
+      expect(await c.balanceOf(account1.address, 2)).to.equal(1)
 
       expect(await c.balanceOf(account5.address, 0)).to.equal(1)
       expect(await c.balanceOf(account5.address, 1)).to.equal(1)
@@ -420,7 +424,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       for (let i = 0; i < newTokens; i++) {
         if (i !== 3 && i !== 0) {
-          const dynamicSupply = (i % 10) + 1;
+          const dynamicSupply = (i % 10);
           expect(await c.totalSupply(i)).to.equal(dynamicSupply * initialHolders.length);
         }
       }
@@ -491,7 +495,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       for (let i = 0; i < newTokens; i++) {
         if (i !== 0) {
-          const dynamicSupply = (i % 10) + 1;
+          const dynamicSupply = (i % 10);
           expect(await c.totalSupply(i)).to.equal(dynamicSupply * initialHolders.length + 3);
         }
       }
@@ -516,7 +520,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       for (let i = 0; i < newTokens; i++) {
         if (i !== 0) {
-          const dynamicSupply = (i % 10) + 1;
+          const dynamicSupply = (i % 10);
           expect(await c.totalSupply(i)).to.equal(dynamicSupply * initialHolders.length - 1);
         }
       }
