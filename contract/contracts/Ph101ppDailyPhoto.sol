@@ -121,7 +121,7 @@ contract Ph101ppDailyPhoto is
         uint periodId
     ) public view returns (string memory) {
         require(periodId < _periods.length, "Period doesn't exist.");
-        
+
         uint lastPeriodTokenId = periodId + 1 < _periodRanges.length
             ? _periodRanges[periodId + 1] - 1
             : lastRangeTokenIdMinted;
@@ -509,7 +509,17 @@ contract Ph101ppDailyPhoto is
         bytes memory data
     ) internal virtual override onlyAllowedOperator(from) {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+    }
 
+    function _afterTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint[] memory ids,
+        uint[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        super._afterTokenTransfer(operator, from, to, ids, amounts, data);
         if (transferEventListenerAddress != address(0)) {
             IPh101ppDailyPhotoListener(transferEventListenerAddress)
                 .Ph101ppDailyPhotoTransferHandler(
