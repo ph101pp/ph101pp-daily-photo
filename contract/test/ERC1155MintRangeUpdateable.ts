@@ -394,7 +394,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await verified.connect(account1).safeTransferFrom(c, account1.address, account3.address, 5, 3, []);
       await c.pause();
 
-      const [{ fromAddresses, toAddresses, ids, amounts, initialize, ...rest }, checksum] = await _getUpdateInitialHolderRangesInputSafe(c, [[account4.address]]);
+      const [{ fromAddresses, toAddresses, ids, amounts, ...rest }, checksum] = await _getUpdateInitialHolderRangesInputSafe(c, [[account4.address]]);
       expect(fromAddresses.length).to.equal(1);
       expect(toAddresses.length).to.equal(1);
       expect(ids.length).to.equal(1);
@@ -403,10 +403,6 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       expect(ids[0]).to.not.include(0);
       expect(ids[0]).to.not.include(1);
       expect(ids[0]).to.not.include(5);
-
-      expect(initialize[0]).to.not.include(0);
-      expect(initialize[0]).to.not.include(1);
-      expect(initialize[0]).to.include(5);
 
       const integrity = await integrityCheck(c).ids([account1.address, account2.address, account3.address, account4.address], [0, 1, 5]);
       const balancesCheck = await integrity.balances();

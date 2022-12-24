@@ -7,7 +7,7 @@ import "./ERC1155MintRangePausable.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -18,7 +18,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         address[] toAddresses;
         uint[][] ids;
         uint[][] amounts;
-        uint[][] initialize;
         address[][] newInitialHolders;
     }
 
@@ -27,7 +26,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         address[] toAddresses;
         uint[][] ids;
         uint[][] amounts;
-        uint[][] initialize;
         address[][] newInitialHolders;
         // privates
         ERC1155MintRangeUpdateable caller;
@@ -127,7 +125,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     address toAddress = newInitialHolders[i];
 
                     for (uint id = fromId; id <= toId; id++) {
-                        // try to initialize from-address if there are already funds
+                        // try to initialize from-address 
+                        // if there are already funds
                         // or if to-address was initialized.
                         if (isBalanceInitialized[toAddress][id] || _balances[id][toAddress] > 0) {
                             _maybeInitializeBalance(fromAddress, id);
@@ -194,7 +193,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     input.toAddresses,
                     input.ids,
                     input.amounts,
-                    input.initialize,
                     input.newInitialHolders,
                     this,
                     _customUpdateInitialHolderRangesChecksum()

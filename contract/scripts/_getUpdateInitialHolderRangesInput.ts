@@ -107,7 +107,6 @@ export async function _getUpdateInitialHolderRangesInput(
     toAddresses,
     ids,
     amounts,
-    initialize,
     newInitialHolders,
   };
 

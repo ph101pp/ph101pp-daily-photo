@@ -305,7 +305,6 @@ library Ph101ppDailyPhotoUtils {
         require(p.fromAddresses.length == p.toAddresses.length, "E:01");
         require(p.fromAddresses.length == p.ids.length, "E:02");
         require(p.fromAddresses.length == p.amounts.length, "E:03");
-        require(p.fromAddresses.length == p.initialize.length, "E:03");
 
         // for each affected token: "transfer" from -> to
         for (uint i = 0; i < p.toAddresses.length; i++) {
@@ -315,7 +314,7 @@ library Ph101ppDailyPhotoUtils {
             require(p.ids[i].length == p.amounts[i].length, "E:07");
 
             uint idId = 0;
-            uint initId = 0;
+            // uint initId = 0;
 
             for (
                 uint tokenId = 0;
@@ -326,7 +325,7 @@ library Ph101ppDailyPhotoUtils {
                 require(p.caller.exists(tokenId) == true, "E:11");
                 // to address is neither initialized nor has a balance
 
-                require(p.caller.balanceOf(to, tokenId) == 0, "E:13");
+                // require(p.caller.balanceOf(to, tokenId) == 0, "E:13");
                 require(!p.caller.isBalanceInitialized(to, tokenId), "E:21");
 
                 // from is in existing initialHolders
@@ -367,49 +366,49 @@ library Ph101ppDailyPhotoUtils {
                     idId++;
                 }
                 // if to address is to be initialized -> from address must be initialized
-                else if (
-                    initId < p.initialize[i].length &&
-                    p.initialize[i][initId] == tokenId
-                ) {
-                    // console.log("inits", tokenId);
+                // else if (
+                //     initId < p.initialize[i].length &&
+                //     p.initialize[i][initId] == tokenId
+                // ) {
+                //     // console.log("inits", tokenId);
 
-                    // Ids must be ordered in accenting order
-                    if (initId != 0) {
-                        require(
-                            p.initialize[i][initId - 1] <
-                                p.initialize[i][initId],
-                            "E:20"
-                        );
-                    }
+                //     // Ids must be ordered in accenting order
+                //     if (initId != 0) {
+                //         require(
+                //             p.initialize[i][initId - 1] <
+                //                 p.initialize[i][initId],
+                //             "E:20"
+                //         );
+                //     }
 
-                    require(
-                        p.caller.isBalanceInitialized(from, tokenId),
-                        "E:21"
-                    );
+                //     require(
+                //         p.caller.isBalanceInitialized(from, tokenId),
+                //         "E:21"
+                //     );
 
-                    // Cant be manually minted
-                    require(p.caller.isManualMint(tokenId) == false, "E:12-2");
+                //     // Cant be manually minted
+                //     require(p.caller.isManualMint(tokenId) == false, "E:12-2");
 
-                    initId++;
-                }
+                //     initId++;
+                // }
                 // else if token is in neither array -> its not initialized and has no balance.
                 // could be manual mint.. either way -> continue
                 else {
                     // console.log("nope", tokenId);
 
-                    uint balance = p.caller.balanceOf(from, tokenId);
+                    // uint balance = p.caller.balanceOf(from, tokenId);
 
-                    if (balance > 0) {
-                        if(!p.caller.isManualMint(tokenId)) {
-                            for(uint m = 0; m<currentInitialHolders.length; m++) {
-                                require(currentInitialHolders[m]==newInitialHolders[m], "E:19");
-                            }
-                        }
-                    }
-                    require(
-                        !p.caller.isBalanceInitialized(from, tokenId),
-                        "E:21"
-                    );
+                    // if (balance > 0) {
+                    //     if(!p.caller.isManualMint(tokenId)) {
+                    //         for(uint m = 0; m<currentInitialHolders.length; m++) {
+                    //             require(currentInitialHolders[m]==newInitialHolders[m], "E:19");
+                    //         }
+                    //     }
+                    // }
+                    // require(
+                    //     !p.caller.isBalanceInitialized(from, tokenId),
+                    //     "E:21"
+                    // );
 
                     // nothing is going to happen to this token;
                     continue;
@@ -438,7 +437,6 @@ library Ph101ppDailyPhotoUtils {
                         p.toAddresses,
                         p.ids,
                         p.amounts,
-                        p.initialize,
                         p.newInitialHolders
                     ),
                     _initialHolders,
