@@ -61,7 +61,8 @@ export async function _getUpdateInitialHolderRangesInput(
       const newHolderIndex = findInRange(currentInitialHoldersRange, i);
       const newHolders = newInitialHolders[newHolderIndex];
 
-      const balances = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
+      const balancesOld = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
+      const balancesNew = await c.balanceOfBatch(newHolders, currentInitialHolders.map(() => i));
       const isManuallyMinted = await c.isManualMint(i);
       if (isManuallyMinted) {
         continue;
@@ -75,28 +76,26 @@ export async function _getUpdateInitialHolderRangesInput(
           continue;
         }
 
-        const balance = balances[a].toNumber();
-        const isBalanceInitialized = await c.isBalanceInitialized(fromAddress, i)
+        const balanceFrom = balancesOld[a].toNumber();
+        const balanceTo = balancesNew[a].toNumber();
+        const isBalanceInitializedFrom = await c.isBalanceInitialized(fromAddress, i)
+        const isBalanceInitializedTo = await c.isBalanceInitialized(toAddress, i)
 
-        if ((balance > 0 || isBalanceInitialized)) {
+        if (
+          (balanceFrom == 0 && !isBalanceInitializedFrom)
+          && (balanceTo == 0 && !isBalanceInitializedTo)
+        ) {
           let addressIndex = fromAddresses.indexOf(fromAddress);
           if (addressIndex < 0) {
             fromAddresses.push(fromAddress);
             toAddresses.push(toAddress);
             addressIndex = fromAddresses.length - 1;
 
-            initialize[addressIndex] = initialize[addressIndex] ?? [];
             ids[addressIndex] = ids[addressIndex] ?? [];
             amounts[addressIndex] = amounts[addressIndex] ?? [];
           }
-
-          if (isBalanceInitialized) {
-            initialize[addressIndex].push(i);
-          }
-          else if (balance > 0) {
-            ids[addressIndex].push(i);
-            amounts[addressIndex].push(balance);
-          }
+          ids[addressIndex].push(i);
+          amounts[addressIndex].push(balanceFrom);
         }
       }
     }
