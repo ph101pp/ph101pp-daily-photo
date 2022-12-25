@@ -44,7 +44,6 @@ export async function _getUpdateInitialHolderRangesInput(
   const toAddresses: string[] = [];
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
-  const initialize: number[][] = [];
   const amounts: number[][] = [];
   const lastTokenId = await c.lastRangeTokenIdMinted();
   const [, currentInitialHoldersRangeBig] = await c.initialHolderRanges();
@@ -81,8 +80,7 @@ export async function _getUpdateInitialHolderRangesInput(
         const isBalanceInitializedTo = await c.isBalanceInitialized(toAddress, i)
 
         if (
-          (balanceFrom == 0 && !isBalanceInitializedFrom)
-          && (balanceTo == 0 && !isBalanceInitializedTo)
+          !isBalanceInitializedFrom && (balanceTo == 0 && !isBalanceInitializedTo)
         ) {
           let addressIndex = fromAddresses.indexOf(fromAddress);
           if (addressIndex < 0) {
@@ -99,7 +97,7 @@ export async function _getUpdateInitialHolderRangesInput(
       }
     }
   }
-  
+
   const input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct = {
     fromAddresses,
     toAddresses,

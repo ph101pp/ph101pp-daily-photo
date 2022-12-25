@@ -910,7 +910,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
   });
 
-  describe.only("Transfer Listener", function () {
+  describe("Transfer Listener", function () {
 
     it("should correcly set transfer listener via setTransferListenerAddress", async function () {
       const { c, pdpl } = await loadFixture(deployFixture);

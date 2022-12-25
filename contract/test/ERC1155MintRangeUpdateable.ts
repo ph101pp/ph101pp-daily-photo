@@ -515,8 +515,8 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await c.pause();
       const newInitialHolders = [ethers.constants.AddressZero, account3.address];
       const newInitialHolders2 = [account1.address, ethers.constants.AddressZero];
-      await expect(_getUpdateInitialHolderRangesInputSafe(c, [newInitialHolders])).to.be.rejectedWith("E:16");
-      await expect(_getUpdateInitialHolderRangesInputSafe(c, [newInitialHolders2])).to.be.rejectedWith("E:16");
+      await expect(_getUpdateInitialHolderRangesInputSafe(c, [newInitialHolders])).to.be.rejected;
+      await expect(_getUpdateInitialHolderRangesInputSafe(c, [newInitialHolders2])).to.be.rejected;
     });
   });
 
@@ -540,7 +540,6 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         const id = mintIds[i]
         await verified.connect(account1).safeTransferFrom(c, account1.address, account3.address, id, 1, []);
         await verified.connect(account1).safeTransferFrom(c, account1.address, account2.address, id, 1, []);
-        await verified.connect(account1).safeTransferFrom(c, account1.address, account3.address, id, 1, []);
         await verified.connect(account1).safeTransferFrom(c, account1.address, account4.address, id, 1, []);
         await verified.connect(account1).safeTransferFrom(c, account1.address, account5.address, id, 1, []);
         await verified.connect(account1).safeTransferFrom(c, account1.address, account6.address, id, 1, []);
@@ -551,8 +550,8 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const transferIds = [4, 6, 8, 14, 16, 18];
       for (let i = 0; i < transferIds.length; i++) {
         const id = transferIds[i];
-        const owner = mintIds.includes(id) ? account1 : id < 10 ? account2 : account4;
-        await verified.connect(owner).safeTransferFrom(c, owner.address, account5.address, id, 1, []);
+        const owner = mintIds.includes(id) ? account1 : id < 10 ? account2 : account5;
+        await verified.connect(owner).safeTransferFrom(c, owner.address, account4.address, id, 1, []);
         await verified.connect(owner).safeTransferFrom(c, owner.address, account6.address, id, 1, []);
         await verified.connect(owner).safeTransferFrom(c, owner.address, account7.address, id, 1, []);
         await verified.connect(owner).safeTransferFrom(c, owner.address, account8.address, id, 1, []);
@@ -597,6 +596,7 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = fixture;
 
       const integrity = await setupRandomContractStateUnstructured(fixture);
+
       const supplyCheck = await integrity.supplies()
       const balancesCheck = await integrity.balances()
 
@@ -612,6 +612,11 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
           [account2.address, account3.address], [account4.address, account5.address]
         ]
       }
+      await c.pause();
+
+      const noopInput = await _getUpdateInitialHolderRangesInput(c, [
+        [account2.address, account3.address], [account4.address, account5.address]
+      ]);
 
       const input1 = {
         ...baseNoopInput,
@@ -629,42 +634,49 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         ...baseNoopInput,
         newInitialHolders: [[account7.address, account8.address], [account7.address, account8.address], [account7.address, account8.address]]
       };
-      const input5 = {
-        ...baseNoopInput,
-        newInitialHolders: [[account5.address, account6.address], [account5.address, account6.address]]
-      };
-      const input6 = {
-        ...baseNoopInput,
-        newInitialHolders: [[account7.address, account7.address], [account8.address, account8.address]]
-      };
-      const input7 = {
-        ...baseNoopInput,
-        newInitialHolders: [[account7.address, account8.address], [account7.address, account8.address]]
-      };
-      await c.pause();
+      // const input5 =await _getUpdateInitialHolderRangesInput(c, [[account5.address, account6.address], [account5.address, account6.address]]);
 
-      await expect(c.updateInitialHolderRanges(baseNoopInput)).to.not.be.rejected;
+      // const input5 = {
+      //   ...baseNoopInput,
+      //   newInitialHolders: [[account5.address, account6.address], [account5.address, account6.address]]
+      // };
+      const input6 = await _getUpdateInitialHolderRangesInput(c, [[account7.address, account7.address], [account8.address, account8.address]]);
+
+      // const input6 = {
+      //   ...baseNoopInput,
+      //   newInitialHolders: [[account7.address, account7.address], [account8.address, account8.address]]
+      // };
+      // const input7 = {
+      //   ...baseNoopInput,
+      //   newInitialHolders: [[account7.address, account8.address], [account7.address, account8.address]]
+      // };
+      const input7 = await _getUpdateInitialHolderRangesInput(c, [[account7.address, account8.address], [account7.address, account8.address]]);
+
+
+      await expect(verified.updateInitialHolderRanges(c, noopInput)).to.not.be.rejected;
       await expect(c.updateInitialHolderRanges(input1)).to.be.rejectedWith("E:01"); // range length mismatch
       await expect(c.updateInitialHolderRanges(input4)).to.be.rejectedWith("E:01"); // range length mismatch
       await expect(c.updateInitialHolderRanges(input3)).to.be.rejectedWith("E:02"); // holders length mismatch
       await expect(c.updateInitialHolderRanges(input2)).to.be.rejectedWith("E:04"); // no address(0)
       await expect(c.updateInitialHolderRanges(input6)).to.be.rejectedWith("E:06"); // only unique initial holders
 
-      await expect(c.updateInitialHolderRanges(input7)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, input7)).to.not.be.rejected;
 
       await supplyCheck.expectEqual();
 
-      await expect(c.updateInitialHolderRanges(input5)).to.not.be.rejected;
+      const input5 = await _getUpdateInitialHolderRangesInput(c, [[account5.address, account6.address], [account5.address, account6.address]]);
+
+      await expect(verified.updateInitialHolderRanges(c, input5)).to.not.be.rejected;
 
       await supplyCheck.expectEqual();
 
-      await expect(c.updateInitialHolderRanges(baseNoopInput)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, baseNoopInput)).to.not.be.rejected;
 
       // console.log(await balancesCheck.getBalances())
       // console.log(await supplyCheck.getSupplies())
 
       await supplyCheck.expectEqual();
-      // await balancesCheck.expectEqual()
+      await balancesCheck.expectEqual()
     })
 
     it("should correctly transfer initialHolders when there were transfers", async function () {
@@ -693,21 +705,20 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         fromAddresses: [account1.address, account2.address],
         toAddresses: [account3.address, account4.address],
         ids: [
-          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+          [1, 3, 5, 7, 9],
+          [1, 3, 5, 7, 9]
         ],
         amounts: [
-          [9999, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-          [9999, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [1, 3, 5, 7, 9],
+          [1, 3, 5, 7, 9],
         ],
-        initialize: [[], []],
         newInitialHolders: [
           [account3.address, account4.address]
         ]
       }
 
       await c.pause();
-      await expect(c.updateInitialHolderRanges(transferAllInput)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, transferAllInput)).to.not.be.rejected;
 
       const expectedDelta = {
         [account1.address]: {
@@ -782,36 +793,19 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
         fromAddresses: [account1.address, account2.address],
         toAddresses: [account3.address, account4.address],
         ids: [
-          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        ],
-        amounts: [
-          [10, 10, 10, 10, 10, 6, 7, 8, 9, 10],
-          [10, 10, 10, 10, 10, 6, 7, 8, 9, 10]
-        ],
-        initialize: [[], []],
-        newInitialHolders: [
-          [account3.address, account4.address]
-        ]
-      }
-      const transferAllInput2 = {
-        fromAddresses: [account1.address, account2.address],
-        toAddresses: [account3.address, account4.address],
-        ids: [
           [5, 6, 7, 8, 9],
           [5, 6, 7, 8, 9],
         ],
         amounts: [
-          [6, 7, 8, 9, 10],
-          [6, 7, 8, 9, 10]
+          [5, 6, 7, 8, 9],
+          [5, 6, 7, 8, 9]
         ],
-        initialize: [[], []],
         newInitialHolders: [
           [account3.address, account4.address]
         ]
       }
       await c.pause();
-      await expect(c.updateInitialHolderRanges(transferAllInput)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, transferAllInput)).to.not.be.rejected;
 
       const expectedDelta = {
         [account1.address]: {
@@ -867,9 +861,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await supplyCheck.expectEqual();
       await balancesCheck.expectDelta(expectedDelta);
 
+      const transferAllInput2 = await _getUpdateInitialHolderRangesInput(c, [
+        [account3.address, account4.address]
+      ]);
+
       // running updates on the same range multiple times should have no effect
-      await expect(c.updateInitialHolderRanges(transferAllInput2)).to.not.be.rejected;
-      await expect(c.updateInitialHolderRanges(transferAllInput2)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, transferAllInput2)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, transferAllInput2)).to.not.be.rejected;
 
       await supplyCheck.expectEqual();
       await balancesCheck.expectDelta(expectedDelta);
@@ -884,40 +882,28 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const supplyCheck = await integrity.supplies()
       const balancesCheck = await integrity.balances()
 
-      // console.log(balancesCheck.balances);
-      // console.log(supplyCheck.supplies);
-      const baseNoopInput = {
-        fromAddresses: [],
-        toAddresses: [],
-        ids: [],
-        amounts: [],
-        initialize: [],
-        newInitialHolders: [
-          [account2.address, account3.address], [account4.address, account5.address]
-        ]
-      }
-      const swapped = {
-        fromAddresses: [],
-        toAddresses: [],
-        ids: [],
-        amounts: [],
-        initialize: [],
-        newInitialHolders: [
-          [account4.address, account5.address], [account2.address, account3.address]
-        ]
-      }
+      const noop = await _getUpdateInitialHolderRangesInput(c, [
+        [account2.address, account3.address], [account4.address, account5.address]
+      ]);
+      const swap = await _getUpdateInitialHolderRangesInput(c, [
+        [account4.address, account5.address], [account2.address, account3.address]
+      ]);
+
       await c.pause();
 
-      await expect(c.updateInitialHolderRanges(baseNoopInput)).to.not.be.rejected;
-
-      await supplyCheck.expectEqual();
-      await balancesCheck.expectEqual()
-
-      await expect(c.updateInitialHolderRanges(swapped)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, noop)).to.not.be.rejected;
 
       await supplyCheck.expectEqual();
 
-      await expect(c.updateInitialHolderRanges(baseNoopInput)).to.not.be.rejected;
+      await expect(verified.updateInitialHolderRanges(c, swap)).to.not.be.rejected;
+
+      await supplyCheck.expectEqual();
+      await expect(balancesCheck.expectEqual()).to.throw;
+
+      const swapBack = await _getUpdateInitialHolderRangesInput(c, [
+        [account2.address, account3.address], [account4.address, account5.address]
+      ]);
+      await expect(verified.updateInitialHolderRanges(c, swapBack)).to.not.be.rejected;
 
       await supplyCheck.expectEqual();
       await balancesCheck.expectEqual()
