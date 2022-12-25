@@ -7,7 +7,7 @@ import "./ERC1155MintRangePausable.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -94,42 +94,35 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 currentInitialHolders.length == newInitialHolders.length,
                 "E:02"
             );
-            bool isChanged = false;
+
+            uint fromId = _initialHolderRanges[k];
+            uint toId = k + 1 < _initialHolderRanges.length
+                ? _initialHolderRanges[k + 1] - 1
+                : lastRangeTokenIdMinted;
 
             for (uint i = 0; i < newInitialHolders.length; i++) {
-                address newInitialHolder = newInitialHolders[i];
-                if (currentInitialHolders[i] != newInitialHolder) {
-                    require(!isLocked, "E:03");
-                    require(newInitialHolder != address(0), "E:04");
-                    for (uint j = 0; j < newInitialHolders.length; j++) {
-                        if (j != i) {
-                            require(
-                                newInitialHolder != newInitialHolders[j],
-                                "E:06"
-                            );
-                        }
-                    }
-                    isChanged = true;
-                    _initialHoldersAddressMap[newInitialHolder] = true;
-                }
-            }
+                address fromAddress = currentInitialHolders[i];
+                address toAddress = newInitialHolders[i];
 
-            if (isChanged) {
-                uint fromId = _initialHolderRanges[k];
-                uint toId = k + 1 < _initialHolderRanges.length
-                    ? _initialHolderRanges[k + 1] - 1
-                    : lastRangeTokenIdMinted;
-                for (uint i = 0; i < newInitialHolders.length; i++) {
-                    address fromAddress = currentInitialHolders[i];
-                    address toAddress = newInitialHolders[i];
+                if (fromAddress != toAddress) {
+                    require(!isLocked, "E:03");
+                    require(toAddress != address(0), "E:04");
+                    // initialHolders must be unique per tokenId
+                    for (uint j = i + 1; j < newInitialHolders.length; j++) {
+                        require(toAddress != newInitialHolders[j], "E:06");
+                    }
+                    _initialHoldersAddressMap[toAddress] = true;
 
                     for (uint id = fromId; id <= toId; id++) {
-                        // try to initialize from-address 
-                        // if there are already funds
+                        // try to initialize from-address
+                        // if there are already funds in to-address
                         // or if to-address was initialized.
-                        if (isBalanceInitialized[toAddress][id] || _balances[id][toAddress] > 0) {
+                        if (
+                            isBalanceInitialized[toAddress][id] ||
+                            _balances[id][toAddress] > 0
+                        ) {
                             _maybeInitializeBalance(fromAddress, id);
-                        } 
+                        }
                         // initialize to-balance if from-address is initialized
                         if (isBalanceInitialized[fromAddress][id]) {
                             isBalanceInitialized[toAddress][id] = true;

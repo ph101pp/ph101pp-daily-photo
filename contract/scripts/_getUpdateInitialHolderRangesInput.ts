@@ -67,8 +67,7 @@ export async function _getUpdateInitialHolderRangesInput(
       if (isManuallyMinted) {
         continue;
       }
-
-      for (let a = 0; a < currentInitialHolders.length; a++) {
+      for (let a = 0; a < newHolders.length; a++) {
         const fromAddress = currentInitialHolders[a];
         const toAddress = newHolders[a];
 
