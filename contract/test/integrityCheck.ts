@@ -9,7 +9,7 @@ type CheckTransfers = (fromAddresses: string[], toAddresses: string[], ids: numb
 type CheckTransferSingle = (fromAddress: string, toAddress: string, id: number, amount: number) => Promise<TransferCheck>
 type CheckTransferBatch = (fromAddresses: string, toAddresses: string, ids: number[], amounts: number[]) => Promise<TransferCheck>
 type CheckTransfersMintRange = (initialHolders: string[], input: ERC1155MintRange.MintRangeInputStructOutput) => Promise<TransferCheck>
-type CheckTransfersUpdateInitialHolderRanges = (input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct) => Promise<TransferCheck>
+type CheckTransfersUpdateInitialHolders = (input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct) => Promise<TransferCheck>
 
 type IntegrityChecks = {
   range: CheckRange,
@@ -18,7 +18,7 @@ type IntegrityChecks = {
   transferSingle: CheckTransferSingle
   transferBatch: CheckTransferBatch
   transfersMintRange: CheckTransfersMintRange
-  transfersUpdateInitialHolderRanges: CheckTransfersUpdateInitialHolderRanges
+  transfersUpdateInitialHolders: CheckTransfersUpdateInitialHolders
 }
 
 type BalancesRangeResults = { [address: string]: { [id: string]: number } };
@@ -82,7 +82,7 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
     return checkTransfers(c)(from, initialHolders, new Array(amounts.length).fill(ids), amounts);
   }
 
-  const transfersUpdateInitialHolderRanges = (c: Contracts): CheckTransfersUpdateInitialHolderRanges => (input) => {
+  const transfersUpdateInitialHolders = (c: Contracts): CheckTransfersUpdateInitialHolders => (input) => {
     const ids = input.ids.map(BNs => BNs.map(bn => BigNumber.from(bn).toNumber()));
     const amounts = input.amounts.map(BNs => BNs.map(bn => BigNumber.from(bn).toNumber()));
     return checkTransfers(c)(input.fromAddresses as string[], input.toAddresses as string[], ids, amounts);
@@ -102,7 +102,7 @@ export default function integrityCheck(c: Contracts): IntegrityChecks {
     transferSingle: transferSingle(c),
     transferBatch: transferBatch(c),
     transfersMintRange: transfersMintRange(c),
-    transfersUpdateInitialHolderRanges: transfersUpdateInitialHolderRanges(c),
+    transfersUpdateInitialHolders: transfersUpdateInitialHolders(c),
   }
 }
 

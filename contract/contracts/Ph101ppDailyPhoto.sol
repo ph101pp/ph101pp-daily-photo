@@ -327,23 +327,23 @@ contract Ph101ppDailyPhoto is
     // wallets without having to transfer them through ERC1155.
     // This method doesnt affect ERC1155.balances, so tokens that
     // have been sold or transfered before can't ever be affected by this method.
-    function updateInitialHolderRanges(
-        UpdateInitialHolderRangesInput memory input,
+    function updateInitialHolders(
+        UpdateInitialHoldersInput memory input,
         bytes32 checksum
     ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
-        _updateInitialHolderRangesSafe(input, checksum);
+        _updateInitialHoldersSafe(input, checksum);
     }
 
     // Defensive coding: Lock initial holders up to tokenId
-    // so they cant be updated via updateInitialHolderRanges.
+    // so they cant be updated via updateInitialHolders.
     function setLockInitialHoldersUpTo(
         uint256 tokenId
     ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
         _setLockInitialHoldersUpTo(tokenId);
     }
 
-    // Defensive coding: Permanently disable updateInitialHolderRanges.
+    // Defensive coding: Permanently disable updateInitialHolders.
     function permanentlyDisableInitialHoldersRangeUpdate()
         public
         whenNotPaused

@@ -48,21 +48,21 @@ const verified = {
   //   await transfers.expectSuccess(tx, { expectSupplyChange: true });
   //   return tx;
   // },
-  updateInitialHolderRanges: async (c: TestERC1155MintRangeUpdateable, input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct) => {
-    const transfers = await integrityCheck(c).transfersUpdateInitialHolderRanges(input);
-    const tx = await c.updateInitialHolderRanges(input);
+  updateInitialHolders: async (c: TestERC1155MintRangeUpdateable, input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct) => {
+    const transfers = await integrityCheck(c).transfersUpdateInitialHolders(input);
+    const tx = await c.updateInitialHolders(input);
     await transfers.expectSuccess(tx, { expectSupplyChange: false });
     return tx;
   },
-  updateInitialHolderRangesSafe: async (c: TestERC1155MintRangeUpdateable, input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct, checksum:string) => {
-    const transfers = await integrityCheck(c).transfersUpdateInitialHolderRanges(input);
-    const tx = await c.updateInitialHolderRangesSafe(input, checksum);
+  updateInitialHoldersSafe: async (c: TestERC1155MintRangeUpdateable, input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct, checksum:string) => {
+    const transfers = await integrityCheck(c).transfersUpdateInitialHolders(input);
+    const tx = await c.updateInitialHoldersSafe(input, checksum);
     await transfers.expectSuccess(tx, { expectSupplyChange: false });
     return tx;
   },
-  pdpUpdateInitialHolderRanges: async (c: Ph101ppDailyPhoto, input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct, checksum:string) => {
-    const transfers = await integrityCheck(c).transfersUpdateInitialHolderRanges(input);
-    const tx = await c.updateInitialHolderRanges(input, checksum);
+  pdpUpdateInitialHolders: async (c: Ph101ppDailyPhoto, input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct, checksum:string) => {
+    const transfers = await integrityCheck(c).transfersUpdateInitialHolders(input);
+    const tx = await c.updateInitialHolders(input, checksum);
     await transfers.expectSuccess(tx, { expectSupplyChange: false });
     return tx;  
   },

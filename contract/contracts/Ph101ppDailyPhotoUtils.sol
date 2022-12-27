@@ -261,8 +261,8 @@ library Ph101ppDailyPhotoUtils {
     /**
      * @dev Verify and hash input updateInitialHolderRange method.
      */
-    function verifyUpdateInitialHolderRangesInput(
-        ERC1155MintRangeUpdateable.VerifyUpdateInitialHolderRangesInput memory p
+    function verifyUpdateInitialHoldersInput(
+        ERC1155MintRangeUpdateable.VerifyUpdateInitialHoldersInput memory p
     ) external view returns (bytes32) {
         // Verify New Initial Holders Range: //////////////////////////////////
         (
@@ -432,7 +432,7 @@ library Ph101ppDailyPhotoUtils {
         return
             keccak256(
                 abi.encode(
-                    ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInput(
+                    ERC1155MintRangeUpdateable.UpdateInitialHoldersInput(
                         p.fromAddresses,
                         p.toAddresses,
                         p.ids,

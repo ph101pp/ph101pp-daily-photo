@@ -1,7 +1,7 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { ethers } from "hardhat";
 import { ContractTransaction } from "ethers";
-import _getUpdateInitialHolderRangesInputSafe, { _getUpdateInitialHolderRangesInput } from "../scripts/_getUpdateInitialHolderRangesInput";
+import _getUpdateInitialHoldersInputSafe, { _getUpdateInitialHoldersInput } from "../scripts/_getUpdateInitialHoldersInput";
 import integrityCheck from "./integrityCheck";
 
 const interations = 100;
@@ -47,7 +47,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     return { erc, c1, c2, pdp, owner, treasury, vault, mutableUri, immutableUri, account1, account2, account3, account4, account5, account6 };
   }
 
-  it("updateInitialHolderRanges() vs transferBatch()", async function () {
+  it("updateInitialHolders() vs transferBatch()", async function () {
     const numberOfTokens = 100;
     const { c2, account1, account2, account3, account4, account5, account6 } = await loadFixture(deployFixture);
     await c2.setInitialHolders([account1.address, account2.address]);
@@ -55,10 +55,10 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     const input = await c2.getMintRangeInput(numberOfTokens);
     await c2.mintRangeSafe(...input);
 
-    const inputUpdate = await _getUpdateInitialHolderRangesInput(c2, [[account3.address, account4.address]]);
+    const inputUpdate = await _getUpdateInitialHoldersInput(c2, [[account3.address, account4.address]]);
 
     await c2.pause();
-    const tx = await c2.updateInitialHolderRanges(inputUpdate);
+    const tx = await c2.updateInitialHolders(inputUpdate);
 
     const receipt = await tx.wait();
     console.log(receipt.cumulativeGasUsed.toNumber());

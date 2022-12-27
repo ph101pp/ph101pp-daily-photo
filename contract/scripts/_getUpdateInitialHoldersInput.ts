@@ -10,12 +10,12 @@ function findInRange(range: number[], needle: number) {
   return 0;
 }
 
-export default async function _getUpdateInitialHolderRangesInputSafe(
+export default async function _getUpdateInitialHoldersInputSafe(
   c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
   newInitialHolders: string[][],
   newInitialHolderRanges: number[]
 ): Promise<[
-  ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct,
+  ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct,
   string
 ]> {
   const [currentInitialHolders] = await c.initialHolderRanges();
@@ -28,20 +28,20 @@ export default async function _getUpdateInitialHolderRangesInputSafe(
       throw Error("Error: newInitialHolders.length does not match");
     }
   }
-  const input = await _getUpdateInitialHolderRangesInput(c, newInitialHolders, newInitialHolderRanges);
+  const input = await _getUpdateInitialHoldersInput(c, newInitialHolders, newInitialHolderRanges);
 
-  const checksum = await c.verifyUpdateInitialHolderRangesInput(input);
+  const checksum = await c.verifyUpdateInitialHoldersInput(input);
   return [
     input,
     checksum
   ]
 }
 
-export async function _getUpdateInitialHolderRangesInput(
+export async function _getUpdateInitialHoldersInput(
   c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
   newInitialHolders: string[][],
   newInitialHolderRanges: number[]
-): Promise<ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct> {
+): Promise<ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct> {
   const toAddresses: string[] = [];
   const fromAddresses: string[] = [];
   const ids: number[][] = [];
@@ -99,7 +99,7 @@ export async function _getUpdateInitialHolderRangesInput(
     }
   }
 
-  const input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct = {
+  const input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct = {
     fromAddresses,
     toAddresses,
     ids,
