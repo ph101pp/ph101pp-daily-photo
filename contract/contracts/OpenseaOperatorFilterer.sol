@@ -17,7 +17,7 @@ abstract contract OpenseaOperatorFilterer {
     bool public isOperatorFilterRegistryAddressPermanentlyFrozen;
 
     // Default: OpenSea OperatorFilterRegistry contract
-    address public operatorFilterRegistry = 
+    address public operatorFilterRegistryAddress = 
         0x000000000000AAeB6D7670E522A718067333cd4E;
 
     // required as authority to make updates to OperatorFilterRegistry for this contract.
@@ -26,14 +26,14 @@ abstract contract OpenseaOperatorFilterer {
     // Enables updating registry contract address
     // (requires manual registering / unregistring with Registry)
     // set to address(0) to disable operator filtering
-    function _setOperatorFilterRegistry(
-        address _operatorFilterRegistry
+    function _setOperatorFilterRegistryAddress(
+        address _operatorFilterRegistryAddress
     ) internal virtual {
         require(
             !isOperatorFilterRegistryAddressPermanentlyFrozen,
             "O:01"
         );
-        operatorFilterRegistry = _operatorFilterRegistry;
+        operatorFilterRegistryAddress = _operatorFilterRegistryAddress;
     }
 
     // Permanently freeze filter registry address.
@@ -43,7 +43,7 @@ abstract contract OpenseaOperatorFilterer {
 
     function _isOperatorAllowed(address operator) private view {
         if (
-            !IOperatorFilterRegistry(operatorFilterRegistry).isOperatorAllowed(
+            !IOperatorFilterRegistry(operatorFilterRegistryAddress).isOperatorAllowed(
                 address(this),
                 operator
             )
@@ -56,7 +56,7 @@ abstract contract OpenseaOperatorFilterer {
         // Allow spending tokens from addresses with balance
         // Note that this still allows listings and marketplaces with escrow to transfer tokens if transferred
         // from an EOA.
-        if (from != msg.sender && operatorFilterRegistry != address(0)) {
+        if (from != msg.sender && operatorFilterRegistryAddress != address(0)) {
             _isOperatorAllowed(msg.sender);
         }
         _;

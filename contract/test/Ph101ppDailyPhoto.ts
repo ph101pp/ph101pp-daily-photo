@@ -783,7 +783,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setOperatorFilterRegistryAddress(account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setInitialSupply([1, 2])).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setOwner(account1.address)).to.be.rejectedWith("AccessControl");
@@ -810,7 +810,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
 
       await expect(c.connect(account1).setOwner(account1.address)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setOperatorFilterRegistry(account1.address)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setOperatorFilterRegistryAddress(account1.address)).to.not.be.rejectedWith("AccessControl");
 
       await c.grantRole(await c.PHOTO_MINTER_ROLE(), account2.address);
       await c.setInitialSupply([1, 4]);
@@ -843,7 +843,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.resetTokenRoyalty(1)).to.be.rejectedWith("paused");
 
       await expect(c.setOwner(account1.address)).to.be.rejectedWith("paused");
-      await expect(c.setOperatorFilterRegistry(account1.address)).to.be.rejectedWith("paused");
+      await expect(c.setOperatorFilterRegistryAddress(account1.address)).to.be.rejectedWith("paused");
       await expect(c.setApprovalForAll(account1.address, true)).to.be.rejectedWith("paused");
 
       await expect(c.setInitialSupply([1, 2])).to.be.rejectedWith("paused");
@@ -869,7 +869,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should correctly register contract with Operator Filter Registry and subscribe to opensea", async function () {
       const { c, ofr } = await loadFixture(deployFixture);
-      expect(await c.operatorFilterRegistry()).to.equal("0x000000000000AAeB6D7670E522A718067333cd4E");
+      expect(await c.operatorFilterRegistryAddress()).to.equal("0x000000000000AAeB6D7670E522A718067333cd4E");
       await ofr.registerAndSubscribe(c.address, "0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
       expect(await ofr.isRegistered(c.address)).to.be.true;
       expect(await ofr.subscriptionOf(c.address)).to.equal("0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6");
@@ -898,16 +898,16 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.be.reverted;
 
       // disable operator filter by setting operator filter to address();
-      await c.setOperatorFilterRegistry(ethers.constants.AddressZero);
+      await c.setOperatorFilterRegistryAddress(ethers.constants.AddressZero);
       await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
-      await c.setOperatorFilterRegistry("0x000000000000AAeB6D7670E522A718067333cd4E");
+      await c.setOperatorFilterRegistryAddress("0x000000000000AAeB6D7670E522A718067333cd4E");
       await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.be.reverted;
 
       // permanently disable operator filter
-      await c.setOperatorFilterRegistry(ethers.constants.AddressZero);
+      await c.setOperatorFilterRegistryAddress(ethers.constants.AddressZero);
       await c.permanentlyFreezeOperatorFilterRegistryAddress();
       await expect(verified.connect(account1).safeTransferFrom(c, treasury.address, account2.address, 0, 1, [])).to.not.be.reverted;
-      await expect(c.setOperatorFilterRegistry(ethers.constants.AddressZero)).to.be.revertedWith("O:01");
+      await expect(c.setOperatorFilterRegistryAddress(ethers.constants.AddressZero)).to.be.revertedWith("O:01");
     });
   });
 
@@ -932,7 +932,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.setTransferEventListenerAddress(account1.address)).to.be.reverted; 
 
     });
-
 
     it("should emit Ph101ppDailyPhotoTransferReceived from Listener on transfer", async function () {
       const { c, pdpl, treasury, account1 } = await loadFixture(deployFixture);

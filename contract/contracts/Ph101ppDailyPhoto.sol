@@ -426,10 +426,10 @@ contract Ph101ppDailyPhoto is
 
     // Update address to OperatorFilterRegistry contract.
     // Set to address(0) to disable registry checks.
-    function setOperatorFilterRegistry(
-        address _operatorFilterRegistry
+    function setOperatorFilterRegistryAddress(
+        address _operatorFilterRegistryAddress
     ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-        _setOperatorFilterRegistry(_operatorFilterRegistry);
+        _setOperatorFilterRegistryAddress(_operatorFilterRegistryAddress);
     }
 
     // Defensive Coding: Permanently freeze operator filter registry address
