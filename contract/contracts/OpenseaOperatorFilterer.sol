@@ -17,7 +17,7 @@ abstract contract OpenseaOperatorFilterer {
     bool public isOperatorFilterRegistryAddressPermanentlyFrozen;
 
     // Default: OpenSea OperatorFilterRegistry contract
-    address public operatorFilterRegistry =
+    address public operatorFilterRegistry = 
         0x000000000000AAeB6D7670E522A718067333cd4E;
 
     // required as authority to make updates to OperatorFilterRegistry for this contract.
@@ -31,7 +31,7 @@ abstract contract OpenseaOperatorFilterer {
     ) internal virtual {
         require(
             !isOperatorFilterRegistryAddressPermanentlyFrozen,
-            "Permanently frozen"
+            "O:01"
         );
         operatorFilterRegistry = _operatorFilterRegistry;
     }

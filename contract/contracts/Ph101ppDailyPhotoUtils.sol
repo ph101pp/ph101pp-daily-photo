@@ -442,8 +442,7 @@ library Ph101ppDailyPhotoUtils {
                     ),
                     _initialHolders,
                     _initialHolderRanges,
-                    p.caller.paused(),
-                    p.customUpdateInitialHolderRangesChecksum
+                    p.caller.paused()
                 )
             );
     }

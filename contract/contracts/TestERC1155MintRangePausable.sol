@@ -3,7 +3,7 @@ pragma solidity ^0.8.12;
 
 import "./ERC1155MintRangePausable.sol";
 
-contract TestERC1155MintRangePausable is ERC1155MintRangePausable {
+contract TestERC1155MintRangePausable is ERC1155MintRangePausable{
     constructor(
         address[] memory initialHolders
     ) ERC1155_("") ERC1155MintRange(initialHolders) {}
@@ -29,17 +29,12 @@ contract TestERC1155MintRangePausable is ERC1155MintRangePausable {
         _setInitialHolders(addresses);
     }
 
-    function mintRange(
-        MintRangeInput memory input
-    ) public virtual {
-        _mintRange(input);
-    }
 
-    function mintRangeSafe(
+    function mintRange(
         MintRangeInput memory input,
         bytes32 checksum
     ) public virtual {
-        _mintRangeSafe(input, checksum);
+        _mintRange(input, checksum);
     }
 
     function pause() public {

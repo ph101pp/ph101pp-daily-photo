@@ -32,22 +32,22 @@ const verified = {
       return tx;
     }
   }),
-  mintRange: async (c: Contracts, input: ERC1155MintRange.MintRangeInputStructOutput) => {
+  mintRange: async (c: Contracts, input: ERC1155MintRange.MintRangeInputStructOutput, checksum: string) => {
     const lastIndex = await c.lastRangeTokenIdMinted();
     const initialHolders = await c.initialHolders(lastIndex.toNumber()+1);
     const transfers = await integrityCheck(c).transfersMintRange(initialHolders, input);
-    const tx = await c.mintRange(input);
+    const tx = await c.mintRange(input, checksum);
     await transfers.expectSuccess(tx, { expectSupplyChange: true });
     return tx;
   },
-  mintRangeSafe: async (c: Contracts, input: ERC1155MintRange.MintRangeInputStructOutput, checksum: string) => {
-    const lastIndex = await c.lastRangeTokenIdMinted();
-    const initialHolders = await c.initialHolders(lastIndex.toNumber()+1);
-    const transfers = await integrityCheck(c).transfersMintRange(initialHolders, input);
-    const tx = await c.mintRangeSafe(input, checksum);
-    await transfers.expectSuccess(tx, { expectSupplyChange: true });
-    return tx;
-  },
+  // mintRangeSafe: async (c: Contracts, input: ERC1155MintRange.MintRangeInputStructOutput, checksum: string) => {
+  //   const lastIndex = await c.lastRangeTokenIdMinted();
+  //   const initialHolders = await c.initialHolders(lastIndex.toNumber()+1);
+  //   const transfers = await integrityCheck(c).transfersMintRange(initialHolders, input);
+  //   const tx = await c.mintRangeSafe(input, checksum);
+  //   await transfers.expectSuccess(tx, { expectSupplyChange: true });
+  //   return tx;
+  // },
   updateInitialHolderRanges: async (c: TestERC1155MintRangeUpdateable, input: ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct) => {
     const transfers = await integrityCheck(c).transfersUpdateInitialHolderRanges(input);
     const tx = await c.updateInitialHolderRanges(input);

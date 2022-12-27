@@ -116,45 +116,22 @@ contract Ph101ppDailyPhoto is
         return string.concat(base, tokenSlugFromTokenId(tokenId));
     }
 
-    function periodUri(
-        uint tokenId,
-        uint periodId
-    ) public view returns (string memory) {
-        require(periodId < _periods.length, "Period doesn't exist.");
-
-        uint lastPeriodTokenId = periodId + 1 < _periodRanges.length
-            ? _periodRanges[periodId + 1] - 1
-            : lastRangeTokenIdMinted;
-
-        require(tokenId <= lastPeriodTokenId, "Token did not exist in period.");
-
-        uint permanentUriIndex = _findLowerBound(
-            _permanentUriRanges,
-            lastPeriodTokenId
-        );
-
-        return
-            string.concat(
-                _permanentUris[permanentUriIndex],
-                tokenSlugFromTokenId(tokenId)
-            );
-    }
-
     // Returns all histoical uris that include tokenId
-    function uriHistory(uint tokenId) public view returns (string[] memory) {
+    function uriHistory(uint tokenId) public view returns (string[][] memory) {
         if (tokenId > lastRangeTokenIdWithPermanentUri) {
-            return new string[](0);
+            return new string[][](0);
         }
         uint permanentUriIndex = _findLowerBound(_permanentUriRanges, tokenId);
         string memory slug = tokenSlugFromTokenId(tokenId);
-        string[] memory history = new string[](
+        string[][] memory history = new string[][](
             _permanentUris.length - permanentUriIndex
         );
         for (uint i = permanentUriIndex; i < _permanentUris.length; i++) {
-            history[i - permanentUriIndex] = string.concat(
-                _permanentUris[i],
-                slug
-            );
+            uint periodIndex = _findLowerBound(_periodRanges, _permanentUriRanges[permanentUriIndex]);
+            string[] memory item = new string[](2);
+            item[0] = string.concat(_permanentUris[i], slug);
+            item[1] = _periods[periodIndex];
+            history[i - permanentUriIndex] = item;
         }
         return history;
     }
@@ -179,14 +156,10 @@ contract Ph101ppDailyPhoto is
         return (_permanentUris, _permanentUriRanges);
     }
 
-    // Returns current Period.
-    function period() public view returns (string memory) {
-        return _periods[_periods.length - 1];
-    }
-
-    // // Returns period by id.
-    // function periodName(uint periodId) public view returns (string memory) {
-    //     return _periods[periodId];
+    // Returns Period when token was minted
+    // function period(uint tokenId) public view returns (string memory) {
+    //     uint periodIndex = _findLowerBound(_periodRanges, tokenId);
+    //     return _periods[periodIndex];
     // }
 
     // Returns all period ranges.
@@ -216,15 +189,13 @@ contract Ph101ppDailyPhoto is
 
     // Updates latest permanent base Uri.
     // And begins a new Period
-    function setPermanentBaseUriUpTo(
-        string memory newUri,
-        uint validUpToTokenId,
+    function setPeriod(
+        uint tokenId,
         string memory newPeriodName
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
-        uint periodRangeStart = lastRangeTokenIdWithPermanentUri + 1;
-        setPermanentBaseUriUpTo(newUri, validUpToTokenId);
+        require(tokenId <= lastRangeTokenIdMinted, "E:18");
         _periods.push(newPeriodName);
-        _periodRanges.push(periodRangeStart);
+        _periodRanges.push(tokenId);
     }
 
     // Update proxy base Uri that is used for
@@ -278,18 +249,18 @@ contract Ph101ppDailyPhoto is
         MintRangeInput memory input,
         bytes32 checksum
     ) public onlyRole(PHOTO_MINTER_ROLE) {
-        _mintRangeSafe(input, checksum);
+        _mintRange(input, checksum);
     }
 
     // ensures MintRangeInput get invalidated when initial supply changes
-    function _customMintRangeChecksum()
-        internal
-        view
-        override
-        returns (bytes32)
-    {
-        return keccak256(abi.encode(_initialSupplies));
-    }
+    // function _customMintRangeChecksum()
+    //     internal
+    //     view
+    //     override
+    //     returns (bytes32)
+    // {
+    //     return keccak256(abi.encode(_initialSupplies));
+    // }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Initial Supply

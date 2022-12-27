@@ -7,7 +7,7 @@ import "./ERC1155MintRangePausable.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -31,7 +31,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         uint[] newInitialHolderRanges;
         // privates
         ERC1155MintRangeUpdateable caller;
-        bytes32 customUpdateInitialHolderRangesChecksum;
     }
 
     uint256 public lastRangeTokenIdWithLockedInitialHolders;
@@ -43,54 +42,14 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function _setLockInitialHoldersUpTo(
         uint256 tokenId
     ) internal virtual whenNotPaused {
-        require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "Locked.");
-        require(isZeroMinted && tokenId <= lastRangeTokenIdMinted, "Unminted.");
+        // Token must not be smaller than last locked token
+        require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "E:13");
+        // token must be minted
+        require(isZeroMinted && tokenId <= lastRangeTokenIdMinted, "E:14");
         lastRangeTokenIdWithLockedInitialHolders = tokenId;
         if (!isZeroLocked) {
             isZeroLocked = true;
         }
-    }
-
-    function _splitInitialHolderRangeAt(
-        uint256 tokenId
-    ) internal virtual whenNotPaused {
-        require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "Locked.");
-        require(isZeroMinted && tokenId <= lastRangeTokenIdMinted, "Unminted.");
-
-        uint index = _findLowerBound(_initialHolderRanges, tokenId);
-        uint rangeTokenId = _initialHolderRanges[index];
-
-        if (rangeTokenId != tokenId) {
-            address[][] memory newHolders = new address[][](
-                _initialHolders.length + 1
-            );
-            uint[] memory newRange = new uint[](
-                _initialHolderRanges.length + 1
-            );
-            for (uint i = 0; i < _initialHolders.length + 1; i++) {
-                newHolders[i] = _initialHolders[i];
-                newRange[i] = _initialHolderRanges[i];
-                if (i == index) {
-                    newHolders[i + 1] = _initialHolders[i];
-                    newRange[i + 1] = _initialHolderRanges[i];
-                    i++;
-                }
-            }
-            _initialHolders = newHolders;
-            _initialHolderRanges = newRange;
-        }
-    }
-
-    /**
-     * @dev Implement: May be overwritten to add custom values to checksum test.
-     */
-    function _customUpdateInitialHolderRangesChecksum()
-        internal
-        view
-        virtual
-        returns (bytes32)
-    {
-        return 0x00;
     }
 
     /**
@@ -99,16 +58,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function _updateInitialHolderRanges(
         UpdateInitialHolderRangesInput memory input
     ) internal virtual whenPaused {
-        // uint lastLockedIndex = _findLowerBound(
-        //     _initialHolderRanges,
-        //     lastRangeTokenIdWithLockedInitialHolders
-        // );
-
         // Update initialHoldersAddress Map
         // && check no locked initial holders were updated
 
         require(
-            // range needs to start at 0
+            // range must to start at 0
             input.newInitialHolderRanges[0] == 0 &&
                 // and end before last minted id
                 input.newInitialHolderRanges[
@@ -148,9 +102,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 address[] memory currentInitialHolders;
 
                 if (tokenA > tokenB) {
+                    // token before larger
                     uint tokenA0 = a - 1 >= 0
                         ? input.newInitialHolderRanges[a - 1]
                         : 0;
+                    // token after smaller
                     uint tokenB1 = b + 1 < _initialHolderRanges.length
                         ? _initialHolderRanges[b + 1]
                         : lastRangeTokenIdMinted + 1;
@@ -161,7 +117,9 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     newInitialHolders = input.newInitialHolders[a - 1];
                     currentInitialHolders = _initialHolders[b];
                 } else {
+                    // token before large
                     uint tokenB0 = b - 1 >= 0 ? _initialHolderRanges[b - 1] : 0;
+                    // token after smaller
                     uint tokenA1 = a + 1 < input.newInitialHolderRanges.length
                         ? input.newInitialHolderRanges[a + 1]
                         : lastRangeTokenIdMinted + 1;
@@ -182,7 +140,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     address fromAddress = currentInitialHolders[i];
                     address toAddress = newInitialHolders[i];
 
-                    // if it was updated
+                    // if address was updated
                     if (fromAddress != toAddress) {
                         // initialHolders cant be zero-address
                         require(toAddress != address(0), "E:04");
@@ -239,7 +197,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         _initialHolders = input.newInitialHolders;
         _initialHolderRanges = input.newInitialHolderRanges;
 
-        // Send events
         _unpause();
         // emit "transfer" events
         for (uint i = 0; i < input.toAddresses.length; i++) {
@@ -260,20 +217,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function _updateInitialHolderRangesSafe(
         UpdateInitialHolderRangesInput memory input,
         bytes32 inputChecksum
-    ) internal virtual whenPaused {
+    ) internal virtual {
         bytes32 checksum = keccak256(
-            abi.encode(
-                input,
-                _initialHolders,
-                _initialHolderRanges,
-                paused(),
-                _customUpdateInitialHolderRangesChecksum()
-            )
+            abi.encode(input, _initialHolders, _initialHolderRanges, paused())
         );
-        require(
-            inputChecksum == checksum,
-            "Invalid. Use verifyUpdateInitialHolderRangesInput()."
-        );
+        require(inputChecksum == checksum, "E:14");
         _updateInitialHolderRanges(input);
     }
 
@@ -292,8 +240,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     input.amounts,
                     input.newInitialHolders,
                     input.newInitialHolderRanges,
-                    this,
-                    _customUpdateInitialHolderRangesChecksum()
+                    this
                 )
             );
     }

@@ -31,16 +31,10 @@ contract TestERC1155MintRange is ERC1155MintRange {
     }
 
     function mintRange(
-        MintRangeInput memory input
-    ) public virtual {
-        _mintRange(input);
-    }
-
-    function mintRangeSafe(
         MintRangeInput memory input,
         bytes32 checksum
     ) public virtual {
-        _mintRangeSafe(input, checksum);
+        _mintRange(input, checksum);
     }
 
     function mint(
