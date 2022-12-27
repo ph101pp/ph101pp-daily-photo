@@ -10,6 +10,10 @@ export default async function getPh101ppDailyPhotoUpdateInitialHolderRangesInput
   string
 ]> {
   const newInitialHolders = [treasury, vault];
-  const [currentInitialHolders] = await c.initialHolderRanges();
-  return _getUpdateInitialHolderRangesInputSafe(c, currentInitialHolders.map(()=>newInitialHolders));
+  const [currentInitialHolders, currentInitialHolderRanges] = await c.initialHolderRanges();
+  return _getUpdateInitialHolderRangesInputSafe(
+    c,
+    currentInitialHolders.map(() => newInitialHolders),
+    currentInitialHolderRanges.map((range) => range.toNumber())
+  );
 }
