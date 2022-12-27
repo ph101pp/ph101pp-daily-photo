@@ -12,8 +12,8 @@ function findInRange(range: number[], needle: number) {
 
 export default async function _getUpdateInitialHolderRangesInputSafe(
   c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
-
-  newInitialHolders: string[][]
+  newInitialHolders: string[][],
+  newInitialHolderRanges: number[]
 ): Promise<[
   ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct,
   string
@@ -28,7 +28,7 @@ export default async function _getUpdateInitialHolderRangesInputSafe(
       throw Error("Error: newInitialHolders.length does not match");
     }
   }
-  const input = await _getUpdateInitialHolderRangesInput(c, newInitialHolders);
+  const input = await _getUpdateInitialHolderRangesInput(c, newInitialHolders, newInitialHolderRanges);
 
   const checksum = await c.verifyUpdateInitialHolderRangesInput(input);
   return [
@@ -39,7 +39,8 @@ export default async function _getUpdateInitialHolderRangesInputSafe(
 
 export async function _getUpdateInitialHolderRangesInput(
   c: TestERC1155MintRangeUpdateable | Ph101ppDailyPhoto,
-  newInitialHolders: string[][]
+  newInitialHolders: string[][],
+  newInitialHolderRanges: number[]
 ): Promise<ERC1155MintRangeUpdateable.UpdateInitialHolderRangesInputStruct> {
   const toAddresses: string[] = [];
   const fromAddresses: string[] = [];
@@ -57,11 +58,11 @@ export async function _getUpdateInitialHolderRangesInput(
   if (zeroMinted) {
     for (let i = from; i <= too; i++) {
       const currentInitialHolders = await c.initialHolders(i);
-      const newHolderIndex = findInRange(currentInitialHoldersRange, i);
+      const newHolderIndex = findInRange(newInitialHolderRanges, i);
       const newHolders = newInitialHolders[newHolderIndex];
 
       const balancesOld = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
-      const balancesNew = await c.balanceOfBatch(newHolders, currentInitialHolders.map(() => i));
+      const balancesNew = await c.balanceOfBatch(newHolders, newHolders.map(() => i));
       const isManuallyMinted = await c.isManualMint(i);
       if (isManuallyMinted) {
         continue;
@@ -104,6 +105,7 @@ export async function _getUpdateInitialHolderRangesInput(
     ids,
     amounts,
     newInitialHolders,
+    newInitialHolderRanges
   };
 
   return input;

@@ -437,7 +437,8 @@ library Ph101ppDailyPhotoUtils {
                         p.toAddresses,
                         p.ids,
                         p.amounts,
-                        p.newInitialHolders
+                        p.newInitialHolders,
+                        p.newInitialHolderRanges
                     ),
                     _initialHolders,
                     _initialHolderRanges,

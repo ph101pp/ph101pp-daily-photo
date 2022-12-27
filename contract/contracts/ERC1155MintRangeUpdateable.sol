@@ -7,7 +7,7 @@ import "./ERC1155MintRangePausable.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -19,6 +19,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         uint[][] ids;
         uint[][] amounts;
         address[][] newInitialHolders;
+        uint[] newInitialHolderRanges;
     }
 
     struct VerifyUpdateInitialHolderRangesInput {
@@ -27,6 +28,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         uint[][] ids;
         uint[][] amounts;
         address[][] newInitialHolders;
+        uint[] newInitialHolderRanges;
         // privates
         ERC1155MintRangeUpdateable caller;
         bytes32 customUpdateInitialHolderRangesChecksum;
@@ -41,7 +43,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function _setLockInitialHoldersUpTo(
         uint256 tokenId
     ) internal virtual whenNotPaused {
-        _splitInitialHolderRangeAt(tokenId);
+        require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "Locked.");
+        require(isZeroMinted && tokenId <= lastRangeTokenIdMinted, "Unminted.");
         lastRangeTokenIdWithLockedInitialHolders = tokenId;
         if (!isZeroLocked) {
             isZeroLocked = true;
@@ -96,66 +99,145 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function _updateInitialHolderRanges(
         UpdateInitialHolderRangesInput memory input
     ) internal virtual whenPaused {
-        uint lastLockedIndex = _findLowerBound(
-            _initialHolderRanges,
-            lastRangeTokenIdWithLockedInitialHolders
-        );
+        // uint lastLockedIndex = _findLowerBound(
+        //     _initialHolderRanges,
+        //     lastRangeTokenIdWithLockedInitialHolders
+        // );
 
         // Update initialHoldersAddress Map
         // && check no locked initial holders were updated
 
         require(
-            input.newInitialHolders.length == _initialHolders.length,
+            // range needs to start at 0
+            input.newInitialHolderRanges[0] == 0 &&
+                // and end before last minted id
+                input.newInitialHolderRanges[
+                    input.newInitialHolderRanges.length - 1
+                ] <=
+                lastRangeTokenIdMinted &&
+                // amount of ranges & initialHolders must match
+                input.newInitialHolderRanges.length ==
+                input.newInitialHolders.length,
             "E:01"
         );
 
-        for (uint k = 0; k < input.newInitialHolders.length; k++) {
-            address[] memory newInitialHolders = input.newInitialHolders[k];
-            address[] memory currentInitialHolders = _initialHolders[k];
-            bool isLocked = isZeroLocked && k <= lastLockedIndex;
-            require(
-                currentInitialHolders.length == newInitialHolders.length,
-                "E:02"
-            );
+        uint a = 0;
+        uint b = 0;
 
-            uint fromId = _initialHolderRanges[k];
-            uint toId = k + 1 < _initialHolderRanges.length
-                ? _initialHolderRanges[k + 1] - 1
-                : lastRangeTokenIdMinted;
+        // cycle through all overlapping range group segments
+        // A: |--|–----|
+        // B: |-----|--|
+        // => |--|--|--|
+        while (
+            a <= input.newInitialHolderRanges.length &&
+            b <= _initialHolderRanges.length
+        ) {
+            // add last minted token Id to end of range
+            uint tokenA = a < input.newInitialHolderRanges.length
+                ? input.newInitialHolderRanges[a]
+                : lastRangeTokenIdMinted + 1;
+            uint tokenB = b < _initialHolderRanges.length
+                ? _initialHolderRanges[b]
+                : lastRangeTokenIdMinted + 1;
 
-            for (uint i = 0; i < newInitialHolders.length; i++) {
-                address fromAddress = currentInitialHolders[i];
-                address toAddress = newInitialHolders[i];
+            if (tokenA != tokenB) {
+                // Calculate group details:
+                uint fromId;
+                uint toId;
+                address[] memory newInitialHolders;
+                address[] memory currentInitialHolders;
 
-                if (fromAddress != toAddress) {
-                    require(!isLocked, "E:03");
-                    require(toAddress != address(0), "E:04");
-                    // initialHolders must be unique per tokenId
-                    for (uint j = i + 1; j < newInitialHolders.length; j++) {
-                        require(toAddress != newInitialHolders[j], "E:06");
-                    }
-                    _initialHoldersAddressMap[toAddress] = true;
+                if (tokenA > tokenB) {
+                    uint tokenA0 = a - 1 >= 0
+                        ? input.newInitialHolderRanges[a - 1]
+                        : 0;
+                    uint tokenB1 = b + 1 < _initialHolderRanges.length
+                        ? _initialHolderRanges[b + 1]
+                        : lastRangeTokenIdMinted + 1;
 
-                    for (uint id = fromId; id <= toId; id++) {
-                        // try to initialize from-address
-                        // if there are already funds in to-address
-                        // or if to-address was initialized.
-                        if (
-                            isBalanceInitialized[toAddress][id] ||
-                            _balances[id][toAddress] > 0
+                    fromId = tokenA0 > tokenB ? tokenA0 : tokenB;
+                    toId = (tokenB1 < tokenA ? tokenB1 : tokenA) - 1;
+
+                    newInitialHolders = input.newInitialHolders[a - 1];
+                    currentInitialHolders = _initialHolders[b];
+                } else {
+                    uint tokenB0 = b - 1 >= 0 ? _initialHolderRanges[b - 1] : 0;
+                    uint tokenA1 = a + 1 < input.newInitialHolderRanges.length
+                        ? input.newInitialHolderRanges[a + 1]
+                        : lastRangeTokenIdMinted + 1;
+
+                    fromId = tokenB0 > tokenA ? tokenB0 : tokenA;
+                    toId = (tokenA1 < tokenB ? tokenA1 : tokenB) - 1;
+
+                    newInitialHolders = input.newInitialHolders[a];
+                    currentInitialHolders = _initialHolders[b - 1];
+                }
+                require(
+                    currentInitialHolders.length == newInitialHolders.length,
+                    "E:02"
+                );
+
+                // for each initial holder address in group
+                for (uint i = 0; i < newInitialHolders.length; i++) {
+                    address fromAddress = currentInitialHolders[i];
+                    address toAddress = newInitialHolders[i];
+
+                    // if it was updated
+                    if (fromAddress != toAddress) {
+                        // initialHolders cant be zero-address
+                        require(toAddress != address(0), "E:04");
+                        // initialHolders must be unique per tokenId
+                        for (
+                            uint j = i + 1;
+                            j < newInitialHolders.length;
+                            j++
                         ) {
-                            _maybeInitializeBalance(fromAddress, id);
+                            require(toAddress != newInitialHolders[j], "E:06");
                         }
-                        // initialize to-balance if from-address is initialized
-                        if (isBalanceInitialized[fromAddress][id]) {
-                            isBalanceInitialized[toAddress][id] = true;
+
+                        // add address to initial holders map
+                        _initialHoldersAddressMap[toAddress] = true;
+
+                        // for each token in range group
+                        for (uint id = fromId; id <= toId; id++) {
+                            // must not be locked
+                            require(
+                                !isZeroLocked ||
+                                    id >
+                                    lastRangeTokenIdWithLockedInitialHolders,
+                                "E:05"
+                            );
+                            // initialize from-address
+                            // if there are already funds in to-address
+                            // or if to-address was initialized.
+                            if (
+                                isBalanceInitialized[toAddress][id] ||
+                                _balances[id][toAddress] > 0
+                            ) {
+                                _maybeInitializeBalance(fromAddress, id);
+                            }
+                            // initialize to-balance if from-address is initialized
+                            if (isBalanceInitialized[fromAddress][id]) {
+                                isBalanceInitialized[toAddress][id] = true;
+                            }
                         }
                     }
                 }
             }
+
+            // increase range with lower tokenId
+            if (
+                tokenA > tokenB || a + 1 > input.newInitialHolderRanges.length
+            ) {
+                b++;
+            } else {
+                a++;
+            }
         }
+
         // Set new initial holders (ranges cannot be changed)
         _initialHolders = input.newInitialHolders;
+        _initialHolderRanges = input.newInitialHolderRanges;
 
         // Send events
         _unpause();
@@ -209,6 +291,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     input.ids,
                     input.amounts,
                     input.newInitialHolders,
+                    input.newInitialHolderRanges,
                     this,
                     _customUpdateInitialHolderRangesChecksum()
                 )
