@@ -41,17 +41,40 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
     function _setLockInitialHoldersUpTo(
         uint256 tokenId
     ) internal virtual whenNotPaused {
-        require(
-            tokenId > lastRangeTokenIdWithLockedInitialHolders,
-            "Already locked."
-        );
-        require(
-            isZeroMinted && tokenId <= lastRangeTokenIdMinted,
-            "Unminted tokens."
-        );
+        _splitInitialHolderRangeAt(tokenId);
         lastRangeTokenIdWithLockedInitialHolders = tokenId;
         if (!isZeroLocked) {
             isZeroLocked = true;
+        }
+    }
+
+    function _splitInitialHolderRangeAt(
+        uint256 tokenId
+    ) internal virtual whenNotPaused {
+        require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "Locked.");
+        require(isZeroMinted && tokenId <= lastRangeTokenIdMinted, "Unminted.");
+
+        uint index = _findLowerBound(_initialHolderRanges, tokenId);
+        uint rangeTokenId = _initialHolderRanges[index];
+
+        if (rangeTokenId != tokenId) {
+            address[][] memory newHolders = new address[][](
+                _initialHolders.length + 1
+            );
+            uint[] memory newRange = new uint[](
+                _initialHolderRanges.length + 1
+            );
+            for (uint i = 0; i < _initialHolders.length + 1; i++) {
+                newHolders[i] = _initialHolders[i];
+                newRange[i] = _initialHolderRanges[i];
+                if (i == index) {
+                    newHolders[i + 1] = _initialHolders[i];
+                    newRange[i + 1] = _initialHolderRanges[i];
+                    i++;
+                }
+            }
+            _initialHolders = newHolders;
+            _initialHolderRanges = newRange;
         }
     }
 
