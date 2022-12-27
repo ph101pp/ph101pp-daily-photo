@@ -248,11 +248,8 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
 
       expect(expectedTransfers.length).to.be.eq(receivedTransferEvents.length);
 
-      const afterIntegrity = await integrityCheck(c).ids(uniqueAddresses, uniqueIds);
-      const afterBalances = await afterIntegrity.balances();
-      const afterSupplies = await afterIntegrity.supplies();
-
-      const supplyChange: { [id: string]: number } = {};
+      const balancesDelta: BalancesRangeDelta = {};
+      const suppliesDelta: SuppliesRangeDelta = {};
 
       expectedTransfers.forEach((transfer) => {
         const transferEvent = receivedTransferEvents.find((event) => {
@@ -267,35 +264,41 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
         // got corresponding event.
         expect(transferEvent).to.not.be.undefined;
 
+        balancesDelta[transfer.from] = balancesDelta[transfer.from]??{};
+        balancesDelta[transfer.to] = balancesDelta[transfer.to]??{};
+
         transfer.ids.forEach((id, i) => {
-          supplyChange[id] = supplyChange[id] ?? 0;
+          suppliesDelta[id] = suppliesDelta[id] ?? 0;
 
           const amount = transfer.amounts[i];
           if (!expectSupplyChange || transfer.from !== ethers.constants.AddressZero) {
-            expect(beforeBalances.balances[transfer.from][id] - amount).to.equal(afterBalances.balances[transfer.from][id]);
+            balancesDelta[transfer.from][id] = -amount;
+            balancesDelta[transfer.to][id] = amount;
           }
           else {
-            supplyChange[id] += amount;
+            suppliesDelta[id] += amount;
           }
 
           if (!expectSupplyChange || transfer.to !== ethers.constants.AddressZero) {
-            expect(beforeBalances.balances[transfer.to][id] + amount).to.equal(afterBalances.balances[transfer.to][id])
+            balancesDelta[transfer.from][id] = -amount;
+            balancesDelta[transfer.to][id] = amount;
           }
           else {
-            supplyChange[id] -= amount;
-          }
-
-          if (!expectSupplyChange || (transfer.to !== ethers.constants.AddressZero && transfer.from !== ethers.constants.AddressZero)) {
-            expect(beforeSupplies.supplies[id]).to.equal(afterSupplies.supplies[id])
+            suppliesDelta[id] -= amount;
           }
         })
 
       });
+
+      // console.log(balancesDelta);
+      // console.log(suppliesDelta);
+      beforeBalances.expectDelta(balancesDelta);
+
       if (expectSupplyChange) {
-        Object.keys(beforeSupplies.supplies).forEach((id) => {
-          const delta = supplyChange[id] ?? 0;
-          expect(beforeSupplies.supplies[id] + delta).to.equal(afterSupplies.supplies[id]);
-        });
+        beforeSupplies.expectDelta(suppliesDelta);
+      }
+      else {
+        beforeSupplies.expectEqual();
       }
     }
   }

@@ -891,7 +891,6 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const swap = await _getUpdateInitialHolderRangesInput(c, [
         [account4.address, account5.address], [account2.address, account3.address]
       ], [0,10]);
-      return;
       await c.pause();
 
       await expect(verified.updateInitialHolderRanges(c, noop)).to.not.be.rejected;
