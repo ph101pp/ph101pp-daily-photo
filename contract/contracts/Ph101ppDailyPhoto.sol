@@ -193,7 +193,7 @@ contract Ph101ppDailyPhoto is
         uint tokenId,
         string memory newPeriodName
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
-        require(tokenId <= lastRangeTokenIdMinted, "E:18");
+        require(tokenId <= lastRangeTokenIdMinted, ":18");
         _periods.push(newPeriodName);
         _periodRanges.push(tokenId);
     }
@@ -514,4 +514,4 @@ contract Ph101ppDailyPhoto is
     ) public view override(AccessControl, ERC1155_, ERC2981) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
-}
+} 

@@ -29,7 +29,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     // Track initial holders across tokenID ranges + lookup mapping;
     address[][] internal _initialHolders;
     uint[] internal _initialHolderRanges;
-    mapping(address => bool) internal _initialHoldersAddressMap;
+    mapping(address => bool) public isInitialHolderAddress;
 
     // last tokenId minted via mintRange.
     uint public lastRangeTokenIdMinted;
@@ -39,7 +39,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         _initialHolderRanges.push(0);
         _initialHolders.push(initialInitialHolders);
         for (uint i = 0; i < initialInitialHolders.length; i++) {
-            _initialHoldersAddressMap[initialInitialHolders[i]] = true;
+            isInitialHolderAddress[initialInitialHolders[i]] = true;
         }
     }
 
@@ -175,7 +175,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
         for (uint i = 0; i < addresses.length; i++) {
             address initialHolder = addresses[i];
-            _initialHoldersAddressMap[initialHolder] = true;
+            isInitialHolderAddress[initialHolder] = true;
         }
     }
 
@@ -210,7 +210,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
      * @dev Returns true if address is an initial holder of tokenId
      */
     function _maybeInitialHolder(address account) internal view returns (bool) {
-        return _initialHoldersAddressMap[account];
+        return isInitialHolderAddress[account];
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         // invalid input -> use getMintRangeInput
         require(
             inputChecksum == checksum,
-            "E:30"
+            ":30"
         );
         // Update last minted tokenId
         lastRangeTokenIdMinted = input.ids[input.ids.length - 1];

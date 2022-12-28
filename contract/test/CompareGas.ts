@@ -31,7 +31,7 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
       }
     });
     const pdp = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]);
-    await pdp.setOperatorFilterRegistry(ethers.constants.AddressZero);
+    await pdp.setOperatorFilterRegistryAddress(ethers.constants.AddressZero);
 
     const C1 = await ethers.getContractFactory("TestERC1155MintRange");
     const c1 = await C1.deploy([]);
@@ -53,9 +53,9 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     await c2.setInitialHolders([account1.address, account2.address]);
 
     const input = await c2.getMintRangeInput(numberOfTokens);
-    await c2.mintRangeSafe(...input);
+    await c2.mintRange(...input);
 
-    const inputUpdate = await _getUpdateInitialHoldersInput(c2, [[account3.address, account4.address]]);
+    const inputUpdate = await _getUpdateInitialHoldersInputSafe(c2, [[account3.address, account4.address]], [0]);
 
     await c2.pause();
     const tx = await c2.updateInitialHolders(inputUpdate);
@@ -203,10 +203,10 @@ describe.skip("Gas costs ERC1155 vs ERC1155MintRange vs ERC1155MintRangeUpdateab
     await c1.setInitialHolders([account1.address]);
     await c2.setInitialHolders([account1.address]);
 
-    const [input1] = await c1.getMintRangeInput(100);
-    await c1.mintRange(input1);
-    const [input2] = await c2.getMintRangeInput(100);
-    await c2.mintRange(input2);
+    const [input1, checksum1] = await c1.getMintRangeInput(100);
+    await c1.mintRange(input1, checksum1);
+    const [input2, checksum2] = await c2.getMintRangeInput(100);
+    await c2.mintRange(input2, checksum2);
     const input3 = await pdp.getMintRangeInput(100);
     await pdp.mintPhotos(...input3);
 
