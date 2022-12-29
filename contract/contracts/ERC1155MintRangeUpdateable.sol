@@ -7,7 +7,7 @@ import "./ERC1155MintRangePausable.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155MintRange enables ability update initial holders.
@@ -72,7 +72,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 // amount of ranges & initialHolders must match
                 input.newInitialHolderRanges.length ==
                 input.newInitialHolders.length,
-            ":01"
+            ":1"
         );
 
         uint a = 0;
@@ -132,7 +132,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 }
                 require(
                     currentInitialHolders.length == newInitialHolders.length,
-                    ":02"
+                    ":2"
                 );
 
                 // for each initial holder address in group
@@ -143,14 +143,14 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     // if address was updated
                     if (fromAddress != toAddress) {
                         // initialHolders cant be zero-address
-                        require(toAddress != address(0), ":04");
+                        require(toAddress != address(0), ":4");
                         // initialHolders must be unique per tokenId
                         for (
                             uint j = i + 1;
                             j < newInitialHolders.length;
                             j++
                         ) {
-                            require(toAddress != newInitialHolders[j], ":06");
+                            require(toAddress != newInitialHolders[j], ":6");
                         }
 
                         // add address to initial holders map
@@ -163,7 +163,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                                 !isZeroLocked ||
                                     id >
                                     lastRangeTokenIdWithLockedInitialHolders,
-                                ":05"
+                                ":5"
                             );
                             // initialize from-address
                             // if there are already funds in to-address
@@ -174,21 +174,45 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                             ) {
                                 _maybeInitializeBalance(fromAddress, id);
                             }
+                            // initialize to-address
+                            // if there are already funds in from-address
+                            // or if from-address was initialized.
+                            if (
+                                isBalanceInitialized[fromAddress][id] ||
+                                _balances[id][fromAddress] > 0
+                            ) {
+                                _maybeInitializeBalance(toAddress, id);
+                            }
                             // initialize to-balance if from-address is initialized
-                            if (isBalanceInitialized[fromAddress][id]) {
+                            if (
+                                isBalanceInitialized[fromAddress][id] &&
+                                !isBalanceInitialized[toAddress][id]
+                            ) {
                                 isBalanceInitialized[toAddress][id] = true;
+                            }
+                            // initialize from-balance if to-address is initialized
+                            if (
+                                isBalanceInitialized[toAddress][id] &&
+                                !isBalanceInitialized[fromAddress][id]
+                            ) {
+                                isBalanceInitialized[fromAddress][id] = true;
                             }
                         }
                     }
                 }
             }
-
             // increase range with lower tokenId
             if (
                 tokenA > tokenB || a + 1 > input.newInitialHolderRanges.length
             ) {
                 b++;
             } else {
+                require(
+                    a <= 0 ||
+                        input.newInitialHolderRanges[a] >
+                        input.newInitialHolderRanges[a - 1],
+                    ":7"
+                );
                 a++;
             }
         }

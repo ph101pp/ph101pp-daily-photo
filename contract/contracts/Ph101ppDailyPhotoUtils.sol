@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./ERC1155MintRangeUpdateable.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 library Ph101ppDailyPhotoUtils {
     uint256 constant SECONDS_PER_DAY = 1 days;
@@ -273,11 +273,18 @@ library Ph101ppDailyPhotoUtils {
                 lastRangeTokenIdMinted &&
                 // amount of ranges & initialHolders must match
                 p.newInitialHolderRanges.length == p.newInitialHolders.length,
-            ":01"
+            ":1"
         );
-        require(p.fromAddresses.length == p.toAddresses.length, ":02");
-        require(p.fromAddresses.length == p.ids.length, ":03");
-        require(p.fromAddresses.length == p.amounts.length, ":04");
+        require(p.fromAddresses.length == p.toAddresses.length, ":2");
+        require(p.fromAddresses.length == p.ids.length, ":3");
+        require(p.fromAddresses.length == p.amounts.length, ":4");
+
+        for (uint i = 1; i < p.newInitialHolderRanges.length; i++) {
+            require(
+                p.newInitialHolderRanges[i] > p.newInitialHolderRanges[i - 1],
+                ":8"
+            );
+        }
 
         uint[] memory txTokenIndex = new uint[](p.fromAddresses.length);
 
@@ -301,7 +308,7 @@ library Ph101ppDailyPhotoUtils {
                 if (p.caller.isManualMint(tokenId)) {
                     continue;
                 }
-                require(newHolders.length == currentHolders.length, ":05");
+                require(newHolders.length == currentHolders.length, ":5");
 
                 uint[] memory ids = new uint[](newHolders.length);
                 for (uint k = 0; k < newHolders.length; k++) {
@@ -320,11 +327,17 @@ library Ph101ppDailyPhotoUtils {
                 for (uint a = 0; a < newHolders.length; a++) {
                     // address fromAddress = currentHolders[a];
                     // address toAddress = newHolders[a];
+
+                    // No duplicate address for tokenID
+                    for (uint b = a + 1; b < newHolders.length; b++) {
+                        require(newHolders[a] != newHolders[b], ":14");
+                    }
+
                     if (currentHolders[a] == newHolders[a]) {
                         continue;
                     }
 
-                    require(!isLocked, ":06");
+                    require(!isLocked, ":6");
 
                     uint txIndex;
                     bool txFound;
@@ -338,7 +351,7 @@ library Ph101ppDailyPhotoUtils {
                             txFound = true;
                         }
                     }
-                    require(txFound, ":07");
+                    require(txFound, ":7");
 
                     // uint balanceFrom = balancesOld[a];
                     // uint balanceTo = balancesNew[a];
@@ -371,9 +384,9 @@ library Ph101ppDailyPhotoUtils {
                         // console.log("-----");
                         require(
                             currentHolders[a] == p.fromAddresses[txIndex],
-                            ":08"
+                            ":8"
                         );
-                        require(newHolders[a] == p.toAddresses[txIndex], ":09");
+                        require(newHolders[a] == p.toAddresses[txIndex], ":9");
                         require(
                             tokenId == p.ids[txIndex][txTokenIndex[txIndex]],
                             ":10"

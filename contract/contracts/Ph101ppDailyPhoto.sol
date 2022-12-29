@@ -445,20 +445,20 @@ contract Ph101ppDailyPhoto is
     // Transfer Event Listener Address
     ///////////////////////////////////////////////////////////////////////////////
 
-    function setTransferEventListenerAddress(
-        address listener
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(!isTransferEventListenerAddressPermanentlyFrozen);
-        transferEventListenerAddress = listener;
-    }
+    // function setTransferEventListenerAddress(
+    //     address listener
+    // ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    //     require(!isTransferEventListenerAddressPermanentlyFrozen);
+    //     transferEventListenerAddress = listener;
+    // }
 
-    function permanentlyFreezeTransferEventListenerAddress()
-        public
-        whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
-    {
-        isTransferEventListenerAddressPermanentlyFrozen = true;
-    }
+    // function permanentlyFreezeTransferEventListenerAddress()
+    //     public
+    //     whenNotPaused
+    //     onlyRole(DEFAULT_ADMIN_ROLE)
+    // {
+    //     isTransferEventListenerAddressPermanentlyFrozen = true;
+    // }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Transfer & Approval mods for Opensea Operator Filterer & Transfer Event
@@ -482,27 +482,27 @@ contract Ph101ppDailyPhoto is
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
-    function _afterTokenTransfer(
-        address operator,
-        address from,
-        address to,
-        uint[] memory ids,
-        uint[] memory amounts,
-        bytes memory data
-    ) internal virtual override {
-        super._afterTokenTransfer(operator, from, to, ids, amounts, data);
-        if (transferEventListenerAddress != address(0)) {
-            IPh101ppDailyPhotoListener(transferEventListenerAddress)
-                .Ph101ppDailyPhotoTransferHandler(
-                    operator,
-                    from,
-                    to,
-                    ids,
-                    amounts,
-                    data
-                );
-        }
-    }
+    // function _afterTokenTransfer(
+    //     address operator,
+    //     address from,
+    //     address to,
+    //     uint[] memory ids,
+    //     uint[] memory amounts,
+    //     bytes memory data
+    // ) internal virtual override {
+    //     super._afterTokenTransfer(operator, from, to, ids, amounts, data);
+    //     if (transferEventListenerAddress != address(0)) {
+    //         IPh101ppDailyPhotoListener(transferEventListenerAddress)
+    //             .Ph101ppDailyPhotoTransferHandler(
+    //                 operator,
+    //                 from,
+    //                 to,
+    //                 ids,
+    //                 amounts,
+    //                 data
+    //             );
+    //     }
+    // }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Interface

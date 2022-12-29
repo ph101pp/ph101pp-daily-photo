@@ -19,6 +19,7 @@ export default async function _getUpdateInitialHoldersInputSafe(
   string
 ]> {
   const input = await _getUpdateInitialHoldersInput(c, newInitialHolders, newInitialHolderRanges);
+  // console.log(input);
   const checksum = await c.verifyUpdateInitialHoldersInput(input);
   return [
     input,
@@ -69,12 +70,21 @@ export async function _getUpdateInitialHoldersInput(
         const balanceTo = balancesNew[a].toNumber();
         const isBalanceInitializedFrom = await c.isBalanceInitialized(fromAddress, i)
         const isBalanceInitializedTo = await c.isBalanceInitialized(toAddress, i)
-        const isInitialHolder = await c.isInitialHolderAddress(toAddress);
+        const isToInitialHolder = await c.isInitialHolderAddress(toAddress);
 
         if (
-          !isBalanceInitializedFrom && ((balanceTo == 0 && !isInitialHolder) || (isInitialHolder && !isBalanceInitializedTo))
+          !isBalanceInitializedFrom && ((balanceTo == 0 && !isToInitialHolder) || (isToInitialHolder && !isBalanceInitializedTo))
         ) {
-          let addressIndex = fromAddresses.indexOf(fromAddress);
+          let addressIndex = -1;
+
+          for (let x = 0; x < fromAddresses.length; x++) {
+              if (
+                  fromAddresses[x] == fromAddress &&
+                  toAddresses[x] == toAddress
+              ) {
+                addressIndex = x;
+              }
+          }
 
           if (addressIndex < 0) {
             fromAddresses.push(fromAddress);
