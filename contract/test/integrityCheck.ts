@@ -271,16 +271,14 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
           suppliesDelta[id] = suppliesDelta[id] ?? 0;
 
           const amount = transfer.amounts[i];
-          if (!expectSupplyChange || transfer.from !== ethers.constants.AddressZero) {
+          if (transfer.from !== ethers.constants.AddressZero) {
             balancesDelta[transfer.from][id] = -amount;
-            balancesDelta[transfer.to][id] = amount;
           }
           else {
             suppliesDelta[id] += amount;
           }
 
-          if (!expectSupplyChange || transfer.to !== ethers.constants.AddressZero) {
-            balancesDelta[transfer.from][id] = -amount;
+          if (transfer.to !== ethers.constants.AddressZero) {
             balancesDelta[transfer.to][id] = amount;
           }
           else {
