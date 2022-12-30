@@ -30,6 +30,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     address[][] internal _initialHolders;
     uint[] internal _initialHolderRanges;
     mapping(address => bool) public isInitialHolderAddress;
+    mapping(address => bool) public wasOwnerAddress;
 
     // last tokenId minted via mintRange.
     uint public lastRangeTokenIdMinted;
@@ -132,6 +133,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
             // initialize balances if minted via _mintRange
             _maybeInitializeBalance(from, id);
             _maybeInitializeBalance(to, id);
+        }
+        if(!wasOwnerAddress[to]) {
+            wasOwnerAddress[to] = true;
         }
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }

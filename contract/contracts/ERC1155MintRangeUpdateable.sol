@@ -144,6 +144,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     if (fromAddress != toAddress) {
                         // initialHolders cant be zero-address
                         require(toAddress != address(0), ":4");
+                        require(!wasOwnerAddress[toAddress], ":5");
                         // initialHolders must be unique per tokenId
                         for (
                             uint j = i + 1;
@@ -158,8 +159,6 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
                         // for each token in range group
                         for (uint id = fromId; id <= toId; id++) {
-                            bool fromInitialized = isBalanceInitialized[fromAddress][id];
-                            bool toInitialized = isBalanceInitialized[toAddress][id];
                             // must not be locked
                             require(
                                 !isZeroLocked ||
@@ -167,38 +166,61 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                                     lastRangeTokenIdWithLockedInitialHolders,
                                 ":5"
                             );
+                            if (isBalanceInitialized[fromAddress][id]) {
+                                isBalanceInitialized[toAddress][id] = true;
+                            }
                             // initialize from-address
                             // if there are already funds in to-address
                             // or if to-address was initialized.
-                            if (
-                                toInitialized ||
-                                _balances[id][toAddress] > 0
-                            ) {
-                                _maybeInitializeBalance(fromAddress, id);
-                            }
+                            // if (
+                            //     isBalanceInitialized[toAddress][id] ||
+                            //     _balances[id][toAddress] > 0 ||
+                            //     isBalanceInitialized[fromAddress][id] ||
+                            //     _balances[id][fromAddress] > 0
+                            // ) {
+                            //      if (id == 4) {
+                            //     console.log("maybe from");
+                            //      }
+                            //     _maybeInitializeBalance(fromAddress, id);
+                            //     _maybeInitializeBalance(toAddress, id);
+                            // }
                             // initialize to-address
                             // if there are already funds in from-address
                             // or if from-address was initialized.
-                            if (
-                                fromInitialized ||
-                                _balances[id][fromAddress] > 0
-                            ) {
-                                _maybeInitializeBalance(toAddress, id);
-                            }
+                            // if (
+                            //     isBalanceInitialized[fromAddress][id] ||
+                            //     _balances[id][fromAddress] > 0
+                            // ) {
+                            //      if (id == 4) {
+                            //     console.log("maybe to");
+                            //      }
+                            // }
                             // initialize to-balance if from-address is initialized
-                            if (
-                                fromInitialized &&
-                                !toInitialized
-                            ) {
-                                isBalanceInitialized[toAddress][id] = true;
-                            }
+                            // if (
+                            //     isBalanceInitialized[fromAddress][id] &&
+                            //     !isBalanceInitialized[toAddress][id]
+                            // ) {
+                            //     isBalanceInitialized[toAddress][id] = true;
+                            // }
                             // initialize from-balance if to-address is initialized
-                            if (
-                                toInitialized &&
-                                !fromInitialized
-                            ) {
-                                isBalanceInitialized[fromAddress][id] = true;
-                            }
+                            // if (
+                            //     isBalanceInitialized[toAddress][id] &&
+                            //     !isBalanceInitialized[fromAddress][id]
+                            // ) {
+                            //     isBalanceInitialized[fromAddress][id] = true;
+                            // }
+                            // if (id == 4) {
+                            //     console.log(
+                            //         "from",
+                            //         isBalanceInitialized[fromAddress][id],
+                            //         _balances[id][fromAddress]
+                            //     );
+                            //     console.log(
+                            //         "to",
+                            //         isBalanceInitialized[toAddress][id],
+                            //         _balances[id][toAddress]
+                            //     );
+                            // }
                         }
                     }
                 }
