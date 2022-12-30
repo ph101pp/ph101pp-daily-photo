@@ -127,23 +127,22 @@ const balancesRangeCheck = (c: Contracts, addresses: string[], ids: number[]) =>
     expectDelta: async (delta: BalancesRangeDelta) => {
       const currBalancesCopy = JSON.parse(JSON.stringify(currBalances));
       const newBalances = await getBalances(c, addresses, ids);
-
       const deltaAddresses = Object.keys(delta);
+
       deltaAddresses.forEach((address, i) => {
         const changedIds = Object.keys(delta[address]);
-
         changedIds.forEach((id) => {
           const index = ids.indexOf(parseInt(id));
 
           expect(index).to.be.gte(0, "delta: id not part of range");
 
-          const oldBalance = currBalancesCopy[address][index];
-          const newBalance = newBalances[address][index];
+          const oldBalance = currBalancesCopy[address][id];
+          const newBalance = newBalances[address][id];
 
-          expect(newBalance - oldBalance).to.be.eq(delta[address][parseInt(id)]);
+          expect(oldBalance + delta[address][parseInt(id)]).to.be.eq(newBalance);
 
-          delete currBalancesCopy[address][index];
-          delete newBalances[address][index];
+          delete currBalancesCopy[address][id];
+          delete newBalances[address][id];
         });
       });
       expect(currBalancesCopy).to.deep.equal(newBalances);
@@ -178,13 +177,13 @@ const suppliesRangeCheck = (c: Contracts, addresses: string[], ids: number[]) =>
 
         expect(index).to.be.gte(0, "delta: id not part of range");
 
-        const oldSupply = currSuppliesCopy[index];
-        const newSupply = newSupplies[index];
+        const oldSupply = currSuppliesCopy[id];
+        const newSupply = newSupplies[id];
 
         expect(newSupply - oldSupply).to.be.equal(delta[id]);
 
-        delete currSuppliesCopy[index];
-        delete newSupplies[index];
+        delete currSuppliesCopy[id];
+        delete newSupplies[id];
       });
       expect(currSuppliesCopy).to.deep.equal(newSupplies);
     },
@@ -247,7 +246,6 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
       const receivedTransferEvents = normalizeTransferEvents(receipt.events);
 
       expect(expectedTransfers.length).to.be.eq(receivedTransferEvents.length);
-
       const balancesDelta: BalancesRangeDelta = {};
       const suppliesDelta: SuppliesRangeDelta = {};
 
@@ -264,40 +262,46 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
         // got corresponding event.
         expect(transferEvent).to.not.be.undefined;
 
-        balancesDelta[transfer.from] = balancesDelta[transfer.from]??{};
-        balancesDelta[transfer.to] = balancesDelta[transfer.to]??{};
+        balancesDelta[transfer.from] = balancesDelta[transfer.from] ?? {};
+        balancesDelta[transfer.to] = balancesDelta[transfer.to] ?? {};
 
         transfer.ids.forEach((id, i) => {
           suppliesDelta[id] = suppliesDelta[id] ?? 0;
 
           const amount = transfer.amounts[i];
           if (transfer.from !== ethers.constants.AddressZero) {
-            balancesDelta[transfer.from][id] = -amount;
+            balancesDelta[transfer.from][id] = balancesDelta[transfer.from][id] ?? 0;
+            balancesDelta[transfer.from][id] -= amount;
           }
           else {
             suppliesDelta[id] += amount;
           }
 
           if (transfer.to !== ethers.constants.AddressZero) {
-            balancesDelta[transfer.to][id] = amount;
+            balancesDelta[transfer.to][id] = balancesDelta[transfer.to][id] ?? 0;
+            balancesDelta[transfer.to][id] += amount;
           }
           else {
             suppliesDelta[id] -= amount;
           }
         })
 
+        delete balancesDelta[ethers.constants.AddressZero];
       });
 
-      // console.log(balancesDelta);
-      // console.log(suppliesDelta);
-      beforeBalances.expectDelta(balancesDelta);
+
+      // console.log(beforeBalances, balancesDelta);
+      // console.log(suppliesDelta, beforeSupplies);
+
+      await beforeBalances.expectDelta(balancesDelta);
 
       if (expectSupplyChange) {
-        beforeSupplies.expectDelta(suppliesDelta);
+        await beforeSupplies.expectDelta(suppliesDelta);
       }
       else {
-        beforeSupplies.expectEqual();
+        await beforeSupplies.expectEqual();
       }
+
     }
   }
 }

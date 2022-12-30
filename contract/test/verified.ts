@@ -49,36 +49,26 @@ const verified = {
   //   return tx;
   // },
   updateInitialHolders: async (c: TestERC1155MintRangeUpdateable, input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct) => {
-    const addresses = [... (new Set([...input.fromAddresses as string[], ...input.toAddresses as string[]]))];
-    const lastTokenId = await c.lastRangeTokenIdMinted();
-    const integrity = await integrityCheck(c).range(addresses, 0, lastTokenId.toNumber());
-    const supplies = await integrity.supplies();
     const transfers = await integrityCheck(c).transfersUpdateInitialHolders(input);
     const tx = await c.updateInitialHolders(input);
     await transfers.expectSuccess(tx, { expectSupplyChange: false });
-    await supplies.expectEqual();
     return tx;
   },
   updateInitialHoldersSafe: async (c: TestERC1155MintRangeUpdateable, input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct, checksum: string) => {
-    const addresses = [... (new Set([...input.fromAddresses as string[], ...input.toAddresses as string[]]))];
-    const lastTokenId = await c.lastRangeTokenIdMinted();
-    const integrity = await integrityCheck(c).range(addresses, 0, lastTokenId.toNumber());
-    const supplies = await integrity.supplies();
+    // const addresses = [... (new Set([...input.fromAddresses as string[], ...input.toAddresses as string[]]))];
+    // const lastTokenId = await c.lastRangeTokenIdMinted();
+    // const integrity = await integrityCheck(c).range(addresses, 0, lastTokenId.toNumber());
+    // const supplies = await integrity.supplies();
     const transfers = await integrityCheck(c).transfersUpdateInitialHolders(input);
     const tx = await c.updateInitialHoldersSafe(input, checksum);
-    await transfers.expectSuccess(tx, { expectSupplyChange: false });
-    await supplies.expectEqual();
+    await transfers.expectSuccess(tx, { expectSupplyChange: false, test:true});
+    // await supplies.expectEqual();
     return tx;
   },
   pdpUpdateInitialHolders: async (c: Ph101ppDailyPhoto, input: ERC1155MintRangeUpdateable.UpdateInitialHoldersInputStruct, checksum: string) => {
-    const addresses = [... (new Set([...input.fromAddresses as string[], ...input.toAddresses as string[]]))];
-    const lastTokenId = await c.lastRangeTokenIdMinted();
-    const integrity = await integrityCheck(c).range(addresses, 0, lastTokenId.toNumber());
-    const supplies = await integrity.supplies();
     const transfers = await integrityCheck(c).transfersUpdateInitialHolders(input);
     const tx = await c.updateInitialHolders(input, checksum);
     await transfers.expectSuccess(tx, { expectSupplyChange: false });
-    await supplies.expectEqual();
     return tx;
   },
   mintClaims: async (c: Ph101ppDailyPhoto, to: string, amount: number, data: []) => {
