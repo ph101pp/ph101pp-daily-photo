@@ -349,6 +349,7 @@ library Ph101ppDailyPhotoUtils {
                         ) {
                             txIndex = x;
                             txFound = true;
+                            break;
                         }
                     }
                     require(txFound, ":7");
