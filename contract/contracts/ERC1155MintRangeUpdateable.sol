@@ -158,6 +158,8 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
 
                         // for each token in range group
                         for (uint id = fromId; id <= toId; id++) {
+                            bool fromInitialized = isBalanceInitialized[fromAddress][id];
+                            bool toInitialized = isBalanceInitialized[toAddress][id];
                             // must not be locked
                             require(
                                 !isZeroLocked ||
@@ -169,7 +171,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                             // if there are already funds in to-address
                             // or if to-address was initialized.
                             if (
-                                isBalanceInitialized[toAddress][id] ||
+                                toInitialized ||
                                 _balances[id][toAddress] > 0
                             ) {
                                 _maybeInitializeBalance(fromAddress, id);
@@ -178,22 +180,22 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                             // if there are already funds in from-address
                             // or if from-address was initialized.
                             if (
-                                isBalanceInitialized[fromAddress][id] ||
+                                fromInitialized ||
                                 _balances[id][fromAddress] > 0
                             ) {
                                 _maybeInitializeBalance(toAddress, id);
                             }
                             // initialize to-balance if from-address is initialized
                             if (
-                                isBalanceInitialized[fromAddress][id] &&
-                                !isBalanceInitialized[toAddress][id]
+                                fromInitialized &&
+                                !toInitialized
                             ) {
                                 isBalanceInitialized[toAddress][id] = true;
                             }
                             // initialize from-balance if to-address is initialized
                             if (
-                                isBalanceInitialized[toAddress][id] &&
-                                !isBalanceInitialized[fromAddress][id]
+                                toInitialized &&
+                                !fromInitialized
                             ) {
                                 isBalanceInitialized[fromAddress][id] = true;
                             }
