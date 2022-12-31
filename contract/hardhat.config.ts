@@ -7,6 +7,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const gasGoerliGwei = 5;
+const mainnetGwei = 25;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -31,9 +32,9 @@ const config: HardhatUserConfig = {
       gasPrice: gasGoerliGwei * 1000000000
     },
     mainnet: {
-      url: `https://eth.g.alchemy.com/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
+      url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
       accounts: [`${process.env.PRIVATE_KEY}`],
-      gasPrice: gasGoerliGwei * 1000000000
+      gasPrice: mainnetGwei * 1000000000
     }
   },
   gasReporter: {
