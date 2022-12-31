@@ -1,5 +1,4 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { EtherscanConfig } from "@nomiclabs/hardhat-etherscan/dist/src/types";
 import { expect, assert } from "chai";
 import { ethers } from "hardhat";
 import { BaseContract } from "ethers";
@@ -89,11 +88,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
 
     it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriRanges + uriHistory to reflect this.", async function () {
-      const period = "Genesis";
+      // const period = "Init";
       const immutableUri2 = "immutable.uri.2/";
-      const period2 = "Period2";
+      // const period2 = "Period2";
       const immutableUri3 = "immutable.uri.3/";      
-      const period3 = "Period3";
+      // const period3 = "Period3";
 
       const { c, immutableUri } = await loadFixture(deployFixture);
 
@@ -102,42 +101,44 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await verified.mintPhotos(c, ...input);
 
       expect(await c.permanentBaseUri()).to.equal(immutableUri);
-      await c.setPermanentBaseUriUpTo(immutableUri2, period2, 100);
+      await c.setPermanentBaseUriUpTo(immutableUri2, 100);
+      // await c.setPeriod(period2, 100);
+
       expect(await c.permanentBaseUri()).to.equal(immutableUri2);
 
       const history = await c.permanentBaseUriRanges();
 
-      expect(history.length).to.equal(3);
+      expect(history.length).to.equal(2);
       const urls = history[0];
       expect(urls.length).to.equal(2);
       expect(urls[0]).to.equal(immutableUri);
       expect(urls[1]).to.equal(immutableUri2);
       
-      expect(history[1][0]).to.equal(period);
-      expect(history[1][1]).to.equal(period2);
+      // expect(history[1][0]).to.equal(period);
+      // expect(history[1][1]).to.equal(period2);
 
-      expect(history[2][0]).to.equal(0)
-      expect(history[2][1]).to.equal(1)
+      expect(history[1][0]).to.equal(0)
+      expect(history[1][1]).to.equal(1)
 
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(100);
       
-      await c.setPermanentBaseUriUpTo(immutableUri3, period3, 101);
+      await c.setPermanentBaseUriUpTo(immutableUri3, 101);
 
       const history2 = await c.permanentBaseUriRanges();
-      expect(history2.length).to.equal(3);
+      expect(history2.length).to.equal(2);
       const urls2 = history2[0];
       expect(urls2.length).to.equal(3);
       expect(urls2[0]).to.equal(immutableUri);
       expect(urls2[1]).to.equal(immutableUri2);
       expect(urls2[2]).to.equal(immutableUri3);
 
-      expect(history2[1][0]).to.equal(period);
-      expect(history2[1][1]).to.equal(period2);
-      expect(history2[1][2]).to.equal(period3);
+      // expect(history2[1][0]).to.equal(period);
+      // expect(history2[1][1]).to.equal(period2);
+      // expect(history2[1][2]).to.equal(period3);
       
-      expect(history2[2][0]).to.equal(0)
-      expect(history2[2][1]).to.equal(1)
-      expect(history2[2][2]).to.equal(101)
+      expect(history2[1][0]).to.equal(0)
+      expect(history2[1][1]).to.equal(1)
+      expect(history2[1][2]).to.equal(101)
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(101);
 
       const history0 = await c.uriHistory(0);
@@ -145,28 +146,28 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(history0[0][0]).to.include(immutableUri);
       expect(history0[1][0]).to.include(immutableUri2);
       expect(history0[2][0]).to.include(immutableUri3);
-      expect(history0[0][1]).to.include(period);
-      expect(history0[1][1]).to.include(period2);
-      expect(history0[2][1]).to.include(period3);
+      // expect(history0[0][1]).to.include(period);
+      // expect(history0[1][1]).to.include(period2);
+      // expect(history0[2][1]).to.include(period3);
 
       const history1 = await c.uriHistory(1);
       expect(history1.length).to.equal(2);
       expect(history1[0][0]).to.include(immutableUri2);
       expect(history1[1][0]).to.include(immutableUri3);
-      expect(history1[0][1]).to.include(period2);
-      expect(history1[1][1]).to.include(period3);
+      // expect(history1[0][1]).to.include(period2);
+      // expect(history1[1][1]).to.include(period3);
 
       const history5 = await c.uriHistory(5);
       expect(history5.length).to.equal(2);
       expect(history5[0][0]).to.include(immutableUri2);
       expect(history5[1][0]).to.include(immutableUri3);
-      expect(history5[0][1]).to.include(period2);
-      expect(history5[1][1]).to.include(period3);
+      // expect(history5[0][1]).to.include(period2);
+      // expect(history5[1][1]).to.include(period3);
 
       const history101 = await c.uriHistory(101);
       expect(history101.length).to.equal(1);
       expect(history101[0][0]).to.include(immutableUri3);
-      expect(history101[0][1]).to.include(period3);
+      // expect(history101[0][1]).to.include(period3);
     });
 
     it("Should require new permanentUri via setPermanentBaseUriUpTo() to be valid for more tokenIds than the last one and less than last minted one.", async function () {
@@ -180,11 +181,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const input = await c.getMintRangeInput(101);
       await verified.mintPhotos(c, ...input);
 
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, period2, 0)).to.be.revertedWith(":32");
-      await c.setPermanentBaseUriUpTo(immutableUri2, period2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, period3, 100)).to.be.revertedWith(":32");
-      await c.setPermanentBaseUriUpTo(immutableUri3, period3, 101);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, period2, 102)).to.be.revertedWith(":32");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith(":32");
+      await c.setPermanentBaseUriUpTo(immutableUri2, 100);
+      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith(":32");
+      await c.setPermanentBaseUriUpTo(immutableUri3, 101);
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith(":32");
     });
 
   });
@@ -308,7 +309,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await verified.mintPhotos(c, ...inputs);
-      await c.setPermanentBaseUriUpTo(immutableUri, "", 50);
+      await c.setPermanentBaseUriUpTo(immutableUri, 50);
 
       for (let i = 1; i < 100; i++) {
         if (i > 50) expect(await c.uri(i)).to.include(mutableUri);
@@ -322,7 +323,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await verified.mintPhotos(c, ...inputs);
-      await c.setPermanentBaseUriUpTo(immutableUri, "", 10);
+      await c.setPermanentBaseUriUpTo(immutableUri, 10);
 
       for (let i = 1; i < 50; i++) {
         if (i > 10) expect(await c.uri(i)).to.include(mutableUri);
@@ -404,7 +405,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     });
 
-    it("Should correctly update initial supply with setInitialHolders 2", async function () {
+    it.only("Should correctly update initial supply with setInitialHolders 2", async function () {
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
       const initialSupply = [1, 5];
       const initialSupply2 = [1, 7];
@@ -814,75 +815,67 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
   });
 
-  describe("AccessControl", function () {
-
-    it("should set default roles during deploy", async function () {
-      const { c, owner } = await loadFixture(deployFixture);
-      expect(await c.hasRole(await c.CLAIM_MINTER_ROLE(), owner.address)).to.be.true;
-      expect(await c.hasRole(await c.PHOTO_MINTER_ROLE(), owner.address)).to.be.true;
-      expect(await c.hasRole(await c.URI_UPDATER_ROLE(), owner.address)).to.be.true;
-      expect(await c.hasRole(await c.DEFAULT_ADMIN_ROLE(), owner.address)).to.be.true;
-    });
+  describe("Ownable / Ownable", function () {
 
     it("should fail to execute access guarded functions without role", async function () {
       const { c, account1 } = await loadFixture(deployFixture);
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersInput(c, account1.address, account1.address);
-      await expect(c.connect(account1).updateInitialHolders(...updateInitialHoldersInput)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).updateInitialHolders(...updateInitialHoldersInput)).to.be.rejectedWith("Ownable");
       await c.unpause();
       await c.setInitialSupply([1, 4]);
       const mintInput = await c.getMintRangeInput(4);
-      await expect(c.connect(account1).mintPhotos(...mintInput)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).mintClaims(account1.address, 5, [])).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).pause()).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setPermanentBaseUriUpTo("", "", 100)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setProxyBaseUri("")).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setOperatorFilterRegistryAddress(account1.address)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setInitialSupply([1, 2])).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setOwner(account1.address)).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).mintPhotos(...mintInput)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).mintClaims(account1.address, 5, [])).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).pause()).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).unpause()).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setProxyBaseUri("")).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).resetTokenRoyalty(1)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setOperatorFilterRegistryAddress(account1.address)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setInitialSupply([1, 2])).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).transferOwnership(account1.address)).to.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.be.rejectedWith("Ownable");
     });
 
     it("should execute access guarded functions with special role", async function () {
       const { c, account1, account2, account3, account4 } = await loadFixture(deployFixture);
 
-      await c.grantRole(await c.DEFAULT_ADMIN_ROLE(), account1.address);
-      await c.pause();
+      await c.transferOwnership(account1.address);
+      await c.connect(account1).pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersInput(c, account1.address, account1.address);
-      await expect(c.connect(account1).updateInitialHolders(...updateInitialHoldersInput)).to.not.be.rejectedWith("AccessControl");
-      await c.unpause();
-      await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).updateInitialHolders(...updateInitialHoldersInput)).to.not.be.rejectedWith("Ownable");
+      await c.connect(account1).unpause();
+      await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setLockInitialHoldersUpTo(0)).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).permanentlyDisableInitialHoldersRangeUpdate()).to.not.be.rejectedWith("Ownable");
 
-      await expect(c.connect(account1).pause()).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).unpause()).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).pause()).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).unpause()).to.not.be.rejectedWith("Ownable");
 
-      await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).resetTokenRoyalty(1)).to.not.be.rejectedWith("Ownable");
 
-      await expect(c.connect(account1).setOwner(account1.address)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setOperatorFilterRegistryAddress(account1.address)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).transferOwnership(account1.address)).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setOperatorFilterRegistryAddress(account1.address)).to.not.be.rejectedWith("Ownable");
 
-      await c.grantRole(await c.PHOTO_MINTER_ROLE(), account2.address);
-      await c.setInitialSupply([1, 4]);
+      // await c.grantRole(await c.PHOTO_MINTER_ROLE(), account2.address);
+      await c.connect(account1).setInitialSupply([1, 4]);
       const mintInput = await c.getMintRangeInput(4);
-      await expect(c.connect(account2).setInitialSupply([1, 2])).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account2).mintPhotos(...mintInput)).to.not.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setInitialSupply([1, 2])).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).mintPhotos(...mintInput)).to.not.be.rejectedWith("Ownable");
 
-      await c.grantRole(await c.CLAIM_MINTER_ROLE(), account3.address);
-      await expect(c.connect(account3).mintClaims(account1.address, 5, [])).to.not.be.rejectedWith("AccessControl");
+      // await c.grantRole(await c.CLAIM_MINTER_ROLE(), account3.address);
+      await expect(c.connect(account1).mintClaims(account1.address, 5, [])).to.not.be.rejectedWith("Ownable");
 
-      await c.grantRole(await c.URI_UPDATER_ROLE(), account4.address);
-      await expect(c.connect(account4).setPermanentBaseUriUpTo("", 100)).to.not.be.rejectedWith("AccessControl");
-      await expect(c.connect(account4).setProxyBaseUri("")).to.not.be.rejectedWith("AccessControl");
+      // await c.grantRole(await c.URI_UPDATER_ROLE(), account4.address);
+      await expect(c.connect(account1).setPermanentBaseUriUpTo("", 100)).to.not.be.rejectedWith("Ownable");
+      await expect(c.connect(account1).setProxyBaseUri("")).to.not.be.rejectedWith("Ownable");
     });
 
     it("should fail execute non-view functions when paused", async function () {
@@ -901,7 +894,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("paused");
       await expect(c.resetTokenRoyalty(1)).to.be.rejectedWith("paused");
 
-      await expect(c.setOwner(account1.address)).to.be.rejectedWith("paused");
+      // await expect(c.transferOwnership(account1.address)).to.be.rejectedWith("paused");
       await expect(c.setOperatorFilterRegistryAddress(account1.address)).to.be.rejectedWith("paused");
       await expect(c.setApprovalForAll(account1.address, true)).to.be.rejectedWith("paused");
 
@@ -912,14 +905,14 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       // await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
       await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
 
-      await expect(c.setPermanentBaseUriUpTo("", "", 100)).to.be.rejectedWith("paused");
+      await expect(c.setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("paused");
       await expect(c.setProxyBaseUri("")).to.be.rejectedWith("paused");
     });
 
     it("should be possible to update owner via setOwner", async function () {
       const { c, owner, account1, account2, account3, account4 } = await loadFixture(deployFixture);
       expect(await c.owner()).to.equal(owner.address);
-      await c.setOwner(account1.address);
+      await c.transferOwnership(account1.address);
       expect(await c.owner()).to.equal(account1.address);
     })
   });
