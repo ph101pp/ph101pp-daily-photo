@@ -4,6 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
@@ -30,7 +31,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     address[][] internal _initialHolders;
     uint[] internal _initialHolderRanges;
     mapping(address => bool) public isInitialHolderAddress;
-    mapping(address => bool) public wasOwnerAddress;
+    mapping(address => bool) public isHolderAddress;
 
     // last tokenId minted via mintRange.
     uint public lastRangeTokenIdMinted;
@@ -134,8 +135,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
             _maybeInitializeBalance(from, id);
             _maybeInitializeBalance(to, id);
         }
-        if(!wasOwnerAddress[to]) {
-            wasOwnerAddress[to] = true;
+        if (!isHolderAddress[to]) {
+            isHolderAddress[to] = true;
         }
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
@@ -165,20 +166,23 @@ abstract contract ERC1155MintRange is ERC1155_ {
     /**
      * @dev Set initial holders. mintRange will distribute tokens to these holders
      */
-    function _setInitialHolders(
-        address[] memory addresses
-    ) internal virtual {
+    function _setInitialHolders(address[] memory addresses) internal virtual {
         uint256 firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
         uint256 lastIndex = _initialHolders.length - 1;
         uint256 lastId = _initialHolderRanges[lastIndex];
         if (lastId == firstId) {
-            _initialHolders[lastId] = addresses;
+            _initialHolders[lastIndex] = addresses;
         } else {
             _initialHolderRanges.push(firstId);
             _initialHolders.push(addresses);
         }
         for (uint i = 0; i < addresses.length; i++) {
             address initialHolder = addresses[i];
+            require(
+                !isHolderAddress[initialHolder] ||
+                    isInitialHolderAddress[initialHolder],
+                ":5"
+            );
             isInitialHolderAddress[initialHolder] = true;
         }
     }
@@ -292,10 +296,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
             )
         );
         // invalid input -> use getMintRangeInput
-        require(
-            inputChecksum == checksum,
-            ":30"
-        );
+        require(inputChecksum == checksum, ":30");
         // Update last minted tokenId
         lastRangeTokenIdMinted = input.ids[input.ids.length - 1];
 
