@@ -2,7 +2,7 @@
 pragma solidity ^0.8.12;
 
 import "./ERC1155MintRangeUpdateable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 // import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
@@ -12,13 +12,10 @@ import "./OpenseaOperatorFilterer.sol";
 contract Ph101ppDailyPhoto is
     ERC1155MintRangeUpdateable,
     ERC2981,
-    AccessControl,
+    Ownable,
     OpenseaOperatorFilterer
 {
     uint public constant START_DATE = 1661990400; // Sept 1, 2022
-    bytes32 public constant URI_UPDATER_ROLE = keccak256("URI_UPDATER_ROLE");
-    bytes32 public constant CLAIM_MINTER_ROLE = keccak256("CLAIM_MINTER_ROLE");
-    bytes32 public constant PHOTO_MINTER_ROLE = keccak256("PHOTO_MINTER_ROLE");
     uint public constant CLAIM_TOKEN_ID = 0;
     string private constant _CLAIM_TOKEN = "CLAIM";
 
@@ -46,11 +43,6 @@ contract Ph101ppDailyPhoto is
         address[] memory initialHolders
     ) ERC1155_("") ERC1155MintRange(initialHolders) {
         // require(initialHolders.length == 2);
-
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(CLAIM_MINTER_ROLE, msg.sender);
-        _grantRole(PHOTO_MINTER_ROLE, msg.sender);
-        _grantRole(URI_UPDATER_ROLE, msg.sender);
 
         // set initial max supply to 2-3;
         _initialSupplyRanges.push(0);
@@ -162,7 +154,7 @@ contract Ph101ppDailyPhoto is
         string memory newUri,
         string memory periodName,
         uint validUpToTokenId
-    ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
+    ) public whenNotPaused onlyOwner {
         require(
             validUpToTokenId > lastRangeTokenIdWithPermanentUri &&
                 validUpToTokenId <= lastRangeTokenIdMinted,
@@ -178,7 +170,7 @@ contract Ph101ppDailyPhoto is
     // tokens not included in the permanent Uris yet.
     function setProxyBaseUri(
         string memory newProxyUri
-    ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
+    ) public whenNotPaused onlyOwner {
         _proxyUri = newProxyUri;
     }
 
@@ -191,7 +183,7 @@ contract Ph101ppDailyPhoto is
         address to,
         uint amount,
         bytes memory data
-    ) public onlyRole(CLAIM_MINTER_ROLE) {
+    ) public onlyOwner {
         _mint(to, CLAIM_TOKEN_ID, amount, data);
     }
 
@@ -224,19 +216,9 @@ contract Ph101ppDailyPhoto is
     function mintPhotos(
         MintRangeInput memory input,
         bytes32 checksum
-    ) public onlyRole(PHOTO_MINTER_ROLE) {
+    ) public onlyOwner {
         _mintRange(input, checksum);
     }
-
-    // ensures MintRangeInput get invalidated when initial supply changes
-    // function _customMintRangeChecksum()
-    //     internal
-    //     view
-    //     override
-    //     returns (bytes32)
-    // {
-    //     return keccak256(abi.encode(_initialSupplies));
-    // }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Initial Supply
@@ -245,7 +227,7 @@ contract Ph101ppDailyPhoto is
     // Update initial supply range [min, max] for future mints.
     function setInitialSupply(
         uint[] memory newInitialSupply
-    ) public whenNotPaused onlyRole(PHOTO_MINTER_ROLE) {
+    ) public whenNotPaused onlyOwner {
         require(
             newInitialSupply.length == 2 &&
                 newInitialSupply[0] <= newInitialSupply[1]
@@ -292,7 +274,7 @@ contract Ph101ppDailyPhoto is
     function setInitialHolders(
         address treasury,
         address vault
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyOwner {
         address[] memory addresses = new address[](2);
         addresses[0] = treasury;
         addresses[1] = vault;
@@ -308,7 +290,7 @@ contract Ph101ppDailyPhoto is
     function updateInitialHolders(
         UpdateInitialHoldersInput memory input,
         bytes32 checksum
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public onlyOwner {
         require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
         _updateInitialHoldersSafe(input, checksum);
     }
@@ -317,7 +299,7 @@ contract Ph101ppDailyPhoto is
     // so they cant be updated via updateInitialHolders.
     function setLockInitialHoldersUpTo(
         uint256 tokenId
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyOwner {
         _setLockInitialHoldersUpTo(tokenId);
     }
 
@@ -325,7 +307,7 @@ contract Ph101ppDailyPhoto is
     function permanentlyDisableInitialHoldersRangeUpdate()
         public
         whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyOwner
     {
         isInitialHoldersRangeUpdatePermanentlyDisabled = true;
     }
@@ -337,7 +319,7 @@ contract Ph101ppDailyPhoto is
     function setDefaultRoyalty(
         address receiver,
         uint96 feeNumerator
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyOwner {
         _setDefaultRoyalty(receiver, feeNumerator);
     }
 
@@ -345,13 +327,11 @@ contract Ph101ppDailyPhoto is
         uint tokenId,
         address receiver,
         uint96 feeNumerator
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyOwner {
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 
-    function resetTokenRoyalty(
-        uint tokenId
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    function resetTokenRoyalty(uint tokenId) public whenNotPaused onlyOwner {
         _resetTokenRoyalty(tokenId);
     }
 
@@ -359,11 +339,11 @@ contract Ph101ppDailyPhoto is
     // Pausable
     ///////////////////////////////////////////////////////////////////////////////
 
-    function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function pause() public onlyOwner {
         _pause();
     }
 
-    function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function unpause() public onlyOwner {
         _unpause();
     }
 
@@ -391,14 +371,12 @@ contract Ph101ppDailyPhoto is
 
     // Owner can be used to make updates (register / subscribe)
     // to the OperatorFilterRegistry on behalf of this contract.
-    function owner() public view override returns (address) {
+    function owner() public view override(OpenseaOperatorFilterer, Ownable) returns (address) {
         return _owner;
     }
 
     // Set new owner. This address will be returned by owner().
-    function setOwner(
-        address newOwner
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setOwner(address newOwner) public whenNotPaused onlyOwner {
         _owner = newOwner;
     }
 
@@ -406,7 +384,7 @@ contract Ph101ppDailyPhoto is
     // Set to address(0) to disable registry checks.
     function setOperatorFilterRegistryAddress(
         address _operatorFilterRegistryAddress
-    ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public whenNotPaused onlyOwner {
         _setOperatorFilterRegistryAddress(_operatorFilterRegistryAddress);
     }
 
@@ -414,7 +392,7 @@ contract Ph101ppDailyPhoto is
     function permanentlyFreezeOperatorFilterRegistryAddress()
         public
         whenNotPaused
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyOwner
     {
         _permanentlyFreezeOperatorFilterRegistryAddress();
     }
@@ -423,20 +401,20 @@ contract Ph101ppDailyPhoto is
     // Transfer Event Listener Address
     ///////////////////////////////////////////////////////////////////////////////
 
-    // function setTransferEventListenerAddress(
-    //     address listener
-    // ) public whenNotPaused onlyRole(DEFAULT_ADMIN_ROLE) {
-    //     require(!isTransferEventListenerAddressPermanentlyFrozen);
-    //     transferEventListenerAddress = listener;
-    // }
+    function setTransferEventListenerAddress(
+        address listener
+    ) public whenNotPaused onlyOwner {
+        require(!isTransferEventListenerAddressPermanentlyFrozen);
+        transferEventListenerAddress = listener;
+    }
 
-    // function permanentlyFreezeTransferEventListenerAddress()
-    //     public
-    //     whenNotPaused
-    //     onlyRole(DEFAULT_ADMIN_ROLE)
-    // {
-    //     isTransferEventListenerAddressPermanentlyFrozen = true;
-    // }
+    function permanentlyFreezeTransferEventListenerAddress()
+        public
+        whenNotPaused
+        onlyOwner
+    {
+        isTransferEventListenerAddressPermanentlyFrozen = true;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Transfer & Approval mods for Opensea Operator Filterer & Transfer Event
@@ -460,27 +438,27 @@ contract Ph101ppDailyPhoto is
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
-    // function _afterTokenTransfer(
-    //     address operator,
-    //     address from,
-    //     address to,
-    //     uint[] memory ids,
-    //     uint[] memory amounts,
-    //     bytes memory data
-    // ) internal virtual override {
-    //     super._afterTokenTransfer(operator, from, to, ids, amounts, data);
-    //     if (transferEventListenerAddress != address(0)) {
-    //         IPh101ppDailyPhotoListener(transferEventListenerAddress)
-    //             .Ph101ppDailyPhotoTransferHandler(
-    //                 operator,
-    //                 from,
-    //                 to,
-    //                 ids,
-    //                 amounts,
-    //                 data
-    //             );
-    //     }
-    // }
+    function _afterTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint[] memory ids,
+        uint[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        super._afterTokenTransfer(operator, from, to, ids, amounts, data);
+        if (transferEventListenerAddress != address(0)) {
+            IPh101ppDailyPhotoListener(transferEventListenerAddress)
+                .Ph101ppDailyPhotoTransferHandler(
+                    operator,
+                    from,
+                    to,
+                    ids,
+                    amounts,
+                    data
+                );
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
     // Interface
@@ -489,7 +467,7 @@ contract Ph101ppDailyPhoto is
     // The following functions are overrides required by Solidity.
     function supportsInterface(
         bytes4 interfaceId
-    ) public view override(AccessControl, ERC1155_, ERC2981) returns (bool) {
+    ) public view override(ERC1155_, ERC2981) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
