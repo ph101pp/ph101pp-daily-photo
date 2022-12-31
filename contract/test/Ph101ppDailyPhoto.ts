@@ -88,11 +88,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
 
     it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriRanges + uriHistory to reflect this.", async function () {
-      // const period = "Init";
+      const period = "Init";
       const immutableUri2 = "immutable.uri.2/";
-      // const period2 = "Period2";
+      const period2 = "Period2";
       const immutableUri3 = "immutable.uri.3/";      
-      // const period3 = "Period3";
+      const period3 = "Period3";
 
       const { c, immutableUri } = await loadFixture(deployFixture);
 
@@ -102,7 +102,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
       expect(await c.permanentBaseUri()).to.equal(immutableUri);
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      // await c.setPeriod(period2, 100);
+      await c.setPeriod(period2);
 
       expect(await c.permanentBaseUri()).to.equal(immutableUri2);
 
@@ -123,6 +123,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(100);
       
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
+      await c.setPeriod(period3);
 
       const history2 = await c.permanentBaseUriRanges();
       expect(history2.length).to.equal(2);
@@ -146,28 +147,28 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(history0[0][0]).to.include(immutableUri);
       expect(history0[1][0]).to.include(immutableUri2);
       expect(history0[2][0]).to.include(immutableUri3);
-      // expect(history0[0][1]).to.include(period);
-      // expect(history0[1][1]).to.include(period2);
-      // expect(history0[2][1]).to.include(period3);
+      expect(history0[0][1]).to.include(period);
+      expect(history0[1][1]).to.include(period2);
+      expect(history0[2][1]).to.include(period3);
 
       const history1 = await c.uriHistory(1);
       expect(history1.length).to.equal(2);
       expect(history1[0][0]).to.include(immutableUri2);
       expect(history1[1][0]).to.include(immutableUri3);
-      // expect(history1[0][1]).to.include(period2);
-      // expect(history1[1][1]).to.include(period3);
+      expect(history1[0][1]).to.include(period2);
+      expect(history1[1][1]).to.include(period3);
 
       const history5 = await c.uriHistory(5);
       expect(history5.length).to.equal(2);
       expect(history5[0][0]).to.include(immutableUri2);
       expect(history5[1][0]).to.include(immutableUri3);
-      // expect(history5[0][1]).to.include(period2);
-      // expect(history5[1][1]).to.include(period3);
+      expect(history5[0][1]).to.include(period2);
+      expect(history5[1][1]).to.include(period3);
 
       const history101 = await c.uriHistory(101);
       expect(history101.length).to.equal(1);
       expect(history101[0][0]).to.include(immutableUri3);
-      // expect(history101[0][1]).to.include(period3);
+      expect(history101[0][1]).to.include(period3);
     });
 
     it("Should require new permanentUri via setPermanentBaseUriUpTo() to be valid for more tokenIds than the last one and less than last minted one.", async function () {
@@ -332,6 +333,48 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
   });
 
+
+  describe("Periods & uriHistory", function () {
+
+    it("should return correctly set Init period", async function () {
+      const { c, mutableUri } = await loadFixture(deployFixture);
+
+      expect(await c.period(0)).to.equal("Init");
+    });
+
+    it("Should correctly set Periods with setPeriod", async function () {
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const period1 = "Period 1";
+      const period2 = "Period 2";
+      const period3 = "Period 3";
+      
+      await c.setPeriod(period1);
+      const periodRanges = await c.periodRanges();
+      expect(periodRanges.ranges.length).to.equal(1);
+      expect(periodRanges.periods[0]).to.deep.equal(period1);
+
+      expect(await c.period(1000)).to.deep.equal(period1);
+
+      const inputs = await c.getMintRangeInput(5);
+      await verified.mintPhotos(c, ...inputs);
+
+      await c.setPermanentBaseUriUpTo("uri2", 3);
+      await c.setPeriod(period2);
+      const periodRanges2 = await c.periodRanges();
+      expect(periodRanges2.ranges.length).to.equal(2);
+      expect(periodRanges2.periods[1]).to.deep.equal(period2);
+
+      await c.setPermanentBaseUriUpTo("uri3", 5);
+      await c.setPeriod(period3);
+      const periodRanges3 = await c.periodRanges();
+      expect(periodRanges3.ranges.length).to.equal(3);
+      expect(periodRanges3.periods[2]).to.deep.equal(period3);
+
+      expect(await c.period(1000)).to.deep.equal(period3);
+    });
+
+  });
+
   describe("Initial Supply ", function () {
 
     it("should fail to set max initial supply when paused", async function () {
@@ -405,7 +448,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     });
 
-    it.only("Should correctly update initial supply with setInitialHolders 2", async function () {
+    it("Should correctly update initial supply with setInitialHolders 2", async function () {
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
       const initialSupply = [1, 5];
       const initialSupply2 = [1, 7];
@@ -1017,5 +1060,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
 
   });
+
+  
 }
 

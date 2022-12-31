@@ -116,13 +116,9 @@ contract Ph101ppDailyPhoto is
             _permanentUris.length - permanentUriIndex
         );
         for (uint i = permanentUriIndex; i < _permanentUris.length; i++) {
-            uint periodIndex = _findLowerBound(
-                _periodRanges,
-                _permanentUriRanges[permanentUriIndex]
-            );
             string[] memory item = new string[](2);
             item[0] = string.concat(_permanentUris[i], slug);
-            item[1] = _periods[periodIndex];
+            item[1] = period(_permanentUriRanges[i]);
             history[i - permanentUriIndex] = item;
         }
         return history;
@@ -148,21 +144,6 @@ contract Ph101ppDailyPhoto is
         return (_permanentUris, _permanentUriRanges);
     }
 
-    // Returns Period when token was minted
-    function period(uint tokenId) public view returns (string memory) {
-        uint periodIndex = _findLowerBound(_periodRanges, tokenId);
-        return _periods[periodIndex];
-    }
-
-    // Returns all period ranges.
-    function periodRanges()
-        public
-        view
-        returns (string[] memory periods, uint256[] memory ranges)
-    {
-        return (_periods, _periodRanges);
-    }
-
     // Updates latest permanent base Uri.
     // New uri must include more token Ids than previous one.
     function setPermanentBaseUriUpTo(
@@ -179,33 +160,46 @@ contract Ph101ppDailyPhoto is
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
     }
 
-    // Updates latest permanent base Uri.
-    // And begins a new Period
-    function setPeriod(
-        string memory periodName,
-        uint tokenId
-    ) public whenNotPaused onlyOwner {
-        uint lastIndex = _periodRanges.length - 1;
-        require(
-            tokenId <= lastRangeTokenIdMinted &&
-                tokenId >= _periodRanges[lastIndex],
-            ":18"
-        );
-
-        if (tokenId == _periodRanges[lastIndex]) {
-            _periods[lastIndex] = periodName;
-        } else {
-            _periods.push(periodName);
-            _periodRanges.push(tokenId);
-        }
-    }
-
     // Update proxy base Uri that is used for
     // tokens not included in the permanent Uris yet.
     function setProxyBaseUri(
         string memory newProxyUri
     ) public whenNotPaused onlyOwner {
         _proxyUri = newProxyUri;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Periods
+    ///////////////////////////////////////////////////////////////////////////////
+
+    // Returns Period when token was minted
+    function period(uint tokenId) public view returns (string memory) {
+        uint periodIndex = _findLowerBound(_periodRanges, tokenId);
+        return _periods[periodIndex];
+    }
+
+    // Returns all period ranges.
+    function periodRanges()
+        public
+        view
+        returns (string[] memory periods, uint256[] memory ranges)
+    {
+        return (_periods, _periodRanges);
+    }
+
+    // Sets new period for current permanent uri
+    function setPeriod(
+        string memory periodName
+    ) public whenNotPaused onlyOwner {
+        uint lastPeriodIndex = _periodRanges.length - 1;
+        uint tokenId = _permanentUriRanges[_permanentUriRanges.length - 1];
+
+        if (tokenId == _periodRanges[lastPeriodIndex]) {
+            _periods[lastPeriodIndex] = periodName;
+        } else {
+            _periods.push(periodName);
+            _periodRanges.push(tokenId);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////
