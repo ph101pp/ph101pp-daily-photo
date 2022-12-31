@@ -38,7 +38,7 @@ contract Ph101ppDailyPhoto is
 
     constructor(
         string memory newProxyUri,
-        string memory newPermanentUri,
+        // string memory newPermanentUri,
         address[] memory initialHolders
     ) ERC1155_("") ERC1155MintRange(initialHolders) {
         // require(initialHolders.length == 2);
@@ -47,15 +47,15 @@ contract Ph101ppDailyPhoto is
         _initialSupplyRanges.push(0);
         _initialSupplies.push([2, 3]);
 
-        _permanentUriRanges.push(0);
-        _permanentUris.push(newPermanentUri);
+        // _permanentUriRanges.push(0);
+        // _permanentUris.push(newPermanentUri);
 
         _periodRanges.push(0);
         _periods.push("Init");
 
         _proxyUri = newProxyUri;
         _setDefaultRoyalty(msg.sender, 500);
-        mintClaims(initialHolders[TREASURY_ID], 10, "");
+        // mintClaims(initialHolders[TREASURY_ID], 10, "");
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -151,13 +151,20 @@ contract Ph101ppDailyPhoto is
         uint validUpToTokenId
     ) public whenNotPaused onlyOwner {
         require(
-            validUpToTokenId > lastRangeTokenIdWithPermanentUri &&
-                validUpToTokenId <= lastRangeTokenIdMinted,
-            ":32" // !(lastIdWithPermanentUri < TokenId <= lastIdMinted)
+            !isZeroMinted ||
+                (validUpToTokenId > lastRangeTokenIdWithPermanentUri &&
+                    validUpToTokenId <= lastRangeTokenIdMinted),
+            "P:01" // !(lastIdWithPermanentUri < TokenId <= lastIdMinted)
         );
-        _permanentUris.push(newUri);
-        _permanentUriRanges.push(lastRangeTokenIdWithPermanentUri + 1);
-        lastRangeTokenIdWithPermanentUri = validUpToTokenId;
+        if (validUpToTokenId == 0) {
+            _permanentUris.push(newUri);
+            _permanentUriRanges.push(0);
+            lastRangeTokenIdWithPermanentUri = 0;
+        } else {
+            _permanentUris.push(newUri);
+            _permanentUriRanges.push(lastRangeTokenIdWithPermanentUri + 1);
+            lastRangeTokenIdWithPermanentUri = validUpToTokenId;
+        }
     }
 
     // Update proxy base Uri that is used for

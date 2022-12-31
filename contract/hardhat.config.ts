@@ -27,7 +27,12 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       url: `https://eth-goerli.g.alchemy.com/v2/${process.env.GOERLI_ALCHEMY_API_KEY}`,
-      accounts: [`${process.env.GOERLI_PRIVATE_KEY}`],
+      accounts: [`${process.env.PRIVATE_KEY}`],
+      gasPrice: gasGoerliGwei * 1000000000
+    },
+    mainnet: {
+      url: `https://eth.g.alchemy.com/v2/${process.env.MAINNET_ALCHEMY_API_KEY}`,
+      accounts: [`${process.env.PRIVATE_KEY}`],
       gasPrice: gasGoerliGwei * 1000000000
     }
   },
