@@ -89,8 +89,12 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
     });
 
     it("Should correcly update immutableUri via setPermanentBaseUriUpTo() and permanentBaseUriRanges + uriHistory to reflect this.", async function () {
+      const period = "Genesis";
       const immutableUri2 = "immutable.uri.2/";
-      const immutableUri3 = "immutable.uri.3/";
+      const period2 = "Period2";
+      const immutableUri3 = "immutable.uri.3/";      
+      const period3 = "Period3";
+
       const { c, immutableUri } = await loadFixture(deployFixture);
 
       await c.setInitialSupply([1, 1]);
@@ -98,33 +102,42 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await verified.mintPhotos(c, ...input);
 
       expect(await c.permanentBaseUri()).to.equal(immutableUri);
-      await c.setPermanentBaseUriUpTo(immutableUri2, 100);
+      await c.setPermanentBaseUriUpTo(immutableUri2, period2, 100);
       expect(await c.permanentBaseUri()).to.equal(immutableUri2);
 
       const history = await c.permanentBaseUriRanges();
-      expect(history.length).to.equal(2);
+
+      expect(history.length).to.equal(3);
       const urls = history[0];
       expect(urls.length).to.equal(2);
       expect(urls[0]).to.equal(immutableUri);
       expect(urls[1]).to.equal(immutableUri2);
+      
+      expect(history[1][0]).to.equal(period);
+      expect(history[1][1]).to.equal(period2);
 
-      expect(history[1][0]).to.equal(0)
-      expect(history[1][1]).to.equal(1)
+      expect(history[2][0]).to.equal(0)
+      expect(history[2][1]).to.equal(1)
+
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(100);
-
-      await c.setPermanentBaseUriUpTo(immutableUri3, 101);
+      
+      await c.setPermanentBaseUriUpTo(immutableUri3, period3, 101);
 
       const history2 = await c.permanentBaseUriRanges();
-      expect(history2.length).to.equal(2);
+      expect(history2.length).to.equal(3);
       const urls2 = history2[0];
       expect(urls2.length).to.equal(3);
       expect(urls2[0]).to.equal(immutableUri);
       expect(urls2[1]).to.equal(immutableUri2);
       expect(urls2[2]).to.equal(immutableUri3);
 
-      expect(history2[1][0]).to.equal(0)
-      expect(history2[1][1]).to.equal(1)
-      expect(history2[1][2]).to.equal(101)
+      expect(history2[1][0]).to.equal(period);
+      expect(history2[1][1]).to.equal(period2);
+      expect(history2[1][2]).to.equal(period3);
+      
+      expect(history2[2][0]).to.equal(0)
+      expect(history2[2][1]).to.equal(1)
+      expect(history2[2][2]).to.equal(101)
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(101);
 
       const history0 = await c.uriHistory(0);
@@ -132,24 +145,33 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(history0[0][0]).to.include(immutableUri);
       expect(history0[1][0]).to.include(immutableUri2);
       expect(history0[2][0]).to.include(immutableUri3);
+      expect(history0[0][1]).to.include(period);
+      expect(history0[1][1]).to.include(period2);
+      expect(history0[2][1]).to.include(period3);
 
       const history1 = await c.uriHistory(1);
       expect(history1.length).to.equal(2);
       expect(history1[0][0]).to.include(immutableUri2);
       expect(history1[1][0]).to.include(immutableUri3);
+      expect(history1[0][1]).to.include(period2);
+      expect(history1[1][1]).to.include(period3);
 
       const history5 = await c.uriHistory(5);
       expect(history5.length).to.equal(2);
       expect(history5[0][0]).to.include(immutableUri2);
       expect(history5[1][0]).to.include(immutableUri3);
+      expect(history5[0][1]).to.include(period2);
+      expect(history5[1][1]).to.include(period3);
 
       const history101 = await c.uriHistory(101);
       expect(history101.length).to.equal(1);
       expect(history101[0][0]).to.include(immutableUri3);
-
+      expect(history101[0][1]).to.include(period3);
     });
 
     it("Should require new permanentUri via setPermanentBaseUriUpTo() to be valid for more tokenIds than the last one and less than last minted one.", async function () {
+      const period2 = "Period2";
+      const period3 = "Period3";
       const immutableUri2 = "2.immutable.uri";
       const immutableUri3 = "3.immutable.uri";
       const { c, owner } = await loadFixture(deployFixture);
@@ -158,12 +180,13 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const input = await c.getMintRangeInput(101);
       await verified.mintPhotos(c, ...input);
 
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
-      await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
-      await c.setPermanentBaseUriUpTo(immutableUri3, 101);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("!(lastIdWithPermanentUri < TokenId <= lastIdMinted)");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, period2, 0)).to.be.revertedWith(":32");
+      await c.setPermanentBaseUriUpTo(immutableUri2, period2, 100);
+      await expect(c.setPermanentBaseUriUpTo(immutableUri3, period3, 100)).to.be.revertedWith(":32");
+      await c.setPermanentBaseUriUpTo(immutableUri3, period3, 101);
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, period2, 102)).to.be.revertedWith(":32");
     });
+
   });
 
   describe("tokenID <> date conversion", function () {
@@ -379,6 +402,42 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
         expect(cIS[1].eq(initialSupply2[1]));
       }
 
+    });
+
+    it("Should correctly update initial supply with setInitialHolders 2", async function () {
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialSupply = [1, 5];
+      const initialSupply2 = [1, 7];
+      const initialSupply3 = [1, 20];
+      const initialSupply4 = [1, 12];
+
+      await c.setInitialSupply(initialSupply);
+
+      const holderRanges = await c.initialSupplyRanges();
+      expect(holderRanges.ranges.length).to.equal(1);
+      expect(holderRanges.supplies[0]).to.deep.equal(initialSupply);
+
+      await c.setInitialSupply(initialSupply2);
+      const holderRanges2 = await c.initialSupplyRanges();
+      expect(holderRanges2.ranges.length).to.equal(1);
+      expect(holderRanges2.supplies[0]).to.deep.equal(initialSupply2);
+
+      expect(await c.initialSupply(1000)).to.deep.equal(initialSupply2);
+
+      const inputs = await c.getMintRangeInput(5);
+      await verified.mintPhotos(c, ...inputs);
+
+      await c.setInitialSupply(initialSupply3);
+      const holderRanges3 = await c.initialSupplyRanges();
+      expect(holderRanges3.ranges.length).to.equal(2);
+      expect(holderRanges3.supplies[1]).to.deep.equal(initialSupply3);
+
+      await c.setInitialSupply(initialSupply4);
+      const holderRanges4 = await c.initialSupplyRanges();
+      expect(holderRanges4.ranges.length).to.equal(2);
+      expect(holderRanges4.supplies[1]).to.deep.equal(initialSupply4);
+
+      expect(await c.initialSupply(1000)).to.deep.equal(initialSupply4);
     });
 
     it("Should distribute tokens evenly within min/max supply range", async function () {
