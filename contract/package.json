@@ -6,6 +6,7 @@
     "test-fast": "TS_NODE_TYPE_CHECK=false npx hardhat test",
     "deploy-test": "npx hardhat run scripts/deploy.ts",
     "deploy-goerli": "npm run test && npx hardhat run scripts/deploy.ts --network goerli",
+    "deploy-mainnet": "npm run test && npx hardhat run scripts/deploy.ts --network mainnet",
     "interact-test": "npx hardhat run scripts/interact.ts",
     "interact-goerli": "npx hardhat run scripts/interact.ts --network goerli",
     "verify-abi-goerli": "npx hardhat verify --network goerli --constructor-args ./scripts/deployArguments.js"
