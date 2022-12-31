@@ -347,6 +347,17 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
   describe("initialHolders", function () {
 
+    it("Should fail to set initial holders to address(0) or same address", async function () {
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialHolders = [ethers.constants.AddressZero, account2.address];
+      const initialHolders1 = [account2.address, ethers.constants.AddressZero];
+      const initialHolders2 = [account5.address, account5.address];
+
+      await expect(c.setInitialHolders(initialHolders)).to.be.rejected;
+      await expect(c.setInitialHolders(initialHolders1)).to.be.rejected;
+      await expect(c.setInitialHolders(initialHolders2)).to.be.rejected;    
+    });
+
     it("Should correctly update initial holders with setInitialHolders", async function () {
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address];

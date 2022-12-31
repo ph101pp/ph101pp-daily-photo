@@ -170,12 +170,6 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint256 firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
         uint256 lastIndex = _initialHolders.length - 1;
         uint256 lastId = _initialHolderRanges[lastIndex];
-        if (lastId == firstId) {
-            _initialHolders[lastIndex] = addresses;
-        } else {
-            _initialHolderRanges.push(firstId);
-            _initialHolders.push(addresses);
-        }
         for (uint i = 0; i < addresses.length; i++) {
             address initialHolder = addresses[i];
             require(
@@ -183,7 +177,17 @@ abstract contract ERC1155MintRange is ERC1155_ {
                     isInitialHolderAddress[initialHolder],
                 ":5"
             );
+            require(initialHolder != address(0), ":6");
+            for (uint j = i + 1; j < addresses.length; j++) {
+                require(initialHolder != addresses[j], ":7");
+            }
             isInitialHolderAddress[initialHolder] = true;
+        }
+        if (lastId == firstId) {
+            _initialHolders[lastIndex] = addresses;
+        } else {
+            _initialHolderRanges.push(firstId);
+            _initialHolders.push(addresses);
         }
     }
 
