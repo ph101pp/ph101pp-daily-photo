@@ -73,7 +73,7 @@ export async function _getUpdateInitialHoldersInput(
         const isToInitialHolder = await c.isInitialHolderAddress(toAddress);
 
         if (
-          !isBalanceInitializedFrom && ((balanceTo == 0 && !isToInitialHolder) || (isToInitialHolder && !isBalanceInitializedTo))
+          !isBalanceInitializedFrom //&& ((balanceTo == 0 && !isToInitialHolder) || (isToInitialHolder && !isBalanceInitializedTo))
         ) {
           let addressIndex = -1;
 
@@ -109,6 +109,5 @@ export async function _getUpdateInitialHoldersInput(
     newInitialHolders,
     newInitialHolderRanges
   };
-
   return input;
 }
