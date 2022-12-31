@@ -175,11 +175,11 @@ abstract contract ERC1155MintRange is ERC1155_ {
             require(
                 !isHolderAddress[initialHolder] ||
                     isInitialHolderAddress[initialHolder],
-                ":5"
+                "M:01"
             );
-            require(initialHolder != address(0), ":6");
+            require(initialHolder != address(0), "M:02");
             for (uint j = i + 1; j < addresses.length; j++) {
-                require(initialHolder != addresses[j], ":7");
+                require(initialHolder != addresses[j], "M:03");
             }
             isInitialHolderAddress[initialHolder] = true;
         }
@@ -300,7 +300,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
             )
         );
         // invalid input -> use getMintRangeInput
-        require(inputChecksum == checksum, ":30");
+        require(inputChecksum == checksum, "M:04");
         // Update last minted tokenId
         lastRangeTokenIdMinted = input.ids[input.ids.length - 1];
 

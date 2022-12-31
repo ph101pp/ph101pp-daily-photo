@@ -43,9 +43,9 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         uint256 tokenId
     ) internal virtual whenNotPaused {
         // Token must not be smaller than last locked token
-        require(tokenId > lastRangeTokenIdWithLockedInitialHolders, ":13");
+        require(tokenId > lastRangeTokenIdWithLockedInitialHolders, "H:01");
         // token must be minted
-        require(isZeroMinted && tokenId <= lastRangeTokenIdMinted, ":14");
+        require(isZeroMinted && tokenId <= lastRangeTokenIdMinted, "H:02");
         lastRangeTokenIdWithLockedInitialHolders = tokenId;
         if (!isZeroLocked) {
             isZeroLocked = true;
@@ -72,7 +72,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 // amount of ranges & initialHolders must match
                 input.newInitialHolderRanges.length ==
                 input.newInitialHolders.length,
-            ":1"
+            "H:03"
         );
 
         uint a = 0;
@@ -132,7 +132,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                 }
                 require(
                     currentInitialHolders.length == newInitialHolders.length,
-                    ":2"
+                    "H:04"
                 );
 
                 // for each initial holder address in group
@@ -143,11 +143,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     // if address was updated
                     if (fromAddress != toAddress) {
                         // initialHolders cant be zero-address
-                        require(toAddress != address(0), ":4");
+                        require(toAddress != address(0), "H:05");
                         require(
                             !isHolderAddress[toAddress] ||
                                 isInitialHolderAddress[toAddress],
-                            ":5"
+                            "H:06"
                         );
                         // initialHolders must be unique per tokenId
                         for (
@@ -155,7 +155,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                             j < newInitialHolders.length;
                             j++
                         ) {
-                            require(toAddress != newInitialHolders[j], ":6");
+                            require(toAddress != newInitialHolders[j], "H:07");
                         }
 
                         // add address to initial holders map
@@ -168,7 +168,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                                 !isZeroLocked ||
                                     id >
                                     lastRangeTokenIdWithLockedInitialHolders,
-                                ":5"
+                                "H:08"
                             );
                             // initialize from-address
                             // if there are already funds in to-address
@@ -194,7 +194,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     a <= 0 ||
                         input.newInitialHolderRanges[a] >
                         input.newInitialHolderRanges[a - 1],
-                    ":7"
+                    "H:09"
                 );
                 a++;
             }
@@ -228,7 +228,7 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
         bytes32 checksum = keccak256(
             abi.encode(input, _initialHolders, _initialHolderRanges, paused())
         );
-        require(inputChecksum == checksum, ":14");
+        require(inputChecksum == checksum, "H:10");
         _updateInitialHolders(input);
     }
 

@@ -49,8 +49,10 @@ function deployFixture<T extends BaseContract>(): () => Promise<Fixture<T> & Fix
       }
     });
 
-    const c = await PDP.deploy(mutableUri, immutableUri, [treasury.address, vault.address]) as BaseContract as T;
-
+    const c = await PDP.deploy(mutableUri, [treasury.address, vault.address]) as BaseContract as T;
+    const pdp: Ph101ppDailyPhoto = c as BaseContract as Ph101ppDailyPhoto;
+    await pdp.setPermanentBaseUriUpTo(immutableUri, 0);
+    await pdp.mintClaims(treasury.address, 10, []);
     const PDPL = await ethers.getContractFactory("TestIPh101ppDailyPhotoListener");
     const pdpl = await PDPL.deploy(c.address);
 
@@ -91,7 +93,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const period = "Init";
       const immutableUri2 = "immutable.uri.2/";
       const period2 = "Period2";
-      const immutableUri3 = "immutable.uri.3/";      
+      const immutableUri3 = "immutable.uri.3/";
       const period3 = "Period3";
 
       const { c, immutableUri } = await loadFixture(deployFixture);
@@ -113,7 +115,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(urls.length).to.equal(2);
       expect(urls[0]).to.equal(immutableUri);
       expect(urls[1]).to.equal(immutableUri2);
-      
+
       // expect(history[1][0]).to.equal(period);
       // expect(history[1][1]).to.equal(period2);
 
@@ -121,7 +123,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       expect(history[1][1]).to.equal(1)
 
       expect(await c.lastRangeTokenIdWithPermanentUri()).to.equal(100);
-      
+
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
       await c.setPeriod(period3);
 
@@ -136,7 +138,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       // expect(history2[1][0]).to.equal(period);
       // expect(history2[1][1]).to.equal(period2);
       // expect(history2[1][2]).to.equal(period3);
-      
+
       expect(history2[1][0]).to.equal(0)
       expect(history2[1][1]).to.equal(1)
       expect(history2[1][2]).to.equal(101)
@@ -182,11 +184,11 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const input = await c.getMintRangeInput(101);
       await verified.mintPhotos(c, ...input);
 
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith(":32");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 0)).to.be.revertedWith("P:01");
       await c.setPermanentBaseUriUpTo(immutableUri2, 100);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith(":32");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri3, 100)).to.be.revertedWith("P:01");
       await c.setPermanentBaseUriUpTo(immutableUri3, 101);
-      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith(":32");
+      await expect(c.setPermanentBaseUriUpTo(immutableUri2, 102)).to.be.revertedWith("P:01");
     });
 
   });
@@ -347,7 +349,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       const period1 = "Period 1";
       const period2 = "Period 2";
       const period3 = "Period 3";
-      
+
       await c.setPeriod(period1);
       const periodRanges = await c.periodRanges();
       expect(periodRanges.ranges.length).to.equal(1);
@@ -1061,6 +1063,6 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
   });
 
-  
+
 }
 

@@ -216,7 +216,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       const inputs = await c.getMintRangeInput(5);
       await verified.mint(c, account1.address, 1, 1, []);
-      await expect(verified.mintRange(c, ...inputs)).to.be.rejectedWith(":30");
+      await expect(verified.mintRange(c, ...inputs)).to.be.rejectedWith("M:04");
 
     });
 
@@ -229,7 +229,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       const inputs = await c.getMintRangeInput(5);
       await verified.mintBatch(c, account1.address, [20, 21], [1, 1], []);
-      await expect(verified.mintRange(c, ...inputs)).to.be.rejectedWith(":30");
+      await expect(verified.mintRange(c, ...inputs)).to.be.rejectedWith("M:04");
 
 
       // const integrity = await integrityCheck(c).ids(initialHolders, [20, 21])
@@ -251,7 +251,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       const inputs = await c.getMintRangeInput(5);
       await c.setInitialHolders(initialHolders2);
-      await expect(verified.mintRange(c, ...inputs)).to.be.rejectedWith(":30");
+      await expect(verified.mintRange(c, ...inputs)).to.be.rejectedWith("M:04");
 
       // should not affect initialHolders1
       const integrity = await integrityCheck(c).range(initialHolders1, 0, 4);
@@ -456,7 +456,7 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
 
       await verified.connect(account1).safeTransferFrom(c, account1.address, account5.address, 3, 1, []);
 
-      await expect( c.setInitialHolders(initialHolders2) ).to.be.rejectedWith(":5");
+      await expect( c.setInitialHolders(initialHolders2) ).to.be.rejectedWith("M:01");
       await expect( c.setInitialHolders(initialHolders3) ).to.not.be.rejected;
       await expect( c.setInitialHolders(initialHolders) ).to.not.be.rejected;
     });

@@ -273,16 +273,16 @@ library Ph101ppDailyPhotoUtils {
                 lastRangeTokenIdMinted &&
                 // amount of ranges & initialHolders must match
                 p.newInitialHolderRanges.length == p.newInitialHolders.length,
-            ":1"
+            "U:01"
         );
-        require(p.fromAddresses.length == p.toAddresses.length, ":2");
-        require(p.fromAddresses.length == p.ids.length, ":3");
-        require(p.fromAddresses.length == p.amounts.length, ":4");
+        require(p.fromAddresses.length == p.toAddresses.length, "U:02");
+        require(p.fromAddresses.length == p.ids.length, "U:03");
+        require(p.fromAddresses.length == p.amounts.length, "U:04");
 
         for (uint i = 1; i < p.newInitialHolderRanges.length; i++) {
             require(
                 p.newInitialHolderRanges[i] > p.newInitialHolderRanges[i - 1],
-                ":8"
+                "U:05"
             );
         }
 
@@ -308,7 +308,7 @@ library Ph101ppDailyPhotoUtils {
                 if (p.caller.isManualMint(tokenId)) {
                     continue;
                 }
-                require(newHolders.length == currentHolders.length, ":5");
+                require(newHolders.length == currentHolders.length, "U:06");
 
                 uint[] memory ids = new uint[](newHolders.length);
                 for (uint k = 0; k < newHolders.length; k++) {
@@ -326,18 +326,18 @@ library Ph101ppDailyPhotoUtils {
 
                     // No duplicate address for tokenID
                     for (uint b = a + 1; b < newHolders.length; b++) {
-                        require(newHolders[a] != newHolders[b], ":14");
+                        require(newHolders[a] != newHolders[b], "U:07");
                     }
 
                     if (currentHolders[a] == newHolders[a]) {
                         continue;
                     }
-                    require(newHolders[a] != address(0), ":18");
-                    require(!isLocked, ":6");
+                    require(newHolders[a] != address(0), "U:08");
+                    require(!isLocked, "U:09");
                     require(
                         !p.caller.isHolderAddress(newHolders[a]) ||
                             p.caller.isInitialHolderAddress(newHolders[a]),
-                        ":13"
+                        "U:10"
                     );
 
                     uint txIndex;
@@ -353,7 +353,7 @@ library Ph101ppDailyPhotoUtils {
                             break;
                         }
                     }
-                    require(txFound, ":7");
+                    require(txFound, "U:11");
 
                     if (
                         !p.caller.isBalanceInitialized(
@@ -367,17 +367,17 @@ library Ph101ppDailyPhotoUtils {
                     ) {
                         require(
                             currentHolders[a] == p.fromAddresses[txIndex],
-                            ":8"
+                            "U:12"
                         );
-                        require(newHolders[a] == p.toAddresses[txIndex], ":9");
+                        require(newHolders[a] == p.toAddresses[txIndex], "U:13");
                         require(
                             tokenId == p.ids[txIndex][txTokenIndex[txIndex]],
-                            ":10"
+                            "U:14"
                         );
                         require(
                             balancesOld[a] ==
                                 p.amounts[txIndex][txTokenIndex[txIndex]],
-                            ":11"
+                            "U:15"
                         );
                         txTokenIndex[txIndex]++;
                     }
@@ -386,7 +386,7 @@ library Ph101ppDailyPhotoUtils {
         }
 
         for (uint x = 0; x < p.fromAddresses.length; x++) {
-            require(txTokenIndex[x] == p.ids[x].length, ":12");
+            require(txTokenIndex[x] == p.ids[x].length, "U:16");
         }
 
         (

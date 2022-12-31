@@ -61,7 +61,7 @@ const verified = {
     // const supplies = await integrity.supplies();
     const transfers = await integrityCheck(c).transfersUpdateInitialHolders(input);
     const tx = await c.updateInitialHoldersSafe(input, checksum);
-    await transfers.expectSuccess(tx, { expectSupplyChange: false, test:true});
+    await transfers.expectSuccess(tx, { expectSupplyChange: false});
     // await supplies.expectEqual();
     return tx;
   },

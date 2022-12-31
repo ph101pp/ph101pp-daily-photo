@@ -258,7 +258,8 @@ contract Ph101ppDailyPhoto is
     ) public whenNotPaused onlyOwner {
         require(
             newInitialSupply.length == 2 &&
-                newInitialSupply[0] <= newInitialSupply[1]
+                newInitialSupply[0] <= newInitialSupply[1],
+            "P:02"
         );
         uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
         uint lastIndex = _initialSupplyRanges.length - 1;
@@ -319,7 +320,7 @@ contract Ph101ppDailyPhoto is
         UpdateInitialHoldersInput memory input,
         bytes32 checksum
     ) public onlyOwner {
-        require(!isInitialHoldersRangeUpdatePermanentlyDisabled);
+        require(!isInitialHoldersRangeUpdatePermanentlyDisabled, "P:03");
         _updateInitialHoldersSafe(input, checksum);
     }
 
@@ -432,7 +433,7 @@ contract Ph101ppDailyPhoto is
     function setTransferEventListenerAddress(
         address listener
     ) public whenNotPaused onlyOwner {
-        require(!isTransferEventListenerAddressPermanentlyFrozen);
+        require(!isTransferEventListenerAddressPermanentlyFrozen, "P:04");
         transferEventListenerAddress = listener;
     }
 
