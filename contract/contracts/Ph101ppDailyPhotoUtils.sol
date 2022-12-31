@@ -319,10 +319,6 @@ library Ph101ppDailyPhotoUtils {
                     currentHolders,
                     ids
                 );
-                uint[] memory balancesNew = p.caller.balanceOfBatch(
-                    newHolders,
-                    ids
-                );
 
                 for (uint a = 0; a < newHolders.length; a++) {
                     // address fromAddress = currentHolders[a];
@@ -338,6 +334,11 @@ library Ph101ppDailyPhotoUtils {
                     }
 
                     require(!isLocked, ":6");
+                    require(
+                        !p.caller.isHolderAddress(newHolders[a]) ||
+                            p.caller.isInitialHolderAddress(newHolders[a]),
+                        ":13"
+                    );
 
                     uint txIndex;
                     bool txFound;
@@ -354,34 +355,25 @@ library Ph101ppDailyPhotoUtils {
                     }
                     require(txFound, ":7");
 
-                    // uint balanceFrom = balancesOld[a];
-                    // uint balanceTo = balancesNew[a];
-                    // bool isBalanceInitializedFrom = p
-                    //     .caller
-                    //     .isBalanceInitialized(currentHolders[a], tokenId);
-                    bool isBalanceInitializedTo = p.caller.isBalanceInitialized(
-                        newHolders[a],
-                        tokenId
-                    );
-                    bool isInitialHolder = p.caller.isInitialHolderAddress(
-                        newHolders[a]
-                    );
-
                     if (
                         !p.caller.isBalanceInitialized(
                             currentHolders[a],
                             tokenId
-                        ) &&
-                        ((balancesNew[a] == 0 && !isInitialHolder) ||
-                            (!isBalanceInitializedTo && isInitialHolder))
+                        ) 
                     ) {
+                        // uint test = p.ids[txIndex][txTokenIndex[txIndex]];
+                        // uint test2 = txTokenIndex[uint(txIndex)];
                         // console.log(
                         //     tokenId,
-                        //     newHolders[a],
-                        //     uint(txIndex),
+                        //     test,
+                        //     uint(txIndex)
+                        // );
+                        // console.log(
+                        //     p.fromAddresses[txIndex],
+                        //     p.toAddresses[txIndex],
+                        //     txIndex,
                         //     txTokenIndex[uint(txIndex)]
                         // );
-                        // console.log( p.fromAddresses[txIndex], p.toAddresses[txIndex], txIndex, uint(txTokenIndex));
                         // console.log("-----");
                         require(
                             currentHolders[a] == p.fromAddresses[txIndex],
