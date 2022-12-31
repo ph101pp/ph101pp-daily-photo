@@ -346,6 +346,44 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
   });
 
   describe("initialHolders", function () {
+
+    it("Should correctly update initial holders with setInitialHolders", async function () {
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address];
+      const initialHolders2 = [account5.address, account6.address];
+      const initialHolders3 = [account3.address, account4.address];
+      const initialHolders4 = [account7.address, account8.address];
+
+      await c.setInitialHolders(initialHolders);
+
+      const holderRanges = await c.initialHolderRanges();
+      expect(holderRanges.ranges.length).to.equal(1);
+      expect(holderRanges.holders[0]).to.deep.equal(initialHolders);
+
+      await c.setInitialHolders(initialHolders2);
+      const holderRanges2 = await c.initialHolderRanges();
+      expect(holderRanges2.ranges.length).to.equal(1);
+      expect(holderRanges2.holders[0]).to.deep.equal(initialHolders2);
+
+      expect(await c.initialHolders(1000)).to.deep.equal(initialHolders2);
+
+      const inputs = await c.getMintRangeInput(5);
+      await verified.mintRange(c, ...inputs);
+
+      await c.setInitialHolders(initialHolders3);
+      const holderRanges3 = await c.initialHolderRanges();
+      expect(holderRanges3.ranges.length).to.equal(2);
+      expect(holderRanges3.holders[1]).to.deep.equal(initialHolders3);
+
+      await c.setInitialHolders(initialHolders4);
+      const holderRanges4 = await c.initialHolderRanges();
+      expect(holderRanges4.ranges.length).to.equal(2);
+      expect(holderRanges4.holders[1]).to.deep.equal(initialHolders4);
+
+
+      expect(await c.initialHolders(1000)).to.deep.equal(initialHolders4);
+    });
+
     it("Should return current initial holders when called with tokenID > number tokens minted", async function () {
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
       const initialHolders = [account1.address, account2.address, account3.address, account4.address];
@@ -393,6 +431,23 @@ export function testERC1155MintRange(deployFixture: () => Promise<Fixture<TestER
           }
         }
       }
+    });
+
+    it("Should not be possible to set initial holders that where token holders", async function () {
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = await loadFixture(deployFixture);
+      const initialHolders = [account1.address, account2.address];
+      const initialHolders2 = [account5.address, account6.address];
+      const initialHolders3 = [account3.address, account4.address];
+
+      await c.setInitialHolders(initialHolders);
+      const inputs = await c.getMintRangeInput(5);
+      await verified.mintRange(c, ...inputs);
+
+      await verified.connect(account1).safeTransferFrom(c, account1.address, account5.address, 3, 1, []);
+
+      await expect( c.setInitialHolders(initialHolders2) ).to.be.rejectedWith(":5");
+      await expect( c.setInitialHolders(initialHolders3) ).to.not.be.rejected;
+      await expect( c.setInitialHolders(initialHolders) ).to.not.be.rejected;
     });
   });
 
