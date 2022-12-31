@@ -28,9 +28,8 @@ contract Ph101ppDailyPhoto is
     uint[][] private _initialSupplies;
     uint[] private _initialSupplyRanges;
     string[] private _permanentUris;
+    string[] private _uriPeriods;
     uint[] private _permanentUriRanges;
-    string[] private _periods;
-    uint[] private _periodRanges;
     string private _proxyUri;
 
     uint public lastRangeTokenIdWithPermanentUri;
@@ -59,9 +58,7 @@ contract Ph101ppDailyPhoto is
 
         _permanentUriRanges.push(0);
         _permanentUris.push(newPermanentUri);
-
-        _periodRanges.push(0);
-        _periods.push("Genesis");
+        _uriPeriods.push("Genesis");
 
         _proxyUri = newProxyUri;
         _owner = msg.sender;
@@ -127,10 +124,9 @@ contract Ph101ppDailyPhoto is
             _permanentUris.length - permanentUriIndex
         );
         for (uint i = permanentUriIndex; i < _permanentUris.length; i++) {
-            uint periodIndex = _findLowerBound(_periodRanges, _permanentUriRanges[permanentUriIndex]);
             string[] memory item = new string[](2);
             item[0] = string.concat(_permanentUris[i], slug);
-            item[1] = _periods[periodIndex];
+            item[1] = _uriPeriods[i];
             history[i - permanentUriIndex] = item;
         }
         return history;
@@ -151,51 +147,31 @@ contract Ph101ppDailyPhoto is
     function permanentBaseUriRanges()
         public
         view
-        returns (string[] memory permanentBaseUris, uint256[] memory ranges)
+        returns (
+            string[] memory permanentBaseUris,
+            string[] memory periodNames,
+            uint256[] memory ranges
+        )
     {
-        return (_permanentUris, _permanentUriRanges);
-    }
-
-    // Returns Period when token was minted
-    // function period(uint tokenId) public view returns (string memory) {
-    //     uint periodIndex = _findLowerBound(_periodRanges, tokenId);
-    //     return _periods[periodIndex];
-    // }
-
-    // Returns all period ranges.
-    function periodRanges()
-        public
-        view
-        returns (string[] memory periods, uint256[] memory ranges)
-    {
-        return (_periods, _periodRanges);
+        return (_permanentUris, _uriPeriods, _permanentUriRanges);
     }
 
     // Updates latest permanent base Uri.
     // New uri must include more token Ids than previous one.
     function setPermanentBaseUriUpTo(
         string memory newUri,
+        string memory periodName,
         uint validUpToTokenId
     ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
         require(
             validUpToTokenId > lastRangeTokenIdWithPermanentUri &&
                 validUpToTokenId <= lastRangeTokenIdMinted,
-            "!(lastIdWithPermanentUri < TokenId <= lastIdMinted)"
+            ":32" // !(lastIdWithPermanentUri < TokenId <= lastIdMinted)
         );
         _permanentUris.push(newUri);
+        _uriPeriods.push(periodName);
         _permanentUriRanges.push(lastRangeTokenIdWithPermanentUri + 1);
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
-    }
-
-    // Updates latest permanent base Uri.
-    // And begins a new Period
-    function setPeriod(
-        uint tokenId,
-        string memory newPeriodName
-    ) public whenNotPaused onlyRole(URI_UPDATER_ROLE) {
-        require(tokenId <= lastRangeTokenIdMinted, ":18");
-        _periods.push(newPeriodName);
-        _periodRanges.push(tokenId);
     }
 
     // Update proxy base Uri that is used for
@@ -274,10 +250,12 @@ contract Ph101ppDailyPhoto is
             newInitialSupply.length == 2 &&
                 newInitialSupply[0] <= newInitialSupply[1]
         );
-        uint firstId = lastRangeTokenIdMinted + 1;
-        uint lastId = _initialSupplyRanges[_initialSupplyRanges.length - 1];
+        uint firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
+        uint lastIndex = _initialSupplyRanges.length - 1;
+        uint lastId = _initialSupplyRanges[lastIndex];
+
         if (lastId == firstId) {
-            _initialSupplies[_initialSupplies.length - 1] = newInitialSupply;
+            _initialSupplies[lastIndex] = newInitialSupply;
         } else {
             _initialSupplyRanges.push(firstId);
             _initialSupplies.push(newInitialSupply);
@@ -514,4 +492,4 @@ contract Ph101ppDailyPhoto is
     ) public view override(AccessControl, ERC1155_, ERC2981) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
-} 
+}
