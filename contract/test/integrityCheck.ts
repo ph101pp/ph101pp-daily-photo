@@ -294,7 +294,7 @@ const checkTransfers = (c: Contracts,) => async (fromAddresses: string[], toAddr
       // console.log(suppliesDelta, beforeSupplies);
 
       await beforeBalances.expectDelta(balancesDelta);
-
+      
       if (expectSupplyChange) {
         await beforeSupplies.expectDelta(suppliesDelta);
       }

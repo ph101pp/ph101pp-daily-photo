@@ -308,7 +308,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await verified.mintPhotos(c, ...inputs);
-      await c.setPermanentBaseUriUpTo(immutableUri, 50);
+      await c.setPermanentBaseUriUpTo(immutableUri, "", 50);
 
       for (let i = 1; i < 100; i++) {
         if (i > 50) expect(await c.uri(i)).to.include(mutableUri);
@@ -322,7 +322,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.setInitialSupply([0, 5]);
       const inputs = await c.getMintRangeInput(50);
       await verified.mintPhotos(c, ...inputs);
-      await c.setPermanentBaseUriUpTo(immutableUri, 10);
+      await c.setPermanentBaseUriUpTo(immutableUri, "", 10);
 
       for (let i = 1; i < 50; i++) {
         if (i > 10) expect(await c.uri(i)).to.include(mutableUri);
@@ -837,7 +837,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await expect(c.connect(account1).setInitialHolders(account1.address, account1.address)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).pause()).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).unpause()).to.be.rejectedWith("AccessControl");
-      await expect(c.connect(account1).setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("AccessControl");
+      await expect(c.connect(account1).setPermanentBaseUriUpTo("", "", 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setProxyBaseUri("")).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setDefaultRoyalty(account1.address, 100)).to.be.rejectedWith("AccessControl");
       await expect(c.connect(account1).setTokenRoyalty(1, account1.address, 100)).to.be.rejectedWith("AccessControl");
@@ -912,7 +912,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       // await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
       await expect(c.redeemClaims([2], [5])).to.be.rejectedWith("paused");
 
-      await expect(c.setPermanentBaseUriUpTo("", 100)).to.be.rejectedWith("paused");
+      await expect(c.setPermanentBaseUriUpTo("", "", 100)).to.be.rejectedWith("paused");
       await expect(c.setProxyBaseUri("")).to.be.rejectedWith("paused");
     });
 

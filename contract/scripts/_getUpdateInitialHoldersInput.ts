@@ -19,7 +19,6 @@ export default async function _getUpdateInitialHoldersInputSafe(
   string
 ]> {
   const input = await _getUpdateInitialHoldersInput(c, newInitialHolders, newInitialHolderRanges);
-  // console.log(input);
   const checksum = await c.verifyUpdateInitialHoldersInput(input);
   return [
     input,
@@ -52,7 +51,6 @@ export async function _getUpdateInitialHoldersInput(
       const newHolders = newInitialHolders[newHolderIndex];
 
       const balancesOld = await c.balanceOfBatch(currentInitialHolders, currentInitialHolders.map(() => i));
-      const balancesNew = await c.balanceOfBatch(newHolders, newHolders.map(() => i));
       const isManuallyMinted = await c.isManualMint(i);
       if (isManuallyMinted) {
         continue;
@@ -65,15 +63,12 @@ export async function _getUpdateInitialHoldersInput(
         if (fromAddress === toAddress) {
           continue;
         }
-
         const balanceFrom = balancesOld[a].toNumber();
-        const balanceTo = balancesNew[a].toNumber();
         const isBalanceInitializedFrom = await c.isBalanceInitialized(fromAddress, i)
         const isBalanceInitializedTo = await c.isBalanceInitialized(toAddress, i)
-        const isToInitialHolder = await c.isInitialHolderAddress(toAddress);
 
         if (
-          !isBalanceInitializedFrom //&& ((balanceTo == 0 && !isToInitialHolder) || (isToInitialHolder && !isBalanceInitializedTo))
+          !isBalanceInitializedFrom && !isBalanceInitializedTo
         ) {
           let addressIndex = -1;
 

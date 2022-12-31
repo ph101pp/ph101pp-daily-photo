@@ -332,7 +332,7 @@ library Ph101ppDailyPhotoUtils {
                     if (currentHolders[a] == newHolders[a]) {
                         continue;
                     }
-
+                    require(newHolders[a] != address(0), ":18");
                     require(!isLocked, ":6");
                     require(
                         !p.caller.isHolderAddress(newHolders[a]) ||
@@ -359,22 +359,12 @@ library Ph101ppDailyPhotoUtils {
                         !p.caller.isBalanceInitialized(
                             currentHolders[a],
                             tokenId
+                        ) &&
+                        !p.caller.isBalanceInitialized(
+                            newHolders[a],
+                            tokenId
                         ) 
                     ) {
-                        // uint test = p.ids[txIndex][txTokenIndex[txIndex]];
-                        // uint test2 = txTokenIndex[uint(txIndex)];
-                        // console.log(
-                        //     tokenId,
-                        //     test,
-                        //     uint(txIndex)
-                        // );
-                        // console.log(
-                        //     p.fromAddresses[txIndex],
-                        //     p.toAddresses[txIndex],
-                        //     txIndex,
-                        //     txTokenIndex[uint(txIndex)]
-                        // );
-                        // console.log("-----");
                         require(
                             currentHolders[a] == p.fromAddresses[txIndex],
                             ":8"

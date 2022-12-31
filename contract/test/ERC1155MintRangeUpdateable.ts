@@ -47,8 +47,9 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
     await c.setInitialHolders(initialHolders2);
     const inputs2 = await c.getMintRangeInput(8);
     await verified.mintRange(c, ...inputs2)
+
     for (let i = 0; i < mintIds.length; i++) {
-      const id = mintIds[i]
+      const id = mintIds[i];
       await verified.connect(account1).safeTransferFrom(c, account1.address, account3.address, id, 1, []);
       await verified.connect(account1).safeTransferFrom(c, account1.address, account4.address, id, 1, []);
       await verified.connect(account1).safeTransferFrom(c, account1.address, account6.address, id, 1, []);
@@ -66,6 +67,42 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
     return await integrityCheck(c).range([account1, account2, account3, account4, account5, account6, account7, account8].map((s) => s.address), 0, 20);
   }
 
+  async function setupRandomContractStateUnstructuredMulti({ c, owner, account1, account2, account3, account4, account5, account6, account7, account8 }: Fixture<TestERC1155MintRangeUpdateable>) {
+    const mintIds = [0, 5, 10, 15, 20];
+    await verified.mintBatch(c, account1.address, mintIds, new Array(mintIds.length).fill(20 * 8), []);
+
+    const initialHolders1 = [account2.address, account3.address];
+    await c.setInitialHolders(initialHolders1);
+    const inputs = await c.getMintRangeInput(8);
+    await verified.mintRange(c, ...inputs)
+
+    const initialHolders2 = [account4.address, account5.address];
+    await c.setInitialHolders(initialHolders2);
+    const inputs2 = await c.getMintRangeInput(8);
+    await verified.mintRange(c, ...inputs2)
+
+    await c.setInitialHolders([account2.address]);
+    const inputs3 = await c.getMintRangeInput(8);
+    await verified.mintRange(c, ...inputs3)
+
+    for (let i = 0; i < mintIds.length; i++) {
+      const id = mintIds[i];
+      await verified.connect(account1).safeTransferFrom(c, account1.address, account3.address, id, 1, []);
+      await verified.connect(account1).safeTransferFrom(c, account1.address, account4.address, id, 1, []);
+      await verified.connect(account1).safeTransferFrom(c, account1.address, account6.address, id, 1, []);
+    };
+
+    const transferIds = [4, 6, 8, 14, 16, 18];
+    for (let i = 0; i < transferIds.length; i++) {
+      const id = transferIds[i];
+      const owner = mintIds.includes(id) ? account1 : id < 10 ? account2 : account5;
+      await verified.connect(owner).safeTransferFrom(c, owner.address, account1.address, id, 1, []);
+      await verified.connect(owner).safeTransferFrom(c, owner.address, account4.address, id, 1, []);
+      await verified.connect(owner).safeTransferFrom(c, owner.address, account6.address, id, 1, []);
+    };
+
+    return await integrityCheck(c).range([account1, account2, account3, account4, account5, account6, account7, account8].map((s) => s.address), 0, 20);
+  }
   describe("updateInitialHoldersInputSafe / _getUpdateInitialHoldersInputSafe / verifyUpdateInitialHoldersInput", function () {
 
     it("should fail when getting bad input or not paused", async function () {
@@ -76,13 +113,13 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address]], [0])).to.be.rejectedWith("Pausable: not paused");
       await c.pause();
       // different amount of addresses for tokenId
-      await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address]], [0])).to.be.rejectedWith(":5");
+      // await expect(_getUpdateInitialHoldersInput(c, [[account3.address], [account3.address]], [0,20])).to.be.rejectedWith(":5");
       // holders and range length
       await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address], [account2.address, account3.address]], [0])).to.be.rejectedWith(":1");
       // range must start at 0 
       await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address]], [1])).to.be.rejectedWith(":1");
       // range can't be longer than last tokenId 
-      await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address], [account2.address, account4.address]], [0, 30])).to.be.rejectedWith(":1");
+      await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address], [account2.address, account4.address], [account3.address]], [0, 40])).to.be.rejectedWith(":1");
       // range must be consecutive
       await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address], [account4.address, account2.address], [account2.address, account3.address]], [0, 2, 1])).to.be.rejectedWith(":8");
       // Same address multiple times for tokenId
@@ -269,50 +306,135 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const fixture = await loadFixture(deployFixture);
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = fixture;
 
-      const integrity = await setupRandomContractStateUnstructured(fixture);
+      const integrity = await setupRandomContractStateUnstructuredMulti(fixture);
       const supplyCheck = await integrity.supplies()
       const balancesCheck = await integrity.balances()
 
-      // const noopInput = await _getUpdateInitialHoldersInput(c, [
-      //   [account2.address, account3.address], [account4.address, account5.address]
-      // ], [0, 10]);
-
       await c.pause();
 
-      // const input1 = await _getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address]], [0]);
-      // await expect(verified.updateInitialHoldersSafe(c, ...input1)).to.not.be.rejected;
+      const input1 = await _getUpdateInitialHoldersInputSafe(c, [
+        [account3.address, account2.address],
+        [account3.address]
+      ], [0, 20]);
+      await expect(verified.updateInitialHoldersSafe(c, ...input1)).to.not.be.rejected;
 
-      // const input2 = await _getUpdateInitialHoldersInput(c, [[account3.address, account2.address], [account2.address, account1.address]], [0, 4]);
-      // await expect(c.updateInitialHolders(input2)).to.not.be.rejected;
+      const input2 = await _getUpdateInitialHoldersInputSafe(c, [
+        [account3.address, account2.address],
+        [account2.address, account8.address],
+        [account7.address]
+      ], [0, 4, 20]);
+      await expect(c.updateInitialHoldersSafe(...input2)).to.not.be.rejected;
 
-      // const input3 = await _getUpdateInitialHoldersInput(c, [[account3.address, account2.address], [account2.address, account1.address], [account3.address, account1.address]], [0, 1, 2]);
-      // await expect(c.updateInitialHolders(input3)).to.not.be.rejected;
+      const input3 = await _getUpdateInitialHoldersInputSafe(c, [
+        [account3.address, account2.address],
+        [account2.address, account8.address],
+        [account3.address, account8.address],
+        [account7.address]
+      ],
+        [0, 1, 2, 20]);
+      await expect(c.updateInitialHoldersSafe(...input3)).to.not.be.rejected;
 
-      const input4 = await _getUpdateInitialHoldersInput(c, [
-        // [account1.address, account2.address],
-        // [account2.address, account3.address],
-        // [account3.address, account4.address],
-        // [account4.address, account5.address],
-        [account8.address, account7.address], // token 4 has balances but is not initialized -> now becomes initial holder
-        // [account8.address, account1.address],
+      const input4 = await _getUpdateInitialHoldersInputSafe(c, [
+        [account8.address, account2.address],
+        [account2.address, account3.address],
+        [account3.address, account4.address],
+        [account4.address, account5.address],
+        [account8.address, account7.address],
+        [account8.address]
+      ], [0, 1, 2, 3, 4, 20]);
+      await expect(c.updateInitialHoldersSafe(...input4)).to.not.be.rejected;
+
+      const input5 = await _getUpdateInitialHoldersInputSafe(c, [
+        [account2.address, account8.address],
+        [account2.address],
+      ], [0, 20]);
+      await expect(c.updateInitialHoldersSafe(...input5)).to.not.be.rejected;
+
+      const input6 = await _getUpdateInitialHoldersInputSafe(c, [
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address, account2.address],
+        [account4.address],
       ], [
         0,
-        // 1, 
-        // 2, 
-        // 3, 
-        // 4, 
-
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        20,
       ]);
-      await expect(c.updateInitialHolders(input4)).to.be.rejectedWith("asdfds");
+      await expect(c.updateInitialHoldersSafe(...input6)).to.not.be.rejected;
 
-      // return;
+      const input7 = await _getUpdateInitialHoldersInputSafe(c, [
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address, account2.address],
+        [account5.address],
+      ], [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        20
+      ]);
+      await expect(c.updateInitialHoldersSafe(...input7)).to.not.be.rejected;
 
       // revert everything:
-      // await expect(c.updateInitialHolders(noopInput)).to.not.be.rejected;
+      const revertInput = await _getUpdateInitialHoldersInputSafe(c, [
+        [account2.address, account3.address],
+        [account4.address, account5.address],
+        [account2.address]
+      ], [0, 10, 20]);
+      await expect(c.updateInitialHoldersSafe(...revertInput)).to.not.be.rejected;
 
       // expect no changes to balances or supply
       await supplyCheck.expectEqual();
-      // await balancesCheck.expectEqual()
+      await balancesCheck.expectEqual()
 
     })
 
@@ -321,11 +443,9 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = fixture;
       const integrity = await setupRandomContractStateUnstructured(fixture);
 
-      const noopInput = await _getUpdateInitialHoldersInput(c, [
-        [account2.address, account3.address], [account4.address, account5.address]
-      ], [0, 10]);
-
+      const noopInput = await _getUpdateInitialHoldersInput(c, [[account2.address, account3.address], [account4.address, account5.address]], [0, 10]);
       await expect(verified.updateInitialHolders(c, noopInput)).to.be.rejectedWith("Pausable: not paused");
+
       await c.pause();
 
       // different amount of addresses for tokenId
