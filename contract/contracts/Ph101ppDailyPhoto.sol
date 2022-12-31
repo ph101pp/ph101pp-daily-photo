@@ -25,8 +25,9 @@ contract Ph101ppDailyPhoto is
     uint[][] private _initialSupplies;
     uint[] private _initialSupplyRanges;
     string[] private _permanentUris;
-    string[] private _uriPeriods;
     uint[] private _permanentUriRanges;
+    string[] private _periods;
+    uint[] private _periodRanges;
     string private _proxyUri;
 
     uint public lastRangeTokenIdWithPermanentUri;
@@ -34,8 +35,6 @@ contract Ph101ppDailyPhoto is
 
     address public transferEventListenerAddress;
     bool public isTransferEventListenerAddressPermanentlyFrozen = false;
-
-    address private _owner;
 
     constructor(
         string memory newProxyUri,
@@ -50,10 +49,11 @@ contract Ph101ppDailyPhoto is
 
         _permanentUriRanges.push(0);
         _permanentUris.push(newPermanentUri);
-        _uriPeriods.push("Genesis");
+
+        _periodRanges.push(0);
+        _periods.push("Init");
 
         _proxyUri = newProxyUri;
-        _owner = msg.sender;
         _setDefaultRoyalty(msg.sender, 500);
         mintClaims(initialHolders[TREASURY_ID], 10, "");
     }
@@ -116,9 +116,13 @@ contract Ph101ppDailyPhoto is
             _permanentUris.length - permanentUriIndex
         );
         for (uint i = permanentUriIndex; i < _permanentUris.length; i++) {
+            uint periodIndex = _findLowerBound(
+                _periodRanges,
+                _permanentUriRanges[permanentUriIndex]
+            );
             string[] memory item = new string[](2);
             item[0] = string.concat(_permanentUris[i], slug);
-            item[1] = _uriPeriods[i];
+            item[1] = _periods[periodIndex];
             history[i - permanentUriIndex] = item;
         }
         return history;
@@ -139,20 +143,30 @@ contract Ph101ppDailyPhoto is
     function permanentBaseUriRanges()
         public
         view
-        returns (
-            string[] memory permanentBaseUris,
-            string[] memory periodNames,
-            uint256[] memory ranges
-        )
+        returns (string[] memory permanentBaseUris, uint256[] memory ranges)
     {
-        return (_permanentUris, _uriPeriods, _permanentUriRanges);
+        return (_permanentUris, _permanentUriRanges);
+    }
+
+    // Returns Period when token was minted
+    function period(uint tokenId) public view returns (string memory) {
+        uint periodIndex = _findLowerBound(_periodRanges, tokenId);
+        return _periods[periodIndex];
+    }
+
+    // Returns all period ranges.
+    function periodRanges()
+        public
+        view
+        returns (string[] memory periods, uint256[] memory ranges)
+    {
+        return (_periods, _periodRanges);
     }
 
     // Updates latest permanent base Uri.
     // New uri must include more token Ids than previous one.
     function setPermanentBaseUriUpTo(
         string memory newUri,
-        string memory periodName,
         uint validUpToTokenId
     ) public whenNotPaused onlyOwner {
         require(
@@ -161,9 +175,29 @@ contract Ph101ppDailyPhoto is
             ":32" // !(lastIdWithPermanentUri < TokenId <= lastIdMinted)
         );
         _permanentUris.push(newUri);
-        _uriPeriods.push(periodName);
         _permanentUriRanges.push(lastRangeTokenIdWithPermanentUri + 1);
         lastRangeTokenIdWithPermanentUri = validUpToTokenId;
+    }
+
+    // Updates latest permanent base Uri.
+    // And begins a new Period
+    function setPeriod(
+        string memory periodName,
+        uint tokenId
+    ) public whenNotPaused onlyOwner {
+        uint lastIndex = _periodRanges.length - 1;
+        require(
+            tokenId <= lastRangeTokenIdMinted &&
+                tokenId >= _periodRanges[lastIndex],
+            ":18"
+        );
+
+        if (tokenId == _periodRanges[lastIndex]) {
+            _periods[lastIndex] = periodName;
+        } else {
+            _periods.push(periodName);
+            _periodRanges.push(tokenId);
+        }
     }
 
     // Update proxy base Uri that is used for
@@ -371,13 +405,13 @@ contract Ph101ppDailyPhoto is
 
     // Owner can be used to make updates (register / subscribe)
     // to the OperatorFilterRegistry on behalf of this contract.
-    function owner() public view override(OpenseaOperatorFilterer, Ownable) returns (address) {
-        return _owner;
-    }
-
-    // Set new owner. This address will be returned by owner().
-    function setOwner(address newOwner) public whenNotPaused onlyOwner {
-        _owner = newOwner;
+    function owner()
+        public
+        view
+        override(OpenseaOperatorFilterer, Ownable)
+        returns (address)
+    {
+        return super.owner();
     }
 
     // Update address to OperatorFilterRegistry contract.
