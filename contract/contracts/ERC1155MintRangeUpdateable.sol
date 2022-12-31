@@ -144,7 +144,11 @@ abstract contract ERC1155MintRangeUpdateable is ERC1155MintRangePausable {
                     if (fromAddress != toAddress) {
                         // initialHolders cant be zero-address
                         require(toAddress != address(0), ":4");
-                        require(!wasOwnerAddress[toAddress], ":5");
+                        require(
+                            !isHolderAddress[toAddress] ||
+                                isInitialHolderAddress[toAddress],
+                            ":5"
+                        );
                         // initialHolders must be unique per tokenId
                         for (
                             uint j = i + 1;
