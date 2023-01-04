@@ -6,7 +6,7 @@ export function isValidDate(tokenId?:string) {
   const month = parseInt(tokenId.slice(4, 6))-1;
   const day = parseInt(tokenId.slice(6, 8));
 
-  const date = new Date(year, month, day);
+  const date = new Date(year, month, day, 12,12,12);
 
   return !isNaN(date as any) && date.getTime()/1000>=1661990400;
 }
