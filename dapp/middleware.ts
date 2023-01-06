@@ -38,7 +38,7 @@ async function middleware(request: NextRequest) {
     const dayTemp = now.getDate();
     date = `${yearTemp}${monthTemp <= 9 ? "0" : ""}${monthTemp}${dayTemp <= 9 ? "0" : ""}${dayTemp}`
     id = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
-  } else if(isNaN(idInt)) {
+  } else if (isNaN(idInt)) {
     // console.log("C");
     id = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
   }
@@ -59,11 +59,14 @@ export default withAuth(
       authorized({ req, token }) {
         const path: string = req.nextUrl.pathname;
         return (
-          !path.startsWith("/CLAIM-0") || // close claim-0 route
-          !path.startsWith("/api/") || // close all api routes
-          path.startsWith("/api/proxy/") || // except for the proxy 
-          token?.email === "hello@philippadrian.com" // or if logged in.
-        );
+          (!path.startsWith("/CLAIM-0") && // close CLAIM-0 route
+            (
+              !path.startsWith("/api/") || // close all api routes
+              path.startsWith("/api/proxy/") // except for the proxy 
+            )
+          ) || 
+          token?.email === "hello@philippadrian.com" // or if logged
+        )
       },
     },
   }
