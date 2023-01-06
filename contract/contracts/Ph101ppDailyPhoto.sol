@@ -444,6 +444,7 @@ contract Ph101ppDailyPhoto is
         transferEventListenerAddress = listener;
     }
 
+    // Defensive Coding: Permanently freeze transfer listener address
     function permanentlyFreezeTransferEventListenerAddress()
         public
         whenNotPaused
@@ -474,6 +475,7 @@ contract Ph101ppDailyPhoto is
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
+    // Notify custom listener about token transfers
     function _afterTokenTransfer(
         address operator,
         address from,

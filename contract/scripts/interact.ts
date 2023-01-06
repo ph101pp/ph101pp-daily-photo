@@ -19,18 +19,25 @@ const photosAddress14 = "0x74F5ab6D014AEa53448B4CB8A735ae9B29b5AAe3";
 const mainnetAddress1 = "0x986A4010D6dF5754f66F72764487070615CBDE9A";
 async function main() {
   const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress14);
-  
+  let tx, receipt;
   
   // do this first:
-  await pdp.setPermanentBaseUriUpTo("ar://UgQV-kWidkUzmrbqWQ5itxSp3XNma6Lp-yVr9Ve1Eiw/", 0);
-  const tx = await pdp.mintClaims("0x1347aeA833D7a54456EAa76f45b66a9d91d0afb2", 10, []);
+  // tx = await pdp.setPermanentBaseUriUpTo("ar://UgQV-kWidkUzmrbqWQ5itxSp3XNma6Lp-yVr9Ve1Eiw/", 0);
+  // receipt = await tx.wait();
+  // console.log(receipt);
 
+  // tx = await pdp.setInitialSupply([1,2]);
+  // receipt = await tx.wait();
+  // console.log(receipt);
+
+  // tx = await pdp.mintClaims("0x1347aeA833D7a54456EAa76f45b66a9d91d0afb2", 10, []);
+  // receipt = await tx.wait();
+  // console.log(receipt);
 
   // do this second:
-  // const input = await pdp.getMintRangeInput(122+31);
-  // const tx = await pdp.mintPhotos(...input);
-  
-  const receipt = await tx.wait();
+  const input = await pdp.getMintRangeInput(122+31); // till january 31, 2023
+  tx = await pdp.mintPhotos(...input);
+  receipt = await tx.wait();
   console.log(receipt);
 
 
