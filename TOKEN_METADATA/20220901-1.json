@@ -1,8 +1,8 @@
 {
-  "description": "This moment was captured on Wednesday, September 1, 2022.",
-  "image": "ar://FYfxx_T1VPluV6ibMopet3HGzlZ4DK4SrW314uDybxg",
-  "image_url": "ar://FYfxx_T1VPluV6ibMopet3HGzlZ4DK4SrW314uDybxg",
-  "name": "#0001 – Wednesday, September 1, 2022",
+  "description": "This moment was captured on Thursday, September 1, 2022.",
+  "image": "ar://zxLaFU5Nyp8Hca4-4O0pH2-c_Cp6xSRymX5vtxVv8vE",
+  "image_url": "ar://zxLaFU5Nyp8Hca4-4O0pH2-c_Cp6xSRymX5vtxVv8vE",
+  "name": "#0001 – Thursday, September 1, 2022",
   "created_by": "Philipp Adrian",
   "external_url": "https://daily-photo.ph101pp.xyz/20220901-1",
   "attributes": [
@@ -41,7 +41,7 @@
     {
       "display_type": "date",
       "trait_type": "Date",
-      "value": 1661983200
+      "value": 1661990400
     },
     {
       "trait_type": "Weekday",
@@ -68,6 +68,6 @@
     "type": "image/jpeg",
     "width": 6240,
     "height": 4160,
-    "sha256": "7531cd35a7988e66a9634246d7bb7b83de77d85d3fc27691212870bc90400455"
+    "sha256": "1f74a8711b655aad0b19d95665f9047f8dd629de50b4d435af6350dabc97926f"
   }
 }
