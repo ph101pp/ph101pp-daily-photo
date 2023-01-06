@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Wednesday, September 1, 2022.",
+  "image": "ar://FYfxx_T1VPluV6ibMopet3HGzlZ4DK4SrW314uDybxg",
+  "image_url": "ar://FYfxx_T1VPluV6ibMopet3HGzlZ4DK4SrW314uDybxg",
+  "name": "#0001 – Wednesday, September 1, 2022",
+  "created_by": "Philipp Adrian",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220901-1",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "LIC, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/13 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Photo"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Photo Nº",
+      "value": 1
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1661983200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 1
+    }
+  ],
+  "image_details": {
+    "size": 16941473,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "7531cd35a7988e66a9634246d7bb7b83de77d85d3fc27691212870bc90400455"
+  }
+}
