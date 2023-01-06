@@ -16,19 +16,19 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    domains: [
-      "arweave.net"
-    ],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.arweave.net',
-      },
-      {
-        protocol: 'https',
-        hostname: 'arweave.net',
-      }
-    ]
+    // domains: [
+    //   "arweave.net"
+    // ],
+    // remotePatterns: [
+    //   {
+    //     protocol: 'https',
+    //     hostname: '**.arweave.net',
+    //   },
+    //   {
+    //     protocol: 'https',
+    //     hostname: 'arweave.net',
+    //   }
+    // ]
   },
 }
 module.exports = nextConfig
