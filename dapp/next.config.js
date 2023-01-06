@@ -15,6 +15,7 @@ const nextConfig = {
     LATEST_MANIFEST_URI: fs.readFileSync(path.join(__dirname, "../LATEST_MANIFEST_URI.txt"), { encoding: 'utf8' })
   },
   images: {
+    unoptimized: true,
     domains: [
       "arweave.net"
     ],
