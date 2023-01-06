@@ -22,12 +22,12 @@ async function main() {
   
   
   // do this first:
-  // await pdp.setPermanentBaseUriUpTo("https://arweave.net/sc9G7tPVgyr9ajAl5erCclHUPq4N_i9hV_s8rjQ8n0o/", 0);
-  // const tx = await pdp.mintClaims("0x1347aeA833D7a54456EAa76f45b66a9d91d0afb2", 10, []);
+  await pdp.setPermanentBaseUriUpTo("ar://UgQV-kWidkUzmrbqWQ5itxSp3XNma6Lp-yVr9Ve1Eiw/", 0);
+  const tx = await pdp.mintClaims("0x1347aeA833D7a54456EAa76f45b66a9d91d0afb2", 10, []);
 
 
   // do this second:
-  // const input = await pdp.getMintRangeInput(122);
+  // const input = await pdp.getMintRangeInput(122+31);
   // const tx = await pdp.mintPhotos(...input);
   
   const receipt = await tx.wait();
