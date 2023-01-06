@@ -1,6 +1,13 @@
+import { TokenMetadataInputType } from "../components/_types/TokenMetadataInputType";
 import { MetadataType } from "./getBaseMetadata";
 
-export default function getClaimMetadata(): MetadataType {
+export default function getClaimMetadata({
+  image_details,
+  imageTx
+}:{
+  image_details: TokenMetadataInputType["image_details"],
+  imageTx: string
+}): MetadataType {
   return ({
     "name": "Claim - One Daily Photo",
     "created_by": "Ph101pp",
@@ -16,14 +23,8 @@ export default function getClaimMetadata(): MetadataType {
         "value": "Claim"
       },
     ],
-    "image": "ar://h0VC9yAnIrT5WJTWBYJNF30Np1tTMEeqoUeX818k_Q8",
-    "image_url": "ar://h0VC9yAnIrT5WJTWBYJNF30Np1tTMEeqoUeX818k_Q8",
-    "image_details": {
-      "size": 7545841,
-      "type": "image/jpeg",
-      "width": 3000,
-      "height": 2000,
-      "sha256": "615e2cf15f64c0347a9ce2314836024696bc86715fa9201dcab624a5f4a8f8e5"
-    }
+    "image": `ar://${imageTx}`,
+    "image_url": `ar://${imageTx}`,
+    "image_details": image_details
   });
 }

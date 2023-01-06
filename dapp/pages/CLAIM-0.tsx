@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import React, { Suspense, useEffect, useState } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Container from "@mui/material/Container";
 
 import Box from "@mui/material/Box";
@@ -13,27 +13,54 @@ import { ManifestType } from "../components/_types/ManifestType";
 import bundlrUploadToArweave from "../components/_helpers/bundlrUploadToArweave";
 import BundlrProgress from "../components/BundlrProgress";
 import bundlrStatusAtom from "../components/_atoms/bundlrStatusAtom";
+import UploadImage from "../components/UploadImage";
+import imageAtom from "../components/_atoms/imageAtom";
+import base64ToArrayBuffer from "../components/_helpers/base64ToArrayBuffer";
+import defaultTokenMetadataInputAtom from "../components/_atoms/defaultTokenMetadataInputAtom";
+import tokenIdAtom from "../components/_atoms/tokenIdAtom";
+import Loading from "../components/Loading";
 
-
-const numberOfSteps = 3;
+const numberOfSteps = 4;
 function Root() {
   const [progress, setProgress] = useRecoilState(bundlrStatusAtom)
   const inProgress = progress.numberOfSteps > 0 && progress.numberOfSteps < progress.steps.length;
   const isDone = progress.numberOfSteps > 0 && progress.numberOfSteps === progress.steps.length;
+  const image = useRecoilValue(imageAtom);
+  const input = useRecoilValue(defaultTokenMetadataInputAtom);
 
-
-  const uploadData = async ()=>{
+  const uploadData = async () => {
     const manifest = INITIAL_MANIFEST as ManifestType;
 
     setProgress({
       numberOfSteps,
       steps: [{
-        message: "> Upload Claim Metadata"
+        message: "> Upload Image"
       }]
     });
 
+    if (!image || !input) {
+      return;
+    }
 
-    const claimMetadata = getClaimMetadata();
+    const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
+    const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
+
+    setProgress({
+      numberOfSteps,
+      steps: [
+        {
+          result: imageResult,
+          stats: imageStats,
+          message: "> Image Uploaded > Upload Claim Metadata"
+        }
+      ]
+    });
+
+
+    const claimMetadata = getClaimMetadata({
+      image_details: input.image_details,
+      imageTx: imageResult.id
+    });
 
     const [claimResult, claimStats] = await bundlrUploadToArweave(JSON.stringify(claimMetadata), "application/json");
 
@@ -43,6 +70,7 @@ function Root() {
         {
           result: claimResult,
           stats: claimStats,
+          metadata: claimMetadata,
           message: "> Claim Uploaded > Uploading Manifest."
         }
       ]
@@ -71,11 +99,12 @@ function Root() {
         }
       ]
     });
-    
+
   }
 
   return <Container>
-    <BundlrProgress/>
+    <UploadImage title={"Upload Claim"} />
+    <BundlrProgress />
 
     <Box
       sx={{
@@ -107,15 +136,19 @@ function Root() {
         </LoadingButton>
       )}
     </Box>
-
   </Container>;
 }
 
-export default ()=>{
+export default () => {
   const [isClient, setIsClient] = useState(false);
-  useEffect(()=>{
+  const setTokenId = useSetRecoilState(tokenIdAtom);
+
+  useEffect(() => {
+    setTokenId("CLAIM-0");
     setIsClient(true);
   })
 
-  return isClient?<Root />:null;
+  return isClient ? <Suspense
+    fallback={<Loading />}
+  ><Root /></Suspense> : null;
 };
