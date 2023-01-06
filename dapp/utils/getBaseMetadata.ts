@@ -31,8 +31,8 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
   const month = parseInt(tokenDate.slice(4, 6)) - 1;
   const day = parseInt(tokenDate.slice(6, 8));
 
-  const date = new Date(year, month, day);
-  const weekday = date.getDay();
+  const date = new Date(Date.UTC(year, month, day));
+  const weekday = date.getUTCDay();
   const timestamp = Math.ceil(date.getTime() / 1000);
   const formattedDate = formatDate(tokenDate);
   const paddedNumber = parseInt(tokenIndex) > 9999 ? tokenIndex : `#${tokenIndex.padStart(4, "0")}`
