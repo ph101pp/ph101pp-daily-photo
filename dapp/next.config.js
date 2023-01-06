@@ -20,6 +20,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.arweave.net',
       },
+      {
+        protocol: 'https',
+        hostname: 'arweave.net',
+      }
     ]
   },
 }
