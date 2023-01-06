@@ -113,7 +113,7 @@ const UploadAndPublish = () => {
     const commitData: CommitPostDataType = {
       message: `Update Manifest: ${tokenMetadata.name}`,
       manifest: JSON.stringify(newManifest, null, 2),
-      manifest_uri: `https://arweave.net/${manifestResult.id}/`,
+      manifest_uri: `ar://${manifestResult.id}/`,
       tokenId: tokenId,
       tokenMetadata: JSON.stringify(tokenMetadata, null, 2)
     }

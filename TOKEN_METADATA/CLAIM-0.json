@@ -1,0 +1,25 @@
+{
+  "name": "Claim - One Daily Photo",
+  "created_by": "Ph101pp",
+  "external_url": "https://daily-photo.ph101pp.xyz/CLAIM-0",
+  "description": "This claim is redeemable for one photo from the Ph101pp Daily Photo collection.",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Claim"
+    }
+  ],
+  "image": "ar://2zcipQj4MkPK3wzA3xAScEVpcoBN6AuJqIH5wrttYc0",
+  "image_url": "ar://2zcipQj4MkPK3wzA3xAScEVpcoBN6AuJqIH5wrttYc0",
+  "image_details": {
+    "size": 7955405,
+    "type": "image/jpeg",
+    "width": 3000,
+    "height": 2000,
+    "sha256": "036b393b6e5937de0a9749c6a8a26cfb4d53a5de69eb46406d0a06371915b1cd"
+  }
+}

@@ -1,8 +1,9 @@
 import { selector } from "recoil";
 import { MetadataType } from "../../utils/getBaseMetadata";
+import arweaveUrl from "../_helpers/arweaveUrl";
 import tokenIdAtom from "./tokenIdAtom";
 
-const arweaveURL = process.env.LATEST_MANIFEST_URI;
+const arweaveURL = arweaveUrl(process.env.LATEST_MANIFEST_URI!);
 
 const existingTokenatom = selector<MetadataType | null>({
   key: "tokenDataAtom",

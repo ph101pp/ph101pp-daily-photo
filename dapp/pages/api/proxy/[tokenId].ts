@@ -1,10 +1,11 @@
 // This is an example of to protect an API route
 import type { NextApiRequest, NextApiResponse } from "next"
+import arweaveUrl from "../../../components/_helpers/arweaveUrl";
 import getClaimMetadata from "../../../utils/getClaimMetadata";
 import getFutureMetadata from "../../../utils/getFutureMetadata";
 import { isValidDate } from "../../../utils/isValidDate";
 
-const arweaveURL = process.env.LATEST_MANIFEST_URI;
+const arweaveURL = arweaveUrl(process.env.LATEST_MANIFEST_URI!);
 
 export default async function handler(
   req: NextApiRequest,
