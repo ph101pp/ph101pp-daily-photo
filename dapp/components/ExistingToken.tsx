@@ -22,9 +22,8 @@ const ExistingToken = ({ tokenMetadata }: { tokenMetadata: MetadataType }) => {
           }}
         >
           {tokenMetadata.image &&
-            <Image
+            <img
               alt="image"
-              layout={"fixed"}
               src={arweaveUrl(tokenMetadata.image)}
               height={height}
               width={width}
