@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, September 2, 2022.",
+  "image": "ar://lvcBGP8OZjFabm3xZzXezDDTHx-stOD3jyzYCMQn3EE",
+  "image_url": "ar://lvcBGP8OZjFabm3xZzXezDDTHx-stOD3jyzYCMQn3EE",
+  "name": "#0002 – Friday, September 2, 2022",
+  "created_by": "Philipp Adrian",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220902-2",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Manhattan, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/4.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Photo"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Photo Nº",
+      "value": 2
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662076800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 2
+    }
+  ],
+  "image_details": {
+    "size": 18396456,
+    "type": "image/jpeg",
+    "width": 5647,
+    "height": 3765,
+    "sha256": "60c219e20d1100d3b3021ed584a6007b9190fdd110d75adb49f28c6dc184d66d"
+  }
+}
