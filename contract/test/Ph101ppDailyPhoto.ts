@@ -387,8 +387,8 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
 
     it("should fail to set initial supply with incorrect inputs", async function () {
       const { c } = await loadFixture(deployFixture);
-      await expect(c.setInitialSupply([1])).to.be.rejected;
-      await expect(c.setInitialSupply([1, 5, 6])).to.be.rejected;
+      await expect(c.setInitialSupply([1])).to.be.rejectedWith("P:02");
+      await expect(c.setInitialSupply([1, 5, 6])).to.be.rejectedWith("P:02");
       await expect(c.setInitialSupply([5, 1])).to.be.rejected;
     });
 
@@ -803,8 +803,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.permanentlyDisableInitialHoldersRangeUpdate();
       await c.pause();
       const updateInitialHoldersInput = await getPh101ppDailyPhotoUpdateInitialHoldersInput(c, account2.address, account1.address);
-      return;
-      await expect(verified.pdpUpdateInitialHolders(c, ...updateInitialHoldersInput)).to.be.rejected;
+      await expect(verified.pdpUpdateInitialHolders(c, ...updateInitialHoldersInput)).to.be.rejectedWith("P:03");
       expect(await c.isInitialHoldersRangeUpdatePermanentlyDisabled()).to.be.true;
     })
   });
@@ -1026,7 +1025,7 @@ export function testPh101ppDailyPhoto(deployFixture: () => Promise<Fixture<Ph101
       await c.permanentlyFreezeTransferEventListenerAddress();
 
       expect(await c.transferEventListenerAddress()).to.equal(pdpl.address);
-      await expect(c.setTransferEventListenerAddress(account1.address)).to.be.reverted;
+      await expect(c.setTransferEventListenerAddress(account1.address)).to.be.revertedWith("P:04");
 
     });
 
