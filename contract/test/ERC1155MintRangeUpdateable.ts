@@ -133,6 +133,214 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
       await expect(_getUpdateInitialHoldersInputSafe(c, [[account3.address, account2.address], [account2.address, account4.address], [account3.address, account4.address]], [0, 1, 2])).to.not.be.rejected;
     })
 
+    it.only("should fail to verify when getting bad input or not paused", async function () {
+      const fixture = await loadFixture(deployFixture);
+      const { c, account1, account2, account3, account4, account5, account6, account7, account8 } = fixture;
+      const integrity = await setupRandomContractStateUnstructured(fixture);
+
+      const supplyCheck = await integrity.supplies()
+      const balancesCheck = await integrity.balances()
+
+      const baseNoopInput = {
+        fromAddresses: [],
+        toAddresses: [],
+        ids: [],
+        amounts: [],
+        initialize: [],
+        newInitialHolders: [
+          [account2.address, account3.address], [account4.address, account5.address]
+        ],
+        newInitialHolderRanges: [0, 10]
+      }
+      await expect(c.verifyUpdateInitialHoldersInput(baseNoopInput)).to.be.rejectedWith("Pausable: not paused");
+      await c.pause();
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address]
+      })).to.be.rejectedWith("U:02");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address],
+        toAddresses: [account2.address]
+      })).to.be.rejectedWith("U:03");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address],
+        toAddresses: [account2.address],
+        ids: [[1]]
+      })).to.be.rejectedWith("U:04");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address],
+        toAddresses: [account2.address],
+        ids: [[1]],
+        amounts: [[1]],
+        newInitialHolders: [
+          [account2.address, account3.address], [account4.address, account5.address], [account4.address, account5.address]
+        ],
+        newInitialHolderRanges: [0, 10, 5]
+      })).to.be.rejectedWith("U:05");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address],
+        toAddresses: [account2.address],
+        ids: [[1]],
+        amounts: [[1]],
+        newInitialHolders: [
+          [account2.address, account3.address], [account4.address]
+        ],
+        newInitialHolderRanges: [0, 10]
+      })).to.be.rejectedWith("U:06");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address],
+        toAddresses: [account2.address],
+        ids: [[1]],
+        amounts: [[1]],
+        newInitialHolders: [
+          [account2.address, account3.address], [account4.address, account4.address]
+        ],
+        newInitialHolderRanges: [0, 10]
+      })).to.be.rejectedWith("U:07");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address],
+        toAddresses: [account2.address],
+        ids: [[1]],
+        amounts: [[1]],
+        newInitialHolders: [
+          [account2.address, account3.address], [account4.address, ethers.constants.AddressZero]
+        ],
+        newInitialHolderRanges: [0, 10]
+      })).to.be.rejectedWith("U:08");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...baseNoopInput,
+        fromAddresses: [account1.address],
+        toAddresses: [account2.address],
+        ids: [[1]],
+        amounts: [[1]],
+        newInitialHolders: [
+          [account7.address, account8.address], [account7.address, account8.address]
+        ],
+        newInitialHolderRanges: [0, 10]
+      })).to.be.rejectedWith("U:11");
+
+      // U:12 & U:13 already checked by U:11;
+
+      const validInput = {
+        // await _getUpdateInitialHoldersInput(c, [[account3.address, account2.address]], [0])
+        fromAddresses: [
+          '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+          '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
+          '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc'
+        ],
+        toAddresses: [
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+          '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+          '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC'
+        ],
+        ids: [
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ],
+          [ 11, 12, 13, 17, 19 ],
+          [ 11, 12, 13, 17, 19 ]
+        ],
+        amounts: [
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ]
+        ],
+        newInitialHolders: [
+          [
+            '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+            '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC'
+          ]
+        ],
+        newInitialHolderRanges: [ 0 ]
+      };
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...validInput,
+        ids: [
+          [ 11, 2, 3, 7, 9 ], // moved 11 to wrong tx
+          [ 11, 2, 3, 7, 9 ], // moved 11 to wrong tx
+          [ 1, 12, 13, 17, 19 ], // moved 1 to wrong tx
+          [ 1, 12, 13, 17, 19 ] // moved 1 to wrong tx
+        ],
+      })).to.be.rejectedWith("U:14");
+
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...validInput,
+        amounts: [
+          [ 2, 2, 3, 7, 9 ], // changed amount[0] 1 -> 2
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ]
+        ],
+      })).to.be.rejectedWith("U:15");
+
+      await expect(c.verifyUpdateInitialHoldersInput({
+        ...validInput,
+        fromAddresses: [
+          '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+          '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
+          '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc',
+          '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc' // add extra tx
+        ],
+        toAddresses: [
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+          '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+          '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906' // add extra tx
+        ],
+        ids: [
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ],
+          [ 11, 12, 13, 17, 19 ],
+          [ 11, 12, 13, 17, 19 ],
+          [ 11 ] // add extra tx
+        ],
+        amounts: [
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ],
+          [ 1, 2, 3, 7, 9 ], 
+          [ 1 ] // add extra tx
+        ],
+      })).to.be.rejectedWith("U:16");
+
+      await expect(verified.updateInitialHolders(c, baseNoopInput)).to.not.be.rejected;
+
+      await supplyCheck.expectEqual();
+      await balancesCheck.expectEqual();
+
+      await expect(verified.updateInitialHolders(c, validInput)).to.not.be.rejected;
+
+      await supplyCheck.expectEqual();
+      await expect(balancesCheck.expectEqual()).to.be.rejected;
+
+      const revertInput = await _getUpdateInitialHoldersInput(c, [[account2.address, account3.address], [account4.address, account5.address]], [0, 10])
+      
+      await expect(verified.updateInitialHolders(c, revertInput)).to.not.be.rejected;
+      
+      await supplyCheck.expectEqual();
+      await balancesCheck.expectEqual();
+    });
+
     it("should skip manuallyMinted tokens && reinitialize initializedBalances", async function () {
       const { c, account1, account2, account3, account4, } = await loadFixture(deployFixture);
       const initialHolders = [account1.address];
@@ -527,14 +735,14 @@ export function testERC1155MintRangeUpdateable(deployFixture: () => Promise<Fixt
 
       const input6 = await _getUpdateInitialHoldersInput(c, [[account7.address, account7.address], [account8.address, account8.address]], [0, 10]);
       const input8 = await _getUpdateInitialHoldersInput(c, [[account7.address, account8.address], [account4.address, account3.address], [account5.address, account2.address]], [0, 10, 7]);
-      
+
       await expect(c.updateInitialHolders(input1)).to.be.rejectedWith("H:03"); // range length mismatch
       await expect(c.updateInitialHolders(input4)).to.be.rejectedWith("H:03"); // range length mismatch
       await expect(c.updateInitialHolders(input3)).to.be.rejectedWith("H:04"); // holders length mismatch
       await expect(c.updateInitialHolders(input2)).to.be.rejectedWith("H:05"); // no address(0)
       await expect(c.updateInitialHolders(input6)).to.be.rejectedWith("H:07"); // only unique initial holders
       await expect(c.updateInitialHolders(input8)).to.be.rejectedWith("H:09"); // consecutive holder ranges
-      
+
       const input7 = await _getUpdateInitialHoldersInputSafe(c, [[account7.address, account8.address], [account7.address, account8.address]], [0, 10]);
       await expect(verified.updateInitialHoldersSafe(c, ...input7)).to.not.be.rejected;
 
