@@ -1,14 +1,14 @@
 {
-  "description": "This moment was captured on Thursday, September 1, 2022.",
-  "image": "ar://zxLaFU5Nyp8Hca4-4O0pH2-c_Cp6xSRymX5vtxVv8vE",
-  "image_url": "ar://zxLaFU5Nyp8Hca4-4O0pH2-c_Cp6xSRymX5vtxVv8vE",
-  "name": "#0001 – Thursday, September 1, 2022",
+  "description": "This moment was captured on Friday, September 2, 2022.",
+  "image": "ar://lvcBGP8OZjFabm3xZzXezDDTHx-stOD3jyzYCMQn3EE",
+  "image_url": "ar://lvcBGP8OZjFabm3xZzXezDDTHx-stOD3jyzYCMQn3EE",
+  "name": "#0002 – Friday, September 2, 2022",
   "created_by": "Philipp Adrian",
-  "external_url": "https://daily-photo.ph101pp.xyz/20220901-1",
+  "external_url": "https://daily-photo.ph101pp.xyz/20220902-2",
   "attributes": [
     {
       "trait_type": "Place",
-      "value": "LIC, New York City"
+      "value": "Manhattan, New York City"
     },
     {
       "trait_type": "Country",
@@ -20,7 +20,7 @@
     },
     {
       "trait_type": "Settings",
-      "value": "23mm 1/250s ƒ/13 ISO320"
+      "value": "23mm 1/2000s ƒ/4.5 ISO320"
     },
     {
       "trait_type": "Type",
@@ -36,16 +36,16 @@
     },
     {
       "trait_type": "Photo Nº",
-      "value": 1
+      "value": 2
     },
     {
       "display_type": "date",
       "trait_type": "Date",
-      "value": 1661990400
+      "value": 1662076800
     },
     {
       "trait_type": "Weekday",
-      "value": "Thursday"
+      "value": "Friday"
     },
     {
       "display_type": "number",
@@ -60,14 +60,14 @@
     {
       "display_type": "number",
       "trait_type": "Day",
-      "value": 1
+      "value": 2
     }
   ],
   "image_details": {
-    "size": 16941473,
+    "size": 18396456,
     "type": "image/jpeg",
-    "width": 6240,
-    "height": 4160,
-    "sha256": "1f74a8711b655aad0b19d95665f9047f8dd629de50b4d435af6350dabc97926f"
+    "width": 5647,
+    "height": 3765,
+    "sha256": "60c219e20d1100d3b3021ed584a6007b9190fdd110d75adb49f28c6dc184d66d"
   }
 }
