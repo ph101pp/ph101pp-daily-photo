@@ -9,7 +9,7 @@ export default function getFutureMetadata(dateString: string, tokenIndex: string
     attributes: [
       {
         "trait_type": "Type",
-        "value": "Future"
+        "value": "Upcoming"
       },
       ...baseMetadata.attributes
     ],

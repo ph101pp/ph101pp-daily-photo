@@ -42,7 +42,7 @@ export default function getTokenMetadata({
       },
       {
         "trait_type": "Type",
-        "value": "Photo"
+        "value": "Captured"
       },
       {
         "trait_type": "Project",
