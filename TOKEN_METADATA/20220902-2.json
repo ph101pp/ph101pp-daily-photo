@@ -24,7 +24,7 @@
     },
     {
       "trait_type": "Type",
-      "value": "Photo"
+      "value": "Captured"
     },
     {
       "trait_type": "Project",
@@ -35,7 +35,7 @@
       "value": "Ph101pp"
     },
     {
-      "trait_type": "Photo Nº",
+      "trait_type": "Number",
       "value": 2
     },
     {
