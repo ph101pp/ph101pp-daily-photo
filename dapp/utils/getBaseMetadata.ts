@@ -31,7 +31,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
   const month = parseInt(tokenDate.slice(4, 6)) - 1;
   const day = parseInt(tokenDate.slice(6, 8));
 
-  const date = new Date(Date.UTC(year, month, day));
+  const date = new Date(Date.UTC(year, month, day, 11, 0, 0));
   const weekday = date.getUTCDay();
   const timestamp = Math.ceil(date.getTime() / 1000);
   const formattedDate = formatDate(tokenDate);
