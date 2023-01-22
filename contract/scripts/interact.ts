@@ -35,11 +35,10 @@ async function main() {
   // console.log(receipt);
 
   // do this second:
-  const input = await pdp.getMintRangeInput(122+31); // till january 31, 2023
+  const input = await pdp.getMintRangeInput(122+31+28); // till February 28, 2023
   tx = await pdp.mintPhotos(...input);
   receipt = await tx.wait();
   console.log(receipt);
-
 
 }
 

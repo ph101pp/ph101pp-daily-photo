@@ -79,7 +79,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     }
 
     /**
-     * @dev Total amount of tokens of a given id.
+     * @dev Returns total amount of tokens of a given id.
      */
     function totalSupply(uint tokenId) public view virtual returns (uint) {
         // Pre initialization
@@ -113,7 +113,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         uint[] memory amounts,
         bytes memory data
     ) internal virtual override {
-        // for each token transfered:
+        // for each token transferred:
         for (uint i = 0; i < ids.length; ++i) {
             uint id = ids[i];
 
@@ -127,8 +127,9 @@ abstract contract ERC1155MintRange is ERC1155_ {
                 // track supply
                 _totalSupplyDelta[id] += int256(amounts[i]);
             }
-            // track supply when burning
+            // when burning
             if (to == address(0)) {
+                // track supply 
                 _totalSupplyDelta[id] -= int256(amounts[i]);
             }
             // initialize balances if minted via _mintRange
