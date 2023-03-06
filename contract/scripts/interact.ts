@@ -35,7 +35,7 @@ async function main() {
   // console.log(receipt);
 
   // do this second:
-  // const input = await pdp.getMintRangeInput(122+31+28); // till February 28, 2023
+  // const input = await pdp.getMintRangeInput(122+31+28+31); // till March 31, 2023
   // tx = await pdp.mintPhotos(...input);
   // receipt = await tx.wait();
   // console.log(receipt);
@@ -46,12 +46,22 @@ async function main() {
   // console.log(receipt);
 
   // do this fourth:
-  // tx = await pdp.setDefaultRoyalty("0x668EC8c20fc5de4aE0a5347801cbC19c6c234563", 690);
+  // tx = await pdp.setDefaultRoyalty("0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba", 690);
   // receipt = await tx.wait();
   // console.log(receipt);
 
-  // do this third
+  // do this fifth:
+  // tx = await pdp.setInitialHolders(
+  //   "0x43B9A200Fc2BAFe82f8992254c2b3df98beCfC73", // treasury -> generate new private key
+  //   "0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba" // vault
+  // );
+  // receipt = await tx.wait();
+  // console.log(receipt);
 
+  // do this fourth:
+  // maybe // tx = await pdp.transferOwnership("0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba");
+  // receipt = await tx.wait();
+  // console.log(receipt);
 
 }
 
