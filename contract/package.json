@@ -9,7 +9,8 @@
     "deploy-mainnet": "npm run test && npx hardhat run scripts/deploy.ts --network mainnet",
     "interact-test": "npx hardhat run scripts/interact.ts",
     "interact-goerli": "npx hardhat run scripts/interact.ts --network goerli",
-    "verify-abi-goerli": "npx hardhat verify --network goerli --constructor-args ./scripts/deployArguments.js"
+    "verify-abi-goerli": "npx hardhat verify --network goerli --constructor-args ./scripts/deployArguments.js",
+    "verify-abi": "npx hardhat verify --network mainnet --constructor-args ./scripts/deployArguments.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",

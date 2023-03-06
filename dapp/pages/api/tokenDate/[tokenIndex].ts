@@ -1,6 +1,5 @@
 // This is an example of to protect an API route
 import type { NextApiRequest, NextApiResponse } from "next"
-import { isValidDate } from "../../../utils/isValidDate";
 import { ethers } from "ethers";
 import contract from "../../../utils/Ph101ppDailyPhoto.json";
 
