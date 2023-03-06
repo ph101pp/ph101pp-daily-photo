@@ -19,6 +19,7 @@ import base64ToArrayBuffer from "../components/_helpers/base64ToArrayBuffer";
 import defaultTokenMetadataInputAtom from "../components/_atoms/defaultTokenMetadataInputAtom";
 import tokenIdAtom from "../components/_atoms/tokenIdAtom";
 import Loading from "../components/Loading";
+import CLAIM from "../../TOKEN_METADATA/CLAIM-0.json";
 
 const numberOfSteps = 4;
 function Root() {
@@ -38,31 +39,32 @@ function Root() {
       }]
     });
 
-    if (!image || !input) {
-      return;
-    }
+    // if (!image || !input) {
+    //   return;
+    // }
 
-    const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
-    const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
+    // const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
+    // const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
 
     setProgress({
       numberOfSteps,
       steps: [
         {
-          result: imageResult,
-          stats: imageStats,
+          result: "imageResult",
+          stats: "imageStats",
           message: "> Image Uploaded > Upload Claim Metadata"
         }
       ]
     });
 
 
-    const claimMetadata = getClaimMetadata({
-      image_details: input.image_details,
-      imageTx: imageResult.id
-    });
+    const claimMetadata = CLAIM;
+    // getClaimMetadata({
+    //   image_details: input.image_details,
+    //   imageTx: imageResult.id
+    // });
 
-    const [claimResult, claimStats] = await bundlrUploadToArweave(JSON.stringify(claimMetadata), "application/json");
+    const [claimResult, claimStats] = await bundlrUploadToArweave(JSON.stringify(CLAIM), "application/json");
 
     setProgress({
       numberOfSteps,
@@ -103,7 +105,7 @@ function Root() {
   }
 
   return <Container>
-    <UploadImage title={"Upload Claim"} />
+    {/* <UploadImage title={"Upload Claim"} /> */}
     <BundlrProgress />
 
     <Box

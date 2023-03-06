@@ -40,7 +40,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
   return {
     "name": `${paddedNumber} – ${formattedDate}`,
     "created_by": "Philipp Adrian",
-    "external_url": `https://daily-photo.ph101pp.xyz/${tokenDate}-${tokenIndex}`,
+    "external_url": `https://daily.ph101pp.xyz/${tokenDate}-${tokenIndex}`,
     "attributes": [
       {
         "trait_type": "Artist",

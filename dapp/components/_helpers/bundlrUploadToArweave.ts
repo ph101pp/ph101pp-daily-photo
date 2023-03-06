@@ -29,9 +29,9 @@ const bundlrUploadToArweave: BundlrUploadToArweave = async (data, contentType) =
   const transaction = bundlr.createTransaction(data, {
     tags: [
       { name: "Content-Type", value: contentType },
-      // { name: "author", value: "Ph101pp" },
-      // { name: "project", value: "Daily Photo" },
-      // { name: "website", value: "https://daily-photo.ph101pp.xyz" },
+      { name: "author", value: "Ph101pp" },
+      { name: "project", value: "Ph101pp Daily" },
+      { name: "website", value: "https://daily.ph101pp.xyz" },
     ]
   });
 
