@@ -22,7 +22,7 @@ async function main() {
   let tx, receipt;
   
   // do this first:
-  // tx = await pdp.setPermanentBaseUriUpTo("ar://UgQV-kWidkUzmrbqWQ5itxSp3XNma6Lp-yVr9Ve1Eiw/", 0);
+  // tx = await pdp.setPermanentBaseUriUpTo("ar://bbgqsCNHX5lbWnZBU6k5XpBtE5-hYhtiZa-33DZa9ts/", 0);
   // receipt = await tx.wait();
   // console.log(receipt);
 
@@ -35,10 +35,23 @@ async function main() {
   // console.log(receipt);
 
   // do this second:
-  const input = await pdp.getMintRangeInput(122+31+28); // till February 28, 2023
-  tx = await pdp.mintPhotos(...input);
-  receipt = await tx.wait();
-  console.log(receipt);
+  // const input = await pdp.getMintRangeInput(122+31+28); // till February 28, 2023
+  // tx = await pdp.mintPhotos(...input);
+  // receipt = await tx.wait();
+  // console.log(receipt);
+
+  // do this third:
+  // tx = await pdp.setProxyBaseUri("https://daily.ph101pp.xyz/api/proxy/");
+  // receipt = await tx.wait();
+  // console.log(receipt);
+
+  // do this fourth:
+  // tx = await pdp.setDefaultRoyalty("0x668EC8c20fc5de4aE0a5347801cbC19c6c234563", 690);
+  // receipt = await tx.wait();
+  // console.log(receipt);
+
+  // do this third
+
 
 }
 
