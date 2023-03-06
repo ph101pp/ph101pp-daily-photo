@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// Author: Philipp Adrian (ph101pp.eth)
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -258,9 +259,7 @@ library Ph101ppDailyPhotoUtils {
     // ERC1155MintRangeUpdateable
     ///////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @dev Verify and hash p updateInitialHolderRange method.
-     */
+    // Verifies input to updateInitialHolders function
     function verifyUpdateInitialHoldersInput(
         ERC1155MintRangeUpdateable.VerifyUpdateInitialHoldersInput memory p
     ) external view returns (bytes32) {
@@ -412,6 +411,9 @@ library Ph101ppDailyPhotoUtils {
             );
     }
 
+    // Utility to find lower bound. 
+    // Returns index of last element that is small 
+    // than given element in a sorted array.
     function _findLowerBound(
         uint256[] memory array,
         uint256 element
@@ -424,9 +426,7 @@ library Ph101ppDailyPhotoUtils {
         return 0;
     }
 
-    /**
-     * @dev Utility to find Address in array of addresses
-     */
+    // Utility to find Address in array of addresses
     function _includesAddress(
         address[] memory array,
         address value

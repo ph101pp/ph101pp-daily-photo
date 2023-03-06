@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
+// Author: Philipp Adrian (ph101pp.eth)
+
 pragma solidity ^0.8.12;
 
 import "./ERC1155MintRangeUpdateable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./Ph101ppDailyPhotoUtils.sol";
 import "./IPh101ppDailyPhotoListener.sol";
@@ -62,7 +63,7 @@ contract Ph101ppDailyPhoto is
     // Token Balances
     ///////////////////////////////////////////////////////////////////////////////
 
-    // Defines initial balances for "lazy" minted photo nfts
+    // Defines initial balances for lazy minted photo nfts
     function initialBalanceOf(
         address account,
         uint tokenId
@@ -291,9 +292,7 @@ contract Ph101ppDailyPhoto is
         return _initialSupplies[supplyIndex];
     }
 
-    /**
-     * @dev Return current initial supply Ranges
-     */
+    // Return current initial supply Ranges
     function initialSupplyRanges()
         public
         view
@@ -331,7 +330,7 @@ contract Ph101ppDailyPhoto is
         _updateInitialHoldersSafe(input, checksum);
     }
 
-    // Defensive coding: Lock initial holders up to tokenId
+    // Lock initial holders up to tokenId
     // so they cant be updated via updateInitialHolders.
     function setLockInitialHoldersUpTo(
         uint256 tokenId
@@ -339,7 +338,7 @@ contract Ph101ppDailyPhoto is
         _setLockInitialHoldersUpTo(tokenId);
     }
 
-    // Defensive coding: Permanently disable updateInitialHolders.
+    // Permanently disable updateInitialHolders.
     function permanentlyDisableInitialHoldersRangeUpdate()
         public
         whenNotPaused
@@ -405,8 +404,7 @@ contract Ph101ppDailyPhoto is
     // Opensea Operator Filterer
     ///////////////////////////////////////////////////////////////////////////////
 
-    // Owner can be used to make updates (register / subscribe)
-    // to the OperatorFilterRegistry on behalf of this contract.
+    // Owner can mint new tokens and make updates to the contract
     function owner()
         public
         view
@@ -424,7 +422,7 @@ contract Ph101ppDailyPhoto is
         _setOperatorFilterRegistryAddress(_operatorFilterRegistryAddress);
     }
 
-    // Defensive Coding: Permanently freeze operator filter registry address
+    // Permanently freeze operator filter registry address
     function permanentlyFreezeOperatorFilterRegistryAddress()
         public
         whenNotPaused
@@ -444,7 +442,7 @@ contract Ph101ppDailyPhoto is
         transferEventListenerAddress = listener;
     }
 
-    // Defensive Coding: Permanently freeze transfer listener address
+    // Permanently freeze transfer listener address
     function permanentlyFreezeTransferEventListenerAddress()
         public
         whenNotPaused

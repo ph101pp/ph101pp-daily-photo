@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC1155/extensions/ERC1155Supply.sol)
+// Author: Philipp Adrian (ph101pp.eth)
 
 pragma solidity ^0.8.0;
 
 import "./ERC1155_.sol";
 import "hardhat/console.sol";
 
-/**
- * @dev Extension of ERC1155 enables mintRange with dynamic initial balance
- * and adds tracking of total supply per id.
- */
+// Extension of ERC1155 enables lazy minting of Range 
+// with dynamic initial balance 
+// also adds tracking of total supply per id.
 abstract contract ERC1155MintRange is ERC1155_ {
     struct MintRangeInput {
         uint[] ids;
@@ -48,18 +47,17 @@ abstract contract ERC1155MintRange is ERC1155_ {
     ///////////////////////////////////////////////////////////////////////////////
     // Token Balances & Total Supply
     ///////////////////////////////////////////////////////////////////////////////
-    /**
-     * @dev Implement: Return initial token balance for address.
-     * This function MUST be pure: Always return the same values for a given input.
-     */
+
+    // Implement: Return initial token balance for address.
+    // This function MUST be pure: Always return the same values for a given input.
     function initialBalanceOf(
         address account,
         uint tokenId
     ) internal view virtual returns (uint);
 
-    /**
-     * @dev See {ERC1155-balanceOf}.
-     */
+    // Returns current token balance of account
+    // calculates and returns initial dynamic balance 
+    // if minted via _mintRange and not yet initialized.
     function balanceOf(
         address account,
         uint id
@@ -78,9 +76,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         return _balances[id][account];
     }
 
-    /**
-     * @dev Returns total amount of tokens of a given id.
-     */
+    // Returns total amount of tokens of a given id.
     function totalSupply(uint tokenId) public view virtual returns (uint) {
         // Pre initialization
         if (_inRange(tokenId) && !isManualMint[tokenId]) {
@@ -102,9 +98,10 @@ abstract contract ERC1155MintRange is ERC1155_ {
         return uint(_totalSupplyDelta[tokenId]);
     }
 
-    /**
-     * @dev See {ERC1155-_beforeTokenTransfer}.
-     */
+    // - Tracks total supply per token
+    // - Tracks manual mints (_mint | _mintBatch)
+    // - Initializes dynamic initial balances 
+    // before any transfer.
     function _beforeTokenTransfer(
         address operator,
         address from,
@@ -142,9 +139,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
-    /**
-     * @dev Writes dynamic initial Balance to state if uninitialized.
-     */
+    // Writes dynamic initial Balance to state if initial holder is uninitialized.
     function _maybeInitializeBalance(address account, uint id) internal {
         if (
             _maybeInitialHolder(account) &&
@@ -164,9 +159,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
     ///////////////////////////////////////////////////////////////////////////////
     // Intitial Holders
     ///////////////////////////////////////////////////////////////////////////////
-    /**
-     * @dev Set initial holders. mintRange will distribute tokens to these holders
-     */
+
+    // Set initial holders. mintRange() will distribute tokens to these holders
     function _setInitialHolders(address[] memory addresses) internal virtual {
         uint256 firstId = isZeroMinted ? lastRangeTokenIdMinted + 1 : 0;
         uint256 lastIndex = _initialHolders.length - 1;
@@ -192,9 +186,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         }
     }
 
-    /**
-     * @dev Returns initial holders of a token.
-     */
+    // Returns initial holders of a token.
     function initialHolders(
         uint tokenId
     ) public view virtual returns (address[] memory) {
@@ -207,9 +199,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         return _initialHolders[index];
     }
 
-    /**
-     * @dev Return current initial holders Range
-     */
+    // Return current initial holders Range
     function initialHolderRanges()
         public
         view
@@ -219,9 +209,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         return (_initialHolders, _initialHolderRanges);
     }
 
-    /**
-     * @dev Returns true if address is an initial holder of tokenId
-     */
+    // Returns true if address is an initial holder of tokenId
     function _maybeInitialHolder(address account) internal view returns (bool) {
         return isInitialHolderAddress[account];
     }
@@ -229,9 +217,8 @@ abstract contract ERC1155MintRange is ERC1155_ {
     ///////////////////////////////////////////////////////////////////////////////
     // Mint Range
     ///////////////////////////////////////////////////////////////////////////////
-    /**
-     * @dev Implement: May be overwritten to add custom values to checksum test.
-     */
+
+    // Implement: May be overwritten to add custom values to checksum test.
     // function _customMintRangeChecksum()
     //     internal
     //     view
@@ -241,9 +228,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
     //     return 0x00;
     // }
 
-    /**
-     * @dev Generate mintRange inputs for x new tokens.
-     */
+    // Generate mintRange inputs for x new tokens.
     function getMintRangeInput(
         uint numberOfTokens
     ) public view returns (MintRangeInput memory, bytes32) {
@@ -281,9 +266,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         return (MintRangeInput(ids, amounts), checksum);
     }
 
-    /**
-     * Verifies the checksum generated by getMintRangeInput
-     */
+    // Verifies the checksum generated by getMintRangeInput
     function _mintRange(
         MintRangeInput memory input,
         bytes32 inputChecksum
@@ -324,20 +307,20 @@ abstract contract ERC1155MintRange is ERC1155_ {
     ///////////////////////////////////////////////////////////////////////////////
     // Uitilities
     ///////////////////////////////////////////////////////////////////////////////
-    /**
-     * @dev Returns true if tokenId was minted.
-     */
+    
+    // Returns true if tokenId was minted.
     function exists(uint tokenId) public view virtual returns (bool) {
         return _inRange(tokenId) || isManualMint[tokenId] == true;
     }
 
-    /**
-     * @dev Returns true if token is in existing id range.
-     */
+    // Returns true if token is in existing id range.
     function _inRange(uint tokenId) private view returns (bool) {
         return isZeroMinted && tokenId <= lastRangeTokenIdMinted;
     }
 
+    // Utility to find lower bound. 
+    // Returns index of last element that is small 
+    // than given element in a sorted array.
     function _findLowerBound(
         uint256[] memory array,
         uint256 element
@@ -350,9 +333,7 @@ abstract contract ERC1155MintRange is ERC1155_ {
         return 0;
     }
 
-    /**
-     * @dev Utility to find Address in array of addresses
-     */
+    // Utility to find Address in array of addresses
     function _includesAddress(
         address[] memory array,
         address value

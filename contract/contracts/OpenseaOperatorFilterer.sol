@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.13;
 
 import {IOperatorFilterRegistry} from "operator-filter-registry/src/IOperatorFilterRegistry.sol";
@@ -51,6 +52,10 @@ abstract contract OpenseaOperatorFilterer {
             revert OperatorNotAllowed(operator);
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    // Modifiers
+    ///////////////////////////////////////////////////////////////////////////////
 
     modifier onlyAllowedOperator(address from) virtual {
         // Allow spending tokens from addresses with balance

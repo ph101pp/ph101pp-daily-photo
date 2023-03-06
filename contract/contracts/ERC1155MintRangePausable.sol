@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC1155/extensions/ERC1155Supply.sol)
+// Author: Philipp Adrian (ph101pp.eth)
 
 pragma solidity ^0.8.0;
 
 import "./ERC1155MintRange.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-/**
- * @dev Extension of ERC1155MintRange enables ability update initial holders.
- */
+// Extension of ERC1155MintRange enables ability to pause contract.
 abstract contract ERC1155MintRangePausable is ERC1155MintRange, Pausable {
     
     function _setInitialHolders(address[] memory addresses)
@@ -20,9 +18,6 @@ abstract contract ERC1155MintRangePausable is ERC1155MintRange, Pausable {
         super._setInitialHolders(addresses);
     }
 
-    /**
-     * @dev Lazy-mint a range of new tokenIds to initial holders
-     */
     function _mintRange(
         MintRangeInput memory input,
         bytes32 inputChecksum
@@ -30,9 +25,6 @@ abstract contract ERC1155MintRangePausable is ERC1155MintRange, Pausable {
         super._mintRange(input, inputChecksum);
     }
 
-    /**
-     * @dev See {ERC1155-_beforeTokenTransfer}.
-     */
     function _beforeTokenTransfer(
         address operator,
         address from,
