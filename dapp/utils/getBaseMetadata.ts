@@ -14,6 +14,7 @@ export type BaseMetadataType = {
 
 export type MetadataType = {
   "description": string,
+  "inscription"?: string, 
   "image": string,
   "image_url": string
   "image_details": {
