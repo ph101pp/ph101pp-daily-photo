@@ -18,11 +18,15 @@ const photosAddress14 = "0x74F5ab6D014AEa53448B4CB8A735ae9B29b5AAe3";
 
 const mainnetAddress1 = "0x986A4010D6dF5754f66F72764487070615CBDE9A";
 async function main() {
-  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress14);
+  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", mainnetAddress1);
   let tx, receipt;
-  
+
   // do this first:
   // tx = await pdp.setPermanentBaseUriUpTo("ar://bbgqsCNHX5lbWnZBU6k5XpBtE5-hYhtiZa-33DZa9ts/", 0);
+  // receipt = await tx.wait();
+  // console.log(receipt);
+
+  // tx = await pdp.mintClaims("0x668EC8c20fc5de4aE0a5347801cbC19c6c234563", 10, []);
   // receipt = await tx.wait();
   // console.log(receipt);
 
@@ -30,12 +34,10 @@ async function main() {
   // receipt = await tx.wait();
   // console.log(receipt);
 
-  // tx = await pdp.mintClaims("0x1347aeA833D7a54456EAa76f45b66a9d91d0afb2", 10, []);
-  // receipt = await tx.wait();
-  // console.log(receipt);
-
   // do this second:
   // const input = await pdp.getMintRangeInput(122+31+28+31); // till March 31, 2023
+  // console.log(JSON.stringify(input[0]))
+  // console.log(JSON.stringify(input[1]))
   // tx = await pdp.mintPhotos(...input);
   // receipt = await tx.wait();
   // console.log(receipt);
@@ -58,16 +60,17 @@ async function main() {
   // receipt = await tx.wait();
   // console.log(receipt);
 
-  // do this fourth:
-  // maybe // tx = await pdp.transferOwnership("0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba");
-  // receipt = await tx.wait();
-  // console.log(receipt);
+  ////// // do this fourth:
+  ////// tx = await pdp.transferOwnership("0xceeaea7510728C1233BEB305a0370CBB2503798A");
+  ////// // goerli // tx = await pdp.transferOwnership("0x50580ca4C2000c031B21747c47036CFFD3Cee226");
+  ////// receipt = await tx.wait();
+  ////// console.log(receipt);
 
 }
 
 // async function main() {
 //   const pdp = await ethers.getContractAt("Ph101ppDailyPhotos", photosAddress);
-  
+
 //   const tx = await pdp.setDefaultRoyalty("0x2852578456552053183201a7c99EF7FA813b3622", 500);
 
 //   const receipt = await tx.wait();
@@ -78,6 +81,6 @@ async function main() {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-      console.error(error);
-      process.exit(1);
+    console.error(error);
+    process.exit(1);
   });
