@@ -13,7 +13,6 @@ async function middleware(request: NextRequest) {
   ) {
     return;
   }
-
   const query = url.pathname.slice(1);
   const [token] = query.split(".");
   const [dateStr, idStr] = token.split("-");
@@ -23,11 +22,13 @@ async function middleware(request: NextRequest) {
 
   let date = dateStr;
   let id = idStr;
+  let fullToken = query;
+
   // id received
   if (dateInt < 20220901 && !isNaN(dateInt) && isNaN(idInt)) {
     // console.log("A");
     id = dateStr;
-    date = await (await fetch(`${url.origin}/api/tokenDate/${id}`)).json();
+    fullToken = await (await fetch(`${url.origin}/api/tokenDate/${id}`)).json();
   }
   else if (!isValidDate(date) && isNaN(idInt)) {
     // console.log("B");
@@ -37,13 +38,11 @@ async function middleware(request: NextRequest) {
     const monthTemp = now.getMonth() + 1;
     const dayTemp = now.getDate();
     date = `${yearTemp}${monthTemp <= 9 ? "0" : ""}${monthTemp}${dayTemp <= 9 ? "0" : ""}${dayTemp}`
-    id = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
+    fullToken = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
   } else if (isNaN(idInt)) {
     // console.log("C");
-    id = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
+    fullToken = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
   }
-
-  const fullToken = `${date}-${id}`;
 
   if (fullToken !== query) {
     url.pathname = `/${fullToken}`
@@ -64,7 +63,7 @@ export default withAuth(
               !path.startsWith("/api/") || // close all api routes
               path.startsWith("/api/proxy/") // except for the proxy 
             )
-          ) || 
+          ) ||
           token?.email === "hello@philippadrian.com" // or if logged
         )
       },

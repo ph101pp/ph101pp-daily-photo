@@ -23,12 +23,8 @@ export default async function handler(
   return res.status(404).end();
 }
 
-  const [yearBN, monthBN, dayBN] = await Ph101ppDailyPhoto.tokenIdToDate(tokenIndex);
-
-  const year = yearBN.toNumber();
-  const month = monthBN.toNumber();
-  const day = dayBN.toNumber();
+  const tokenSlug = await Ph101ppDailyPhoto.tokenSlugFromTokenId(tokenIndex);
 
   res.setHeader("Cache-Control",`s-maxage=${60*60*24*31}`); // max cache
-  res.json(`${year}${month <= 9 ? "0" : ""}${month}${day <= 9 ? "0" : ""}${day}`);
+  res.json(tokenSlug);
 }
