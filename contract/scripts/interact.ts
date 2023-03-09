@@ -18,11 +18,12 @@ const photosAddress14 = "0x74F5ab6D014AEa53448B4CB8A735ae9B29b5AAe3";
 
 const mainnetAddress1 = "0x986A4010D6dF5754f66F72764487070615CBDE9A";
 async function main() {
-  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", mainnetAddress1);
+  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress14);
   let tx, receipt;
 
   // do this first:
-  // tx = await pdp.setPermanentBaseUriUpTo("ar://bbgqsCNHX5lbWnZBU6k5XpBtE5-hYhtiZa-33DZa9ts/", 0);
+  //goerli // tx = await pdp.setPermanentBaseUriUpTo("ar://e4DOYkIp57DGJV7slXf0pa5soqBS57lVyoSuSG8dCvo/", 2);
+  // tx = await pdp.setPermanentBaseUriUpTo("ar://e4DOYkIp57DGJV7slXf0pa5soqBS57lVyoSuSG8dCvo/", 0);
   // receipt = await tx.wait();
   // console.log(receipt);
 

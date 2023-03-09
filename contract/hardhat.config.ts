@@ -6,7 +6,7 @@ import "hardhat-contract-sizer";
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const gasGoerliGwei = 5;
+const gasGoerliGwei = 15;
 const mainnetGwei = 25;
 
 const config: HardhatUserConfig = {
