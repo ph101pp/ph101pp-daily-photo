@@ -27,6 +27,7 @@ async function main() {
   // receipt = await tx.wait();
   // console.log(receipt);
 
+  // Do this second
   // tx = await pdp.mintClaims("0x668EC8c20fc5de4aE0a5347801cbC19c6c234563", 10, []);
   // receipt = await tx.wait();
   // console.log(receipt);
@@ -34,8 +35,26 @@ async function main() {
   // tx = await pdp.setInitialSupply([1,2]);
   // receipt = await tx.wait();
   // console.log(receipt);
-
-  // do this second:
+  
+  // do this third:
+  // tx = await pdp.setProxyBaseUri("https://daily.ph101pp.xyz/api/proxy/");
+  // receipt = await tx.wait();
+  // console.log(receipt);
+  
+  // do this fourth:
+  // tx = await pdp.setDefaultRoyalty("0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba", 690);
+  // receipt = await tx.wait();
+  // console.log(receipt);
+  
+  // do this fifth:
+  // tx = await pdp.setInitialHolders(
+  //   "0x43B9A200Fc2BAFe82f8992254c2b3df98beCfC73", // treasury
+  //   "0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba" // vault
+  // );
+  // receipt = await tx.wait();
+  // console.log(receipt);
+    
+  // do this sixth:
   // const input = await pdp.getMintRangeInput(122+31+28+31); // till March 31, 2023
   // console.log(JSON.stringify(input[0]))
   // console.log(JSON.stringify(input[1]))
@@ -43,23 +62,6 @@ async function main() {
   // receipt = await tx.wait();
   // console.log(receipt);
 
-  // do this third:
-  // tx = await pdp.setProxyBaseUri("https://daily.ph101pp.xyz/api/proxy/");
-  // receipt = await tx.wait();
-  // console.log(receipt);
-
-  // do this fourth:
-  // tx = await pdp.setDefaultRoyalty("0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba", 690);
-  // receipt = await tx.wait();
-  // console.log(receipt);
-
-  // do this fifth:
-  // tx = await pdp.setInitialHolders(
-  //   "0x43B9A200Fc2BAFe82f8992254c2b3df98beCfC73", // treasury -> generate new private key
-  //   "0xe9bcD41B919A144b196905CAee3D7E18F0Bcf3Ba" // vault
-  // );
-  // receipt = await tx.wait();
-  // console.log(receipt);
 
   ////// // do this fourth:
   ////// tx = await pdp.transferOwnership("0xceeaea7510728C1233BEB305a0370CBB2503798A");

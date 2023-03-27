@@ -14,7 +14,7 @@ export default function getClaimMetadata({
     "external_url": "https://daily.ph101pp.xyz/CLAIM-0",
     "description": `This claim is redeemable for one photo from the Ph101pp Daily collection.
 
-[Redeem here](https://daily.ph101pp.xyz/claim)`,
+[Redeem](https://daily.ph101pp.xyz/claim)`,
     "attributes": [
       {
         "trait_type": "Artist",
