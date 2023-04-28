@@ -39,32 +39,32 @@ function Root() {
       }]
     });
 
-    // if (!image || !input) {
-    //   return;
-    // }
+    if (!image || !input) {
+      return;
+    }
 
-    // const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
-    // const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
+    const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
+    const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
 
     setProgress({
       numberOfSteps,
       steps: [
         {
-          result: "imageResult",
-          stats: "imageStats",
+          result: imageResult,
+          stats: imageStats,
           message: "> Image Uploaded > Upload Claim Metadata"
         }
       ]
     });
 
 
-    const claimMetadata = CLAIM;
-    // getClaimMetadata({
-    //   image_details: input.image_details,
-    //   imageTx: imageResult.id
-    // });
+    // const claimMetadata = CLAIM;
+    const claimMetadata = getClaimMetadata({
+      image_details: input.image_details,
+      imageTx: imageResult.id
+    });
 
-    const [claimResult, claimStats] = await bundlrUploadToArweave(JSON.stringify(CLAIM), "application/json");
+    const [claimResult, claimStats] = await bundlrUploadToArweave(JSON.stringify(claimMetadata), "application/json");
 
     setProgress({
       numberOfSteps,
@@ -105,7 +105,7 @@ function Root() {
   }
 
   return <Container>
-    {/* <UploadImage title={"Upload Claim"} /> */}
+    <UploadImage title={"Upload Claim"} />
     <BundlrProgress />
 
     <Box

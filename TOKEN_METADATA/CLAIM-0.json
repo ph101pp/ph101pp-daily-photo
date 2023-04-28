@@ -1,6 +1,6 @@
 {
   "name": "Claim - One Daily Photo",
-  "created_by": "Ph101pp",
+  "created_by": "Philipp Adrian (Ph101pp)",
   "external_url": "https://daily.ph101pp.xyz/claim",
   "description": "This claim is redeemable for one photo from the Ph101pp Daily collection.\n\n[Redeem](https://daily.ph101pp.xyz/claim)",
   "attributes": [
@@ -13,13 +13,13 @@
       "value": "Claim"
     }
   ],
-  "image": "ar://2zcipQj4MkPK3wzA3xAScEVpcoBN6AuJqIH5wrttYc0",
-  "image_url": "ar://2zcipQj4MkPK3wzA3xAScEVpcoBN6AuJqIH5wrttYc0",
+  "image": "ar://ZmF5F28AyxYFDyc0iHMpTRzH9ffYiTl0BHnyaLAKYQ0",
+  "image_url": "ar://ZmF5F28AyxYFDyc0iHMpTRzH9ffYiTl0BHnyaLAKYQ0",
   "image_details": {
-    "size": 7955405,
+    "size": 7357396,
     "type": "image/jpeg",
     "width": 3000,
     "height": 2000,
-    "sha256": "036b393b6e5937de0a9749c6a8a26cfb4d53a5de69eb46406d0a06371915b1cd"
+    "sha256": "c6bee21b89e50d1c86ce7cb41dbeb71f6dbde6fdf7e39161854de2e2e815fe4f"
   }
 }

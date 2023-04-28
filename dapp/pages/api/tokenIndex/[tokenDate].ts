@@ -5,9 +5,9 @@ import { ethers } from "ethers";
 import contract from "../../../utils/Ph101ppDailyPhoto.json";
 
 const wallet = ethers.Wallet.createRandom();
-const alchemyProvider = new ethers.providers.AnkrProvider("goerli");
+const alchemyProvider = new ethers.providers.AlchemyProvider("mainnet", process.env.MAINNET_ALCHEMY_API_KEY);
 const signer = new ethers.Wallet(wallet.privateKey, alchemyProvider);
-const Ph101ppDailyPhoto = new ethers.Contract(process.env.NEXT_PUBLIC_GOERLI_CONTRACT_ADDRESS!, contract.abi, signer);
+const Ph101ppDailyPhoto = new ethers.Contract(process.env.NEXT_PUBLIC_MAINNET_CONTRACT_ADDRESS!, contract.abi, signer);
 
 export default async function handler(
   req: NextApiRequest,

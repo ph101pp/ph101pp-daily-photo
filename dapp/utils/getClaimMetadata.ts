@@ -10,8 +10,8 @@ export default function getClaimMetadata({
 }): MetadataType {
   return ({
     "name": "Claim - One Daily Photo",
-    "created_by": "Ph101pp",
-    "external_url": "https://daily.ph101pp.xyz/CLAIM-0",
+    "created_by": "Philipp Adrian (Ph101pp)",
+    "external_url": "https://daily.ph101pp.xyz/claim",
     "description": `This claim is redeemable for one photo from the Ph101pp Daily collection.
 
 [Redeem](https://daily.ph101pp.xyz/claim)`,
