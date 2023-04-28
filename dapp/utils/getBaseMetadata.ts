@@ -40,7 +40,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
 
   return {
     "name": `${paddedNumber} – ${formattedDate}`,
-    "created_by": "Philipp Adrian (Ph101pp)",
+    "created_by": "Philipp Adrian (ph101pp.eth)",
     "external_url": `https://daily.ph101pp.xyz/${tokenDate}-${tokenIndex}`,
     "attributes": [
       {
