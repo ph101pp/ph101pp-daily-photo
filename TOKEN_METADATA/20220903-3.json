@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, September 3, 2022.",
+  "image": "ar://bQ_KJUGj_kXBGVn_iaUWCXpBnyf0UEGHuQIRKIuyv9U",
+  "image_url": "ar://bQ_KJUGj_kXBGVn_iaUWCXpBnyf0UEGHuQIRKIuyv9U",
+  "name": "#0003 – Saturday, September 3, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20220903-3",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Nom Wah Tea Parlor, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2 ISO1000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 3
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662202800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 3
+    }
+  ],
+  "image_details": {
+    "size": 16789970,
+    "type": "image/jpeg",
+    "width": 5352,
+    "height": 3568,
+    "sha256": "dd60b8e7d14ca3bca28337abfab7e50e73a083ee87dd46092e83147071e1fd41"
+  }
+}
