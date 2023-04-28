@@ -18,12 +18,12 @@ const photosAddress14 = "0x74F5ab6D014AEa53448B4CB8A735ae9B29b5AAe3";
 
 const mainnetAddress1 = "0x986A4010D6dF5754f66F72764487070615CBDE9A";
 async function main() {
-  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", photosAddress14);
+  const pdp = await ethers.getContractAt("Ph101ppDailyPhoto", mainnetAddress1);
   let tx, receipt;
 
   // do this first:
   //goerli // tx = await pdp.setPermanentBaseUriUpTo("ar://e4DOYkIp57DGJV7slXf0pa5soqBS57lVyoSuSG8dCvo/", 2);
-  // tx = await pdp.setPermanentBaseUriUpTo("ar://e4DOYkIp57DGJV7slXf0pa5soqBS57lVyoSuSG8dCvo/", 0);
+  // tx = await pdp.setPermanentBaseUriUpTo("ar://zC-TvOd7BPq97u1sMMma660uwp7wrRAD06zKbplC18w/", 0);
   // receipt = await tx.wait();
   // console.log(receipt);
 
@@ -55,9 +55,9 @@ async function main() {
   // console.log(receipt);
     
   // do this sixth:
-  // const input = await pdp.getMintRangeInput(122+31+28+31); // till March 31, 2023
-  // console.log(JSON.stringify(input[0]))
-  // console.log(JSON.stringify(input[1]))
+  const input = await pdp.getMintRangeInput(122+31+28+31+30+31); // till May 31, 2023
+  console.log(JSON.stringify(input[0]))
+  console.log(JSON.stringify(input[1]))
   // tx = await pdp.mintPhotos(...input);
   // receipt = await tx.wait();
   // console.log(receipt);
