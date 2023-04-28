@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, September 9, 2022.",
+  "image": "ar://oM9H58LRSSc9E42urKNrw3M75-77zR1uORk6YdAX3DU",
+  "image_url": "ar://oM9H58LRSSc9E42urKNrw3M75-77zR1uORk6YdAX3DU",
+  "name": "#0009 – Friday, September 9, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20220909-9",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Winterthur"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/15s ƒ/8 ISO3200"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 9
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662721200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 9
+    }
+  ],
+  "image_details": {
+    "size": 15640234,
+    "type": "image/jpeg",
+    "width": 5305,
+    "height": 3537,
+    "sha256": "9692e37acb5df14486253c7dd05827a3c90b4b6b27d516e0cbd312580c0ef15b"
+  }
+}
