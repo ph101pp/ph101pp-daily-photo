@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, October 1, 2022.",
+  "image": "ar://fT_MAac2P7EF6wjPZOc7zwP177ekyXoJcCps44dw34E",
+  "image_url": "ar://fT_MAac2P7EF6wjPZOc7zwP177ekyXoJcCps44dw34E",
+  "name": "#0031 – Saturday, October 1, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221001-31",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lake Ninevah, Vermont"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/5.6 ISO160"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 31
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1664622000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 1
+    }
+  ],
+  "image_details": {
+    "size": 13112050,
+    "type": "image/jpeg",
+    "width": 5234,
+    "height": 3490,
+    "sha256": "b03734c854f7a9e1e6e2da3aafff3cc1f0f67b38aa2c378f4bde4e978f625168"
+  }
+}
