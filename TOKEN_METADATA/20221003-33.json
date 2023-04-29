@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, October 3, 2022.",
+  "image": "ar://wmDF-oBRxP_Pisr64MYrazKFqsBU7t4_ziySZFaUlN0",
+  "image_url": "ar://wmDF-oBRxP_Pisr64MYrazKFqsBU7t4_ziySZFaUlN0",
+  "name": "#0033 – Monday, October 3, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221003-33",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Greenpoint, Brooklyn, New York"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO1600"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 33
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1664794800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 3
+    }
+  ],
+  "image_details": {
+    "size": 16849909,
+    "type": "image/jpeg",
+    "width": 5241,
+    "height": 3496,
+    "sha256": "0ded576f962def162d3187b397b6603ec1f9c2922494889b92d845a192362f5a"
+  }
+}
