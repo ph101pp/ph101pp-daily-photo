@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, September 12, 2022.",
+  "image": "ar://XBmIUWpQcfRemJdktFxNjV7nz3r_UJ1CV_9EOqEbjLg",
+  "image_url": "ar://XBmIUWpQcfRemJdktFxNjV7nz3r_UJ1CV_9EOqEbjLg",
+  "name": "#0012 – Monday, September 12, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20220912-12",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Oberburg"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/3.2 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 12
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662980400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 12
+    }
+  ],
+  "image_details": {
+    "size": 9487582,
+    "type": "image/jpeg",
+    "width": 2478,
+    "height": 3716,
+    "sha256": "3a2ff550cb6354c3bc6b57e8e597a9544e3c35c95b1a5c961d6783f7252e3cb5"
+  }
+}
