@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, November 5, 2022.",
+  "image": "ar://ojq-nci7zh_6Fbr09j93JT-kq8T1ar6KNpsaiVEbZfk",
+  "image_url": "ar://ojq-nci7zh_6Fbr09j93JT-kq8T1ar6KNpsaiVEbZfk",
+  "name": "#0066 – Saturday, November 5, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221105-66",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lisbon"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Portugal"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/13 ISO500"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 66
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1667646000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 11
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 5
+    }
+  ],
+  "image_details": {
+    "size": 21959493,
+    "type": "image/jpeg",
+    "width": 6092,
+    "height": 4061,
+    "sha256": "94140f86c56c405ee1444766fa16980d9cae2ad5d846d87010b2ab0d53d0acac"
+  }
+}
