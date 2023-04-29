@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, October 7, 2022.",
+  "image": "ar://6yU__YA47WhyKKQShSVErwdp2q9De7vFqycZgEhWfaQ",
+  "image_url": "ar://6yU__YA47WhyKKQShSVErwdp2q9De7vFqycZgEhWfaQ",
+  "name": "#0037 – Friday, October 7, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221007-37",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Monserrat, Buenos Aires"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Argentina"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO4000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 37
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1665140400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 7
+    }
+  ],
+  "image_details": {
+    "size": 8717005,
+    "type": "image/jpeg",
+    "width": 2773,
+    "height": 4160,
+    "sha256": "b6cb2cd6690423b50ad5bdd7397fbf1e6d60949dbaacf7c081d3dc0957d78177"
+  }
+}
