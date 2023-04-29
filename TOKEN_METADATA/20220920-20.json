@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, September 20, 2022.",
+  "image": "ar://2m9dLaF3GrWvuseCCQcaPummKIrRK3ELLflrHmQJSq4",
+  "image_url": "ar://2m9dLaF3GrWvuseCCQcaPummKIrRK3ELLflrHmQJSq4",
+  "name": "#0020 – Tuesday, September 20, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20220920-20",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lueg, Burgdorf"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/4.5 ISO160"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 20
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1663671600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 20
+    }
+  ],
+  "image_details": {
+    "size": 19426143,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "8314771b4a4c6c707f5595aa5d8970fbd9c01e82c7cfd37b81a97c09939ef0e3"
+  }
+}
