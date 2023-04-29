@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, September 18, 2022.",
+  "image": "ar://pOl_n6Fz5KvROrJuqIFUJKhTnunx_QgNTcypcpq6M5M",
+  "image_url": "ar://pOl_n6Fz5KvROrJuqIFUJKhTnunx_QgNTcypcpq6M5M",
+  "name": "#0018 – Sunday, September 18, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20220918-18",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Burgdorf"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/3.2 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 18
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1663498800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 18
+    }
+  ],
+  "image_details": {
+    "size": 21599774,
+    "type": "image/jpeg",
+    "width": 3997,
+    "height": 5995,
+    "sha256": "e04e3afa248b2ea9f2622aa3ff36ee5fc682365a1e7e61b4eb3bb53f295b0f0d"
+  }
+}
