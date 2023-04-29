@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, September 10, 2022.",
+  "image": "ar://aP3H660tbNV0-qJAwIxltmRw5KwtoGmQBnP0KVQL8n0",
+  "image_url": "ar://aP3H660tbNV0-qJAwIxltmRw5KwtoGmQBnP0KVQL8n0",
+  "name": "#0010 – Saturday, September 10, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20220910-10",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lugano"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/7.1 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 10
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1662807600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 10
+    }
+  ],
+  "image_details": {
+    "size": 21680475,
+    "type": "image/jpeg",
+    "width": 5638,
+    "height": 3759,
+    "sha256": "3d6b8c6a596763e5967166ce4d5ef10fc848021aec59208f514568d1478de197"
+  }
+}
