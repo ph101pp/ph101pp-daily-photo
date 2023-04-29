@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, September 13, 2022.",
+  "image": "ar://E1oR14SULr6FrRcIrBAe6nASzjl3KlOd0zYC5h2PYKU",
+  "image_url": "ar://E1oR14SULr6FrRcIrBAe6nASzjl3KlOd0zYC5h2PYKU",
+  "name": "#0013 – Tuesday, September 13, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20220913-13",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Bern"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/2.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 13
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1663066800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 13
+    }
+  ],
+  "image_details": {
+    "size": 11812629,
+    "type": "image/jpeg",
+    "width": 4713,
+    "height": 3142,
+    "sha256": "2517cace2f2e4b6a04d75e150f41a50ca9293b5299b9703b9a96519fa0b19be3"
+  }
+}
