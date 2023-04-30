@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, December 4, 2022.",
+  "image": "ar://EpE6BBoz-vFfjmpxdDWqG0LnIP-nmhKmguORllJn8DY",
+  "image_url": "ar://EpE6BBoz-vFfjmpxdDWqG0LnIP-nmhKmguORllJn8DY",
+  "name": "#0095 – Sunday, December 4, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221204-95",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Brooklyn, New York"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO8000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 95
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1670151600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 4
+    }
+  ],
+  "image_details": {
+    "size": 14023178,
+    "type": "image/jpeg",
+    "width": 4638,
+    "height": 3092,
+    "sha256": "2c5a808b7a4310288c36d125bf9ae654606759b7a21300f71ca7c51dbc4ffc85"
+  }
+}
