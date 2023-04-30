@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, November 22, 2022.",
+  "image": "ar://p8kdpQbi2tR8xq1vhnmufZZV1RTfyF32DsKt-kzf63g",
+  "image_url": "ar://p8kdpQbi2tR8xq1vhnmufZZV1RTfyF32DsKt-kzf63g",
+  "name": "#0083 – Tuesday, November 22, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221122-83",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Buenos Aires"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Argentina"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO3200"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 83
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1669114800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 11
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 22
+    }
+  ],
+  "image_details": {
+    "size": 33100518,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 6240,
+    "sha256": "3eeb494914fb1277af54e4223fa5b46cb37758150077aae3617dad5497ce5a7d"
+  }
+}
