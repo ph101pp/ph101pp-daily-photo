@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, January 2, 2023.",
+  "image": "ar://1_Mkbtw7KYfSfWnqQv6WJ8blmwmjDAqwBdWaANHamYc",
+  "image_url": "ar://1_Mkbtw7KYfSfWnqQv6WJ8blmwmjDAqwBdWaANHamYc",
+  "name": "#0124 – Monday, January 2, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230102-124",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Quinten"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2s ƒ/5.6 ISO3200"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 124
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1672657200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 2
+    }
+  ],
+  "image_details": {
+    "size": 18336830,
+    "type": "image/jpeg",
+    "width": 6038,
+    "height": 4025,
+    "sha256": "0a4e7c89fc13ac8f0058b8a496f204c5f3540c0f761249ca150e8934af911a81"
+  }
+}
