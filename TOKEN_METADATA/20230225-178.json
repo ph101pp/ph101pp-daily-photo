@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, February 25, 2023.",
+  "image": "ar://4jKgHuzHZyczV2Hy592ev2pHtrYHUz2druluCsJgkGo",
+  "image_url": "ar://4jKgHuzHZyczV2Hy592ev2pHtrYHUz2druluCsJgkGo",
+  "name": "#0178 – Saturday, February 25, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230225-178",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Vail, Colorado"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/4000s ƒ/9 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 178
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1677322800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 2
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 25
+    }
+  ],
+  "image_details": {
+    "size": 16582433,
+    "type": "image/jpeg",
+    "width": 4892,
+    "height": 3261,
+    "sha256": "c36b4c356140526044e7ca9c4e028ca993cca6da666ffceb34215a5e0ccc9892"
+  }
+}
