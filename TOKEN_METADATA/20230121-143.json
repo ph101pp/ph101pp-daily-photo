@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, January 21, 2023.",
+  "image": "ar://QR3U_-Uw74a8zOSzYLg9vxYQB4hTDEXxpMQd5rO4JRU",
+  "image_url": "ar://QR3U_-Uw74a8zOSzYLg9vxYQB4hTDEXxpMQd5rO4JRU",
+  "name": "#0143 – Saturday, January 21, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230121-143",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Scharans"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/4 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 143
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1674298800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 21
+    }
+  ],
+  "image_details": {
+    "size": 22200990,
+    "type": "image/jpeg",
+    "width": 6069,
+    "height": 4046,
+    "sha256": "faae23cf1b4ceee924b12a604b5e94ab6a986273ccba0c297ef3e06a962148c8"
+  }
+}
