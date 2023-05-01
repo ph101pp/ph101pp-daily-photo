@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, January 31, 2023.",
+  "image": "ar://DKqamLDTDjw4OZYBv7CI3UzWcPJv8jeBDk0CrRF20iE",
+  "image_url": "ar://DKqamLDTDjw4OZYBv7CI3UzWcPJv8jeBDk0CrRF20iE",
+  "name": "#0153 – Tuesday, January 31, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230131-153",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Manhattan, New York"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO1000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 153
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1675162800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 31
+    }
+  ],
+  "image_details": {
+    "size": 8843901,
+    "type": "image/jpeg",
+    "width": 3754,
+    "height": 2503,
+    "sha256": "7351da56cc42d8d426adb369811bfdf394b15d8bc89e96f4b8c58c8f331b25f7"
+  }
+}
