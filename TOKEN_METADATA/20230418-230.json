@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, April 18, 2023.",
+  "image": "ar://hdRD5KnJIPTOQ4u25h851ql4Y_-EFCFRsGM5ZbarQ8o",
+  "image_url": "ar://hdRD5KnJIPTOQ4u25h851ql4Y_-EFCFRsGM5ZbarQ8o",
+  "name": "#0230 – Tuesday, April 18, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230418-230",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Boston, Massachusetts"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/4.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 230
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1681815600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 4
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 18
+    }
+  ],
+  "image_details": {
+    "size": 20493650,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "3f9ca3fd932e7e6776f82bd0ab9a68d9d3fdd3a20324b8ee654ce0016dc18382"
+  }
+}
