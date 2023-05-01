@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, April 10, 2023.",
+  "image": "ar://7yT4Huyb3J2JbD0-sCBcKE1rWuhIQdAdfvfXtqwTgzI",
+  "image_url": "ar://7yT4Huyb3J2JbD0-sCBcKE1rWuhIQdAdfvfXtqwTgzI",
+  "name": "#0222 – Monday, April 10, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230410-222",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Chicago, Illinois"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/5.6 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 222
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1681124400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 4
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 10
+    }
+  ],
+  "image_details": {
+    "size": 22549014,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 6240,
+    "sha256": "e547b57511e67af755d73c8195f9a636cd3afadc8fbd2fc52493ca6b4e7b46b8"
+  }
+}
