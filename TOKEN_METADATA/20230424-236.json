@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, April 24, 2023.",
+  "image": "ar://xRYFqpYjCTZNFDnXuB3Y8QbnyQM7QT22zPDB3iDhEqI",
+  "image_url": "ar://xRYFqpYjCTZNFDnXuB3Y8QbnyQM7QT22zPDB3iDhEqI",
+  "name": "#0236 – Monday, April 24, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230424-236",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lake Ninevah, Vermont"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2.2 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 236
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1682334000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 4
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 24
+    }
+  ],
+  "image_details": {
+    "size": 15213028,
+    "type": "image/jpeg",
+    "width": 4746,
+    "height": 3164,
+    "sha256": "90fc6594e00a8f562e509ec0b8772d00104c0b0d9b49107538e79f7da150b13e"
+  }
+}
