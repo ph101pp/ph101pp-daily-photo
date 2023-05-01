@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, January 20, 2023.",
+  "image": "ar://Q5_jXZL4c6giNRZtP1mxJ9H41L-_gtb1Pi1jQzsxua0",
+  "image_url": "ar://Q5_jXZL4c6giNRZtP1mxJ9H41L-_gtb1Pi1jQzsxua0",
+  "name": "#0142 – Friday, January 20, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230120-142",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Viamala Gorge"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/60s ƒ/2 ISO3200"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 142
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1674212400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 20
+    }
+  ],
+  "image_details": {
+    "size": 24591146,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "6a39b22bf7881b7c86ec20ffb8ab19759ff3daefa956085820674ca5d497bd0d"
+  }
+}
