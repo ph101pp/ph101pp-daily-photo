@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, April 22, 2023.",
+  "image": "ar://c9y5sexBFIW9OhXvCuwfUiOLHndd5fHOmoMsznVpCSo",
+  "image_url": "ar://c9y5sexBFIW9OhXvCuwfUiOLHndd5fHOmoMsznVpCSo",
+  "name": "#0234 – Saturday, April 22, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230422-234",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Rutland, Vermont"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/3.6 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 234
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1682161200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 4
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 22
+    }
+  ],
+  "image_details": {
+    "size": 20705497,
+    "type": "image/jpeg",
+    "width": 4027,
+    "height": 6040,
+    "sha256": "5850c309c739d13726fff68ba708cb40ae32832ca6ee76d8f4f18c86196e5148"
+  }
+}
