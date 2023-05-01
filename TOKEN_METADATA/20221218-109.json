@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, December 18, 2022.",
+  "image": "ar://5wVbY5JJY1dTvEIemEpxe6NWlgaslWgSuYZm7RCbnBc",
+  "image_url": "ar://5wVbY5JJY1dTvEIemEpxe6NWlgaslWgSuYZm7RCbnBc",
+  "name": "#0109 – Sunday, December 18, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221218-109",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Manhattan, New York"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 109
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1671361200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 18
+    }
+  ],
+  "image_details": {
+    "size": 27514595,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "adc82a02a0b00629d20168170443632481dab059efa6d22ad23b91e9a31d6064"
+  }
+}
