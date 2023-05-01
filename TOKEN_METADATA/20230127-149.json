@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, January 27, 2023.",
+  "image": "ar://OAvMY9x6B7eYdTmuzKt5SP0ldQmOZal8M-EIwPL4c5s",
+  "image_url": "ar://OAvMY9x6B7eYdTmuzKt5SP0ldQmOZal8M-EIwPL4c5s",
+  "name": "#0149 – Friday, January 27, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230127-149",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Winterthur"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/30s ƒ/2 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 149
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1674817200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 27
+    }
+  ],
+  "image_details": {
+    "size": 10768378,
+    "type": "image/jpeg",
+    "width": 2766,
+    "height": 4150,
+    "sha256": "b5743d0c077c3c1fbcf32dfae9302b0f82d1dcf16cb465d1e7fdfd67d2c26b74"
+  }
+}
