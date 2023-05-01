@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, December 31, 2022.",
+  "image": "ar://0c8Xi2bHy36_0ReFBXOwoSnXWP5054FRXIf6PZgSxTc",
+  "image_url": "ar://0c8Xi2bHy36_0ReFBXOwoSnXWP5054FRXIf6PZgSxTc",
+  "name": "#0122 – Saturday, December 31, 2022",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20221231-122",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Zurich"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/2.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 122
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1672484400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2022
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 31
+    }
+  ],
+  "image_details": {
+    "size": 4288912,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 2773,
+    "sha256": "e595ca94a8e3648be9382dac71990962a11a80bc227129e20a17f6fbd976ab6a"
+  }
+}
