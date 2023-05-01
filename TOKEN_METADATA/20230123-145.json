@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, January 23, 2023.",
+  "image": "ar://YHFc7gYmQK4u6wSCZ5mJOUVd1TmDvt2R46oKjQMS4uc",
+  "image_url": "ar://YHFc7gYmQK4u6wSCZ5mJOUVd1TmDvt2R46oKjQMS4uc",
+  "name": "#0145 – Monday, January 23, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230123-145",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Oberburg"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/8s ƒ/2 ISO12800"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 145
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1674471600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 23
+    }
+  ],
+  "image_details": {
+    "size": 16045127,
+    "type": "image/jpeg",
+    "width": 5927,
+    "height": 3951,
+    "sha256": "196f97e2edc399fa7f62569dc1ad8ec944722341c18fe2b7d7c3363a74d5b421"
+  }
+}
