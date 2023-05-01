@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, March 19, 2023.",
+  "image": "ar://zzSMNDgJDggV0gzhGcNMRfoXt5kR6UQxf7bia4HY-YI",
+  "image_url": "ar://zzSMNDgJDggV0gzhGcNMRfoXt5kR6UQxf7bia4HY-YI",
+  "name": "#0200 – Sunday, March 19, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230319-200",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Brooklyn, New York"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/4 ISO3200"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 200
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1679223600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 3
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 19
+    }
+  ],
+  "image_details": {
+    "size": 13727880,
+    "type": "image/jpeg",
+    "width": 4904,
+    "height": 3269,
+    "sha256": "49aa4423ff2f4b3371a30b55643ba248beb710aa0704c150dc83a8ac611ff3a2"
+  }
+}
