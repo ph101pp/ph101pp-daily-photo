@@ -11,7 +11,8 @@
     "interact-goerli": "npx hardhat run scripts/interact.ts --network goerli",
     "interact-mainnet": "npx hardhat run scripts/interact.ts --network mainnet",
     "verify-abi-goerli": "npx hardhat verify --network goerli --constructor-args ./scripts/deployArguments.js",
-    "verify-abi": "npx hardhat verify --network mainnet --constructor-args ./scripts/deployArguments.js"
+    "verify-abi": "npx hardhat verify --network mainnet --constructor-args ./scripts/deployArguments.js",
+    "update-opensea": "npx hardhat run scripts/updateOSMetadata.ts"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
