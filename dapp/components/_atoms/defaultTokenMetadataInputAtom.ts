@@ -44,18 +44,21 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     const userMetadataInput = get(tokenMetadataInputAtom);
     const tokenId = get(tokenIdAtom);
 
+    // no or existing image
     if (!image || image.type === "existing" || !tokenId) {
       return userMetadataInput;
     }
-    console.log(image, userMetadataInput)
+
+    // new image
     const [tokenDate, tokenIndex] = tokenId.split("-");
+    const formattedDate = formatDate(tokenDate);
     const imageDimensions = await getImageDimensions(image.dataURL);
     const sha = await sha256(image.dataURL);
     const autoCamera = `${image.exif.Make} ${image.exif.Model}`
     const exposureTime = parseFloat(image.exif.ExposureTime);
     const shutterSpeed = exposureTime >= 1 ? `${exposureTime}` : `1/${getShutterspeed(exposureTime)}`;
     const autoSettings = `${image.exif.FocalLength}mm ${shutterSpeed}s ƒ/${image.exif.FNumber} ISO${image.exif.ISOSpeedRatings}`;
-    const formattedDate = formatDate(tokenDate);
+
 
     if(userMetadataInput) {
       const newInput = {
@@ -70,7 +73,6 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
           sha256: sha
         }
       }
-      console.log("newInput", newInput);
       return newInput;
     }
 

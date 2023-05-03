@@ -15,10 +15,10 @@ const tokenMetadataInputAtom = atom<TokenMetadataInputType | null>({
       const existingTokenData = get(tokenDataAtom);
       const tokenId = get(tokenIdAtom);
 
-      if(!tokenId ){
+      if (!tokenId) {
         return null;
       }
-      
+
       const [tokenDate, tokenIndex] = tokenId.split("-");
       const formattedDate = formatDate(tokenDate);
 
@@ -35,7 +35,7 @@ const tokenMetadataInputAtom = atom<TokenMetadataInputType | null>({
           width: 0,
           height: 0,
           sha256: ""
-      }
+        }
       }
 
       if (!existingTokenData) {
