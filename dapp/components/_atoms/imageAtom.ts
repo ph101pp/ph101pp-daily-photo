@@ -1,7 +1,9 @@
-import { atom } from "recoil";
+import { atom, selector } from "recoil";
 import { ImageType } from "react-images-uploading";
+import tokenDataAtom from "./tokenDataAtom";
 
-const imageAtom = atom<{
+type ImageAtomType = {
+  type: "new",
   image: ImageType,
   dataURL: string,
   file: {
@@ -9,9 +11,29 @@ const imageAtom = atom<{
     size: number
   }
   exif: any
-} | null >({
+} | {
+  type: "existing"
+  existingArHash: string,
+} | null;
+
+
+const imageAtom = atom<ImageAtomType>({
   key: "imageAtom",
-  default: null
+  default: selector<ImageAtomType>({
+    key: "defaultImageAtom",
+    get: ({ get }) => {
+      const existingTokenData = get(tokenDataAtom);
+
+      if (!existingTokenData) {
+        return null;
+      }
+
+      return {
+        type: "existing",
+        existingArHash: existingTokenData.image_url.replace("ar://", "")
+      }
+    }
+  })
 });
 
 export default imageAtom;

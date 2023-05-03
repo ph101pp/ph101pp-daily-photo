@@ -39,7 +39,7 @@ function Root() {
       }]
     });
 
-    if (!image || !input) {
+    if (image?.type !== "new" || !input) {
       return;
     }
 

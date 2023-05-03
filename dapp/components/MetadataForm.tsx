@@ -1,9 +1,10 @@
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import Box from "@mui/material/Box";
 import { Accordion, AccordionDetails, AccordionSummary, Button, Typography } from "@mui/material";
 import defaultTokenMetadataInputAtom from "./_atoms/defaultTokenMetadataInputAtom";
-import { FormContainer, CheckboxElement, TextFieldElement, useFormContext } from "react-hook-form-mui";
+import { FormContainer, CheckboxElement, TextFieldElement, useFormContext, useForm } from "react-hook-form-mui";
 import { useEffect } from "react";
+import { MetadataType } from "../utils/getBaseMetadata";
 
 
 const RenderFormElement = ({
@@ -46,16 +47,24 @@ const RenderFormElement = ({
 };
 
 function MetadataForm() {
-  const [input, setInput] = useRecoilState(defaultTokenMetadataInputAtom);
+  const input = useRecoilValue(defaultTokenMetadataInputAtom);
+  const { reset } = useFormContext();
 
-  useEffect(()=>{
+  useEffect(() => {
     window.scrollTo(0, document.body.scrollHeight);
-  }, [])
+  }, []);
 
-  if (!input) {
-    return null;
-  }
-  const {image_details, ...defaultInput} = input;
+
+  // reset camera settings when image changed
+  useEffect(() => {
+    reset((data) => {
+      return {
+        ...data,
+        settings: input?.settings ?? data.settings,
+        camera: input?.camera ?? data.camera,
+      }
+    });
+  }, [input?.image_details?.sha256]);
 
   return (
     <Accordion defaultExpanded={true}>
@@ -63,41 +72,25 @@ function MetadataForm() {
         <Typography variant="h6">Update Metadata</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <FormContainer
-          defaultValues={defaultInput}
-          onSuccess={data => {
-            setInput({
-              project: data.project,
-              settings: data.settings,
-              camera: data.camera,
-              description: data.description,
-              place: data.place,
-              country: data.country,
-              image_details
-            })
+        <RenderFormElement name="place" label="Place" required={true} />
+        <RenderFormElement name="country" label="Country" required={true} />
+        <RenderFormElement name="description" label="Description" required={true} disabled={true} />
+        <RenderFormElement name="project" label="Project" required={true} disabled={true} />
+        <RenderFormElement name="camera" label="Camera" required={true} disabled={true} />
+        <RenderFormElement name="settings" label="Settings" required={true} disabled={true} />
+        <Box
+          sx={{
+            margin: "16px 0"
           }}
         >
-
-          <RenderFormElement name="place" label="Place" required={true} />
-          <RenderFormElement name="country" label="Country" required={true} />
-          <RenderFormElement name="description" label="Description" required={true} disabled={true} />
-          <RenderFormElement name="project" label="Project" required={true} disabled={true} />
-          <RenderFormElement name="camera" label="Camera" required={true} disabled={true} />
-          <RenderFormElement name="settings" label="Settings" required={true} disabled={true} />
-          <Box
-            sx={{
-              margin: "16px 0"
-            }}
+          <Button
+            fullWidth={true}
+            variant="outlined"
+            type="submit"
           >
-            <Button
-              fullWidth={true}
-              variant="outlined"
-              type="submit"
-            >
-              Update Metadata
-            </Button>
-          </Box>
-        </FormContainer>
+            Update Metadata
+          </Button>
+        </Box>
       </AccordionDetails>
     </Accordion>
   )

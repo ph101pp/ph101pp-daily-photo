@@ -23,7 +23,7 @@ const baseURI = "https://testnets-api.opensea.io";
 // const baseURI = "https://api.opensea.io";
 const getOSURL = (i: number) => `${baseURI}/api/v1/asset/${contract}/${i}?force_update=true`;
 
-const numberOfSteps = 6;
+let numberOfSteps = 6;
 
 
 const UploadAndPublish = () => {
@@ -49,31 +49,50 @@ const UploadAndPublish = () => {
       }]
     });
 
-    const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
-    const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
+    let imageTx = "";
 
-    setProgress({
-      numberOfSteps,
-      steps: [
-        {
-          result: imageResult,
-          stats: imageStats,
-          message: "> Image Uploaded > Uploading Metadata."
-        }
-      ]
-    });
+    if (image.type === "new") {
+
+      const data = new Uint8Array(base64ToArrayBuffer(image.dataURL));
+      const [imageResult, imageStats] = await bundlrUploadToArweave(data, "image/jpeg");
+
+      setProgress({
+        numberOfSteps,
+        steps: [
+          {
+            result: imageResult,
+            stats: imageStats,
+            message: "> Image Uploaded > Uploading Metadata."
+          }
+        ]
+      });
+      imageTx = imageResult.id;
+    }
+    else if(image.type ==="existing") {
+      console.log("existing");
+      imageTx = image.existingArHash;
+
+      setProgress({
+        numberOfSteps,
+        steps: [
+          {
+            result: {
+              existingArHash: image.existingArHash
+            },
+            message: "> Skip Image Uploading > Uploading Metadata."
+          }
+        ]
+      });
+    }
 
     const tokenMetadata = getTokenMetadata({
       ...metadataInput,
       dateString: tokenDate,
       tokenIndex: tokenIndex,
-      imageTx: imageResult.id
+      imageTx
     });
 
-
-
     const [tokenResult, tokenStats] = await bundlrUploadToArweave(JSON.stringify(tokenMetadata), "application/json");
-
 
     setProgress({
       numberOfSteps,
@@ -152,7 +171,7 @@ const UploadAndPublish = () => {
   };
 
   return (<>
-    <BundlrProgress/>
+    <BundlrProgress />
 
     <Box
       sx={{

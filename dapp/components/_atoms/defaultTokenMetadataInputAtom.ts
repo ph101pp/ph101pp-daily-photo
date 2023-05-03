@@ -43,14 +43,11 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     const image = get(imageAtom);
     const userMetadataInput = get(tokenMetadataInputAtom);
     const tokenId = get(tokenIdAtom);
-    console.log(tokenId);
-    if(userMetadataInput) {
+
+    if (!image || image.type === "existing" || !tokenId) {
       return userMetadataInput;
     }
-
-    if (!image || !tokenId) {
-      return null;
-    }
+    console.log(image, userMetadataInput)
     const [tokenDate, tokenIndex] = tokenId.split("-");
     const imageDimensions = await getImageDimensions(image.dataURL);
     const sha = await sha256(image.dataURL);
@@ -59,8 +56,25 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     const shutterSpeed = exposureTime >= 1 ? `${exposureTime}` : `1/${getShutterspeed(exposureTime)}`;
     const autoSettings = `${image.exif.FocalLength}mm ${shutterSpeed}s ƒ/${image.exif.FNumber} ISO${image.exif.ISOSpeedRatings}`;
     const formattedDate = formatDate(tokenDate);
+
+    if(userMetadataInput) {
+      const newInput = {
+        ...userMetadataInput,
+        settings: autoSettings,
+        camera: autoCamera,
+        image_details: {
+          size: image.file.size,
+          type: image.file.type,
+          width: imageDimensions.width,
+          height: imageDimensions.height,
+          sha256: sha
+        }
+      }
+      console.log("newInput", newInput);
+      return newInput;
+    }
+
     return {
-      tokenId: 1,
       settings: autoSettings,
       camera: autoCamera,
       description: `This moment was captured on ${formattedDate}.`,

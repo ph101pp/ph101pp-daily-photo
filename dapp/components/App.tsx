@@ -22,22 +22,19 @@ function App() {
   const tokenData = useRecoilValue(tokenDataAtom);
   const tokenId = useRecoilValue(tokenIdAtom);
   const { data: session, status } = useSession();
-  
-  if(!tokenId) {
+
+  if (!tokenId) {
     return null;
   }
   const [tokenDate, tokenIndex] = tokenId.split("-");
   const futureTokenData = getFutureMetadata(tokenDate, tokenIndex);
 
-  if(tokenData) {
-    return <ExistingToken tokenMetadata = { tokenData }  />
+
+  if (!session) {
+    return <ExistingToken tokenMetadata={tokenData ?? futureTokenData} />
   }
 
-  if(!session) {
-    return <ExistingToken tokenMetadata = { futureTokenData }  />
-  }
-
-  return <NewToken futureTokenData={futureTokenData} />
+  return <NewToken tokenMetadata={tokenData ?? futureTokenData} />
 
 }
 
