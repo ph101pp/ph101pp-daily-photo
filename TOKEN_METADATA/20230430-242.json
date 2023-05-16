@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, April 30, 2023.",
+  "image": "ar://4UQRejRnKoQLpAmIMizfAko3xB76sWz2gLXDBiGD84k",
+  "image_url": "ar://4UQRejRnKoQLpAmIMizfAko3xB76sWz2gLXDBiGD84k",
+  "name": "#0242 – Sunday, April 30, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230430-242",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Vermont"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2.8 ISO160"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 242
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1682852400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 4
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 30
+    }
+  ],
+  "image_details": {
+    "size": 20601770,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "3bdb5d9c228503e869d283c5c36e79676f3e90287b220aa341736b5a6a30da03"
+  }
+}
