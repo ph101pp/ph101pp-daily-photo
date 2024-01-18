@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, May 16, 2023.",
+  "image": "ar://AkjmegiH5e2-0eA_XQ5N_cSIYm4emYSbRMN2TQ6nPEk",
+  "image_url": "ar://AkjmegiH5e2-0eA_XQ5N_cSIYm4emYSbRMN2TQ6nPEk",
+  "name": "#0258 – Tuesday, May 16, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230516-258",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": ""
+    },
+    {
+      "trait_type": "Country",
+      "value": ""
+    },
+    {
+      "trait_type": "Camera",
+      "value": ""
+    },
+    {
+      "trait_type": "Settings",
+      "value": ""
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 258
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1684234800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 5
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 16
+    }
+  ],
+  "image_details": {
+    "size": 0,
+    "type": "string",
+    "width": 0,
+    "height": 0,
+    "sha256": ""
+  }
+}
