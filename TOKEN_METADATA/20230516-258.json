@@ -1,26 +1,26 @@
 {
   "description": "This moment was captured on Tuesday, May 16, 2023.",
-  "image": "ar://AkjmegiH5e2-0eA_XQ5N_cSIYm4emYSbRMN2TQ6nPEk",
-  "image_url": "ar://AkjmegiH5e2-0eA_XQ5N_cSIYm4emYSbRMN2TQ6nPEk",
+  "image": "ar://kVda1LXf6nmrkqHZJyazxfWQ3rb_fF_UuASV6wowIVg",
+  "image_url": "ar://kVda1LXf6nmrkqHZJyazxfWQ3rb_fF_UuASV6wowIVg",
   "name": "#0258 – Tuesday, May 16, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230516-258",
   "attributes": [
     {
       "trait_type": "Place",
-      "value": ""
+      "value": "Manhattan, New York City"
     },
     {
       "trait_type": "Country",
-      "value": ""
+      "value": "USA"
     },
     {
       "trait_type": "Camera",
-      "value": ""
+      "value": "FUJIFILM X100V"
     },
     {
       "trait_type": "Settings",
-      "value": ""
+      "value": "23mm 1/30s ƒ/2 ISO12800"
     },
     {
       "trait_type": "Type",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 0,
-    "type": "string",
-    "width": 0,
-    "height": 0,
-    "sha256": ""
+    "size": 26148832,
+    "type": "image/jpeg",
+    "width": 4525,
+    "height": 3017,
+    "sha256": "26065aea2746f7fd0c569e266fe2c426b3d3a7039eddbe1b8fbbf63198419361"
   }
 }
