@@ -1,14 +1,14 @@
 {
   "description": "This moment was captured on Friday, June 30, 2023.",
-  "image": "ar://qCIOmrmZSe5mFyi0eFZeXLW371-Ng6j2T6OWb-O1e7c",
-  "image_url": "ar://qCIOmrmZSe5mFyi0eFZeXLW371-Ng6j2T6OWb-O1e7c",
+  "image": "ar://SE-QJ_xTZOIzHqPuPgC2ki18drM01kdaM_dlZUosTL0",
+  "image_url": "ar://SE-QJ_xTZOIzHqPuPgC2ki18drM01kdaM_dlZUosTL0",
   "name": "#0303 – Friday, June 30, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230630-303",
   "attributes": [
     {
       "trait_type": "Place",
-      "value": "Brooklyn, New York City"
+      "value": "Manhattan, New York City"
     },
     {
       "trait_type": "Country",
@@ -20,7 +20,7 @@
     },
     {
       "trait_type": "Settings",
-      "value": "23mm 1/125s ƒ/2 ISO5000"
+      "value": "23mm 1/250s ƒ/2.5 ISO320"
     },
     {
       "trait_type": "Type",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 37549491,
+    "size": 34387802,
     "type": "image/jpeg",
-    "width": 5285,
-    "height": 3523,
-    "sha256": "591923662d7a607d450e0a60c8cdf7f8f91b03e9878bea1715a102a726888c9c"
+    "width": 5458,
+    "height": 3638,
+    "sha256": "b635f89d3b0f9c409db21263bf2f580b446b03268c170ef2cd6074b5a40164b4"
   }
 }
