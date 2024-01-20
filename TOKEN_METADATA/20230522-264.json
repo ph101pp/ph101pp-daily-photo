@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, May 22, 2023.",
+  "image": "ar://e3e8I-sXWL3ob6U11XSh6XjVVXZUZH9xOSot3tCG3Ow",
+  "image_url": "ar://e3e8I-sXWL3ob6U11XSh6XjVVXZUZH9xOSot3tCG3Ow",
+  "name": "#0264 – Monday, May 22, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230522-264",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Brooklyn, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/8 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 264
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1684753200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 5
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 22
+    }
+  ],
+  "image_details": {
+    "size": 41462382,
+    "type": "image/jpeg",
+    "width": 5988,
+    "height": 3992,
+    "sha256": "0b8cbe14c8468ada3a0c115dd62e442a006485d77e8feb35fb6687d878943a99"
+  }
+}
