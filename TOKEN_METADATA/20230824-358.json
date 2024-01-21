@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Thursday, August 24, 2023.",
+  "image": "ar://5pzUoPvnD3TtRidO5oc9YezHibETxvOHV0u4oahVuXw",
+  "image_url": "ar://5pzUoPvnD3TtRidO5oc9YezHibETxvOHV0u4oahVuXw",
+  "name": "#0358 – Thursday, August 24, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230824-358",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Kopenhagen"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Denmark"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 358
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1692874800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 8
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 24
+    }
+  ],
+  "image_details": {
+    "size": 44513697,
+    "type": "image/jpeg",
+    "width": 3762,
+    "height": 5643,
+    "sha256": "13cc6c2bb44ef297d2c170beefd1d77285241d23fa792a31cb1f7bda9d68335d"
+  }
+}
