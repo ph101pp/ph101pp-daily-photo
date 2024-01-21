@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Thursday, August 3, 2023.",
+  "image": "ar://9x9AY3Aq5AF_ToEaUjD_W8SOeUaO4x65WI-VkrlUb7k",
+  "image_url": "ar://9x9AY3Aq5AF_ToEaUjD_W8SOeUaO4x65WI-VkrlUb7k",
+  "name": "#0337 – Thursday, August 3, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230803-337",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Basel"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO10000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 337
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1691060400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 8
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 3
+    }
+  ],
+  "image_details": {
+    "size": 29623862,
+    "type": "image/jpeg",
+    "width": 5590,
+    "height": 3727,
+    "sha256": "63a8d6d78d6e500d035becc461665dc9edd959f8c9e9036c0a268443e14e3b5e"
+  }
+}
