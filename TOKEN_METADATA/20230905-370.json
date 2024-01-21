@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, September 5, 2023.",
+  "image": "ar://NMDaO9HQhEE8nAGvL7JTTs-pPUllSPh01eBJgEa1Yjw",
+  "image_url": "ar://NMDaO9HQhEE8nAGvL7JTTs-pPUllSPh01eBJgEa1Yjw",
+  "name": "#0370 – Tuesday, September 5, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230905-370",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lisbon"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Portugal"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/5.6 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 370
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1693911600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 5
+    }
+  ],
+  "image_details": {
+    "size": 37945569,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 6240,
+    "sha256": "d0fbe936f674761a3530bcba9c022d233e3bab0e005c59dc10d1a4855dfc8a6c"
+  }
+}
