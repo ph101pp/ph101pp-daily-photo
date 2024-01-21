@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, October 28, 2023.",
+  "image": "ar://kcNplv-cPa5zt-g8GYW_oGABjfgxPXElSIRxlkFHiNQ",
+  "image_url": "ar://kcNplv-cPa5zt-g8GYW_oGABjfgxPXElSIRxlkFHiNQ",
+  "name": "#0423 – Saturday, October 28, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231028-423",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Queens, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/4 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 423
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1698490800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 28
+    }
+  ],
+  "image_details": {
+    "size": 24751054,
+    "type": "image/jpeg",
+    "width": 2773,
+    "height": 4160,
+    "sha256": "9814d231364f423421018056e5dd174bc93c9c5d8396c835c111ea9c5bec0679"
+  }
+}
