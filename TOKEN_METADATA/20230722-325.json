@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, July 22, 2023.",
+  "image": "ar://jZr4vM7KoKiFp84JKQXVN-oX0dc3rkyfs_wm4C5SoWQ",
+  "image_url": "ar://jZr4vM7KoKiFp84JKQXVN-oX0dc3rkyfs_wm4C5SoWQ",
+  "name": "#0325 – Saturday, July 22, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230722-325",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Vitznau"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/6.4 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 325
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1690023600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 7
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 22
+    }
+  ],
+  "image_details": {
+    "size": 62765712,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "07eaf988d781b3709caf77514b4f432ba530c9396bf69f30c18b678a3052b2dc"
+  }
+}
