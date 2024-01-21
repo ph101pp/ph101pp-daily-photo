@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Thursday, July 27, 2023.",
+  "image": "ar://YH6rXsyWkwa0L7htgiVuObjqrQMz_oDd9CLudnZhUyQ",
+  "image_url": "ar://YH6rXsyWkwa0L7htgiVuObjqrQMz_oDd9CLudnZhUyQ",
+  "name": "#0330 – Thursday, July 27, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230727-330",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Bern"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/16 ISO2000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 330
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1690455600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 7
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 27
+    }
+  ],
+  "image_details": {
+    "size": 38412482,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "886e72e69dee39cec30d46142fa3ffbccea861e94e83a6538fbc83e9fbe96391"
+  }
+}
