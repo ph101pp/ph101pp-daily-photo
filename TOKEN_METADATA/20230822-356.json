@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, August 22, 2023.",
+  "image": "ar://URNnFyK1odi22UMlrhVIDSTb7pqJVavc5m6Rkq_n09A",
+  "image_url": "ar://URNnFyK1odi22UMlrhVIDSTb7pqJVavc5m6Rkq_n09A",
+  "name": "#0356 – Tuesday, August 22, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230822-356",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Porto"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Portugal"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/6.4 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 356
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1692702000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 8
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 22
+    }
+  ],
+  "image_details": {
+    "size": 59022136,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "15f03372b5952a1f036f351864a64e7a3e08b1b13be1a6c3a936312bd0ab05ef"
+  }
+}
