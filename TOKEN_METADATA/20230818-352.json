@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, August 18, 2023.",
+  "image": "ar://Ids89vNLPYhpe-RdZrp7LsH6DPsi7_H2wPx89WmGutk",
+  "image_url": "ar://Ids89vNLPYhpe-RdZrp7LsH6DPsi7_H2wPx89WmGutk",
+  "name": "#0352 – Friday, August 18, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230818-352",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Winterthur"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO6400"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 352
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1692356400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 8
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 18
+    }
+  ],
+  "image_details": {
+    "size": 48930398,
+    "type": "image/jpeg",
+    "width": 6162,
+    "height": 4108,
+    "sha256": "eb45756e0447221b22364aadf9b1021302c03a47603ae094f1c692bd2f4539a1"
+  }
+}
