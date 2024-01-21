@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Thursday, August 10, 2023.",
+  "image": "ar://k86l6zbOQAJpcFv8Gn7xvueHmr7m-hHoPyhjMTSXiGg",
+  "image_url": "ar://k86l6zbOQAJpcFv8Gn7xvueHmr7m-hHoPyhjMTSXiGg",
+  "name": "#0344 – Thursday, August 10, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230810-344",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Unterschächen"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/4.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 344
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1691665200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 8
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 10
+    }
+  ],
+  "image_details": {
+    "size": 54071381,
+    "type": "image/jpeg",
+    "width": 6048,
+    "height": 4032,
+    "sha256": "156f9061cc43feb77325a3573e83b57e6edc7c58a906c652fa5c3594a180a686"
+  }
+}
