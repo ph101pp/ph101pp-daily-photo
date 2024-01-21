@@ -39,7 +39,7 @@ async function middleware(request: NextRequest) {
     const dayTemp = now.getDate();
     date = `${yearTemp}${monthTemp <= 9 ? "0" : ""}${monthTemp}${dayTemp <= 9 ? "0" : ""}${dayTemp}`
     fullToken = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
-  } else if (isNaN(idInt)) {
+  } else {
     // console.log("C");
     fullToken = await (await fetch(`${url.origin}/api/tokenIndex/${date}`)).json();
   }
