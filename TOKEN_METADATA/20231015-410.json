@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, October 15, 2023.",
+  "image": "ar://oBNOwxXjboLS1l9TFRbw_BABa1qZFqmWBfbbMU7bq2Q",
+  "image_url": "ar://oBNOwxXjboLS1l9TFRbw_BABa1qZFqmWBfbbMU7bq2Q",
+  "name": "#0410 – Sunday, October 15, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231015-410",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Beacon, New York"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/3.6 ISO250"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 410
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1697367600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 10
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 15
+    }
+  ],
+  "image_details": {
+    "size": 48296182,
+    "type": "image/jpeg",
+    "width": 6097,
+    "height": 4065,
+    "sha256": "f21d0831ec8fda1bd9a23dfa010bae2397bdfd92fe62991d698bfd3f0ea4d789"
+  }
+}
