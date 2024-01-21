@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Thursday, September 28, 2023.",
+  "image": "ar://5iSfNdwG5yFj-s_pl4C8sL4ud3K5_SwSTAbPaRT2ePQ",
+  "image_url": "ar://5iSfNdwG5yFj-s_pl4C8sL4ud3K5_SwSTAbPaRT2ePQ",
+  "name": "#0393 – Thursday, September 28, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230928-393",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Brooklyn, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2 ISO400"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 393
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1695898800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 9
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 28
+    }
+  ],
+  "image_details": {
+    "size": 38669354,
+    "type": "image/jpeg",
+    "width": 5733,
+    "height": 3822,
+    "sha256": "2fe78126e7c265e6054dcce9831884783947044b000076a56f51aa95d95ed06f"
+  }
+}
