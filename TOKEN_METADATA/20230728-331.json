@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, July 28, 2023.",
+  "image": "ar://qKuU_xZrS-osUVAR52Dq88EdnJV7tG5R8exqWVXm9Z8",
+  "image_url": "ar://qKuU_xZrS-osUVAR52Dq88EdnJV7tG5R8exqWVXm9Z8",
+  "name": "#0331 – Friday, July 28, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230728-331",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Burgdorf"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/14 ISO1600"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 331
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1690542000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 7
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 28
+    }
+  ],
+  "image_details": {
+    "size": 34126338,
+    "type": "image/jpeg",
+    "width": 5549,
+    "height": 3699,
+    "sha256": "493a2d867d6aa36e054ba8e73d67e5d11b90b2f993ea1ebfc7f5e28bc6f3ea56"
+  }
+}
