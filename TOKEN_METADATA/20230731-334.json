@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, July 31, 2023.",
+  "image": "ar://n6aDJSpk6huRbwsrc7RfjOOgv6aUwaXrMik57XKW-j8",
+  "image_url": "ar://n6aDJSpk6huRbwsrc7RfjOOgv6aUwaXrMik57XKW-j8",
+  "name": "#0334 – Monday, July 31, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230731-334",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Basel"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO10000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 334
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1690801200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 7
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 31
+    }
+  ],
+  "image_details": {
+    "size": 46786556,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 6240,
+    "sha256": "a2aa137d0f533ed5372c51cc28c773cec7ecea2fc2294af4ed34b81ae639c04c"
+  }
+}
