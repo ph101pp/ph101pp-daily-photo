@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, July 30, 2023.",
+  "image": "ar://r4mRROQbivnDQHF-oXqwqmwAw4Xdsw9b_Bh4mhDMX4k",
+  "image_url": "ar://r4mRROQbivnDQHF-oXqwqmwAw4Xdsw9b_Bh4mhDMX4k",
+  "name": "#0333 – Sunday, July 30, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230730-333",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Weil am Rhein"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Germany"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 333
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1690714800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 7
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 30
+    }
+  ],
+  "image_details": {
+    "size": 46381694,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "fed595ef0566707843ba419d22a106c05f64747f0ce0dcfbbbc3d48375268c84"
+  }
+}
