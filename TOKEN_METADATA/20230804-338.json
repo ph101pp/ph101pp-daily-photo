@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, August 4, 2023.",
+  "image": "ar://eWGLjaR74gfQCSFcfqexJBHU8tPZj5bZLvE0PlGZD4M",
+  "image_url": "ar://eWGLjaR74gfQCSFcfqexJBHU8tPZj5bZLvE0PlGZD4M",
+  "name": "#0338 – Friday, August 4, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230804-338",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Selzach"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/4.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 338
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1691146800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 8
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 4
+    }
+  ],
+  "image_details": {
+    "size": 43339005,
+    "type": "image/jpeg",
+    "width": 5855,
+    "height": 3903,
+    "sha256": "9ef6a533794bea7846a379b183d2a74ebf0f4a73df1e597bb958da90a3a38e5e"
+  }
+}
