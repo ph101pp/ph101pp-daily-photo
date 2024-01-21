@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, August 26, 2023.",
+  "image": "ar://IwjrGSnJRAGLGvMuuAyKCTTV5YQ3LwephkJTjZRwVYQ",
+  "image_url": "ar://IwjrGSnJRAGLGvMuuAyKCTTV5YQ3LwephkJTjZRwVYQ",
+  "name": "#0360 – Saturday, August 26, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230826-360",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Copenhagen"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Denmark"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/4 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 360
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1693047600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 8
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 26
+    }
+  ],
+  "image_details": {
+    "size": 33744724,
+    "type": "image/jpeg",
+    "width": 4051,
+    "height": 6076,
+    "sha256": "c70da53e7e8ce993f9fbf957a3d6cc3adfe0fec99a06e1e88cc767257017298e"
+  }
+}
