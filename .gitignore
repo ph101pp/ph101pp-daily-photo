@@ -21,3 +21,6 @@ photos4/
 all_photos_ordered/
 
 assets/final_claim_full.jpg
+*.avif
+*.jpg
+*.xmp
