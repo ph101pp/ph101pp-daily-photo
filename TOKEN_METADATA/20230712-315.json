@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Wednesday, July 12, 2023.",
+  "image": "ar://gBPvHfoGBWSvcsVBntTxaoHkr8Bk5BPttthAWmi0_oc",
+  "image_url": "ar://gBPvHfoGBWSvcsVBntTxaoHkr8Bk5BPttthAWmi0_oc",
+  "name": "#0315 – Wednesday, July 12, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20230712-315",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Manhattan, New York City"
+    },
+    {
+      "trait_type": "Country",
+      "value": "USA"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/7.1 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 315
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1689159600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Wednesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 7
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 12
+    }
+  ],
+  "image_details": {
+    "size": 39622323,
+    "type": "image/jpeg",
+    "width": 5893,
+    "height": 3929,
+    "sha256": "4024067d6792fbede686f84c7366ecb2527b643e9d36677f85d6efd633fe6189"
+  }
+}
