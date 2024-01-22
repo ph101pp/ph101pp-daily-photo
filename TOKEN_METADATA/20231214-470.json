@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Thursday, December 14, 2023.",
+  "image": "ar://uEr053df0iXtFTwia8TtUqcxnkiiuPMbX18HNBJLuvI",
+  "image_url": "ar://uEr053df0iXtFTwia8TtUqcxnkiiuPMbX18HNBJLuvI",
+  "name": "#0470 – Thursday, December 14, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231214-470",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Narita, Chiba"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Japan"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/5 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 470
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1702551600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 14
+    }
+  ],
+  "image_details": {
+    "size": 29021265,
+    "type": "image/jpeg",
+    "width": 5529,
+    "height": 3686,
+    "sha256": "3ba0b428b5e0fa0e00d000015f77e8a0c97bd2b1d83361d2cb8f00fd295f6ed1"
+  }
+}
