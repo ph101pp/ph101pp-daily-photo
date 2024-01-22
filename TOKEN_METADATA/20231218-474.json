@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, December 18, 2023.",
+  "image": "ar://iQRu0JqD2oM0dakziKXpA34wQnp17ONu4f9KVLWUMxg",
+  "image_url": "ar://iQRu0JqD2oM0dakziKXpA34wQnp17ONu4f9KVLWUMxg",
+  "name": "#0474 – Monday, December 18, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231218-474",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Burgdorf"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/7.1 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 474
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1702897200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 18
+    }
+  ],
+  "image_details": {
+    "size": 53149261,
+    "type": "image/jpeg",
+    "width": 4028,
+    "height": 6042,
+    "sha256": "f4e4d792adba536b297438ed59c125f3204691805ab33a577e7faea6131d703e"
+  }
+}
