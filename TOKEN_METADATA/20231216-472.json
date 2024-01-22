@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, December 16, 2023.",
+  "image": "ar://InvaUAaWaAtsqvnbbQeXoUKav-jRlE7V6BLANdewmRc",
+  "image_url": "ar://InvaUAaWaAtsqvnbbQeXoUKav-jRlE7V6BLANdewmRc",
+  "name": "#0472 – Saturday, December 16, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231216-472",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Bern"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2.2 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 472
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1702724400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 16
+    }
+  ],
+  "image_details": {
+    "size": 41197179,
+    "type": "image/jpeg",
+    "width": 5935,
+    "height": 3957,
+    "sha256": "548f7208e24a50e0bb9b8ae0523da6c6a94362411f6212c440a65b977c97f150"
+  }
+}
