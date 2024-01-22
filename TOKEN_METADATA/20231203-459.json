@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, December 3, 2023.",
+  "image": "ar://XV54Vc5RFZnFnAAnavX5yoTI11MkvOZnbseyB3-UioQ",
+  "image_url": "ar://XV54Vc5RFZnFnAAnavX5yoTI11MkvOZnbseyB3-UioQ",
+  "name": "#0459 – Sunday, December 3, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231203-459",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Chiyoda, Tokyo"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Japan"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/7.1 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 459
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1701601200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 3
+    }
+  ],
+  "image_details": {
+    "size": 33744234,
+    "type": "image/jpeg",
+    "width": 6113,
+    "height": 4076,
+    "sha256": "2c7b0a49da3fb60244abb96da199e5462979d44ba3afe00f8b0b49d1aa232640"
+  }
+}
