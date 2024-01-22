@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, December 10, 2023.",
+  "image": "ar://PC60A3LdkQNqwF0G-ArYBYVk3eYXlRK8R9tW0K1wetU",
+  "image_url": "ar://PC60A3LdkQNqwF0G-ArYBYVk3eYXlRK8R9tW0K1wetU",
+  "name": "#0466 – Sunday, December 10, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231210-466",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Shinjuku, Tokyo"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Japan"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/3.2 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 466
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1702206000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 10
+    }
+  ],
+  "image_details": {
+    "size": 44937939,
+    "type": "image/jpeg",
+    "width": 6240,
+    "height": 4160,
+    "sha256": "2d2db73553d95f226acbe86da74ba472622adc25737b109209ba174021359285"
+  }
+}
