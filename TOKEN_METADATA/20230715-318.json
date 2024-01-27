@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Saturday, July 15, 2023.",
-  "image": "ar://B6Kge2cUSTQ74Lk3jedzDU9h1t014YFiLHzERy1yBfM",
-  "image_url": "ar://B6Kge2cUSTQ74Lk3jedzDU9h1t014YFiLHzERy1yBfM",
+  "image": "ar://_Dl75THDZ9IVj9x3JHkxmDgoepPDYQqyAUU1H9pcs3I",
+  "image_url": "ar://_Dl75THDZ9IVj9x3JHkxmDgoepPDYQqyAUU1H9pcs3I",
   "name": "#0318 – Saturday, July 15, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230715-318",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 54184286,
+    "size": 48548866,
     "type": "image/jpeg",
     "width": 6240,
     "height": 4160,
-    "sha256": "315fabb1ed30752d3e4673e69db639ad187641c50d15cf86565c9e24f5efba9c"
+    "sha256": "4a12c0555471ce4609fc561abc52b75e52b445212b33272168d4cc0f201dc13b"
   }
 }
