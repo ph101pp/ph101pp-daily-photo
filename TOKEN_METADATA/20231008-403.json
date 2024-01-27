@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Sunday, October 8, 2023.",
-  "image": "ar://2-5ULKH1SrBgEmOhe2E0-ECL1P_pmPMHpU4dWWV-jY0",
-  "image_url": "ar://2-5ULKH1SrBgEmOhe2E0-ECL1P_pmPMHpU4dWWV-jY0",
+  "image": "ar://xwvq2WGm9yod5zc3eW8qwLOzGVGGK1KkiahUEIFI-jk",
+  "image_url": "ar://xwvq2WGm9yod5zc3eW8qwLOzGVGGK1KkiahUEIFI-jk",
   "name": "#0403 – Sunday, October 8, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20231008-403",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 41913267,
+    "size": 41043008,
     "type": "image/jpeg",
     "width": 6240,
     "height": 4160,
-    "sha256": "f35020e7db665132a9d4e31305b8be1093efff4a5f303265ebec421bd68ba5d4"
+    "sha256": "a7f5ab62b0ca904c93bbe4b409a77fd14c55b6da7261a0b24b46cf96b2c79fe1"
   }
 }
