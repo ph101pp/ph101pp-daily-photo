@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Friday, June 9, 2023.",
-  "image": "ar://3D4S-k-jIgy2gB9GkAxC5GZLJ9GSYhJbEeAW4-t3Z9s",
-  "image_url": "ar://3D4S-k-jIgy2gB9GkAxC5GZLJ9GSYhJbEeAW4-t3Z9s",
+  "image": "ar://tbqJ2Be_t5dyUyfpC5scSCiTxZQxhwa1K5xHPFaru9Q",
+  "image_url": "ar://tbqJ2Be_t5dyUyfpC5scSCiTxZQxhwa1K5xHPFaru9Q",
   "name": "#0282 – Friday, June 9, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230609-282",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 53265968,
+    "size": 55165768,
     "type": "image/jpeg",
     "width": 6064,
     "height": 4043,
-    "sha256": "8f10ddaf108b7687c397a23a95ce60b4f93227d2063a6e8f1ca2f4ed0648f482"
+    "sha256": "767b7ae9590e44beef49fd8e5904ac87a4f0b62144b5bd55b1129ba4f092344d"
   }
 }
