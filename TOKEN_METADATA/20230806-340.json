@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Sunday, August 6, 2023.",
-  "image": "ar://YDxFkbzLbcKlQNLLgI71w15vNhTGzDgb7p-Qar2KZC4",
-  "image_url": "ar://YDxFkbzLbcKlQNLLgI71w15vNhTGzDgb7p-Qar2KZC4",
+  "image": "ar://iduSs6edya3FQoHUf3rD23oUUCX39ymwotrbt9CTvMY",
+  "image_url": "ar://iduSs6edya3FQoHUf3rD23oUUCX39ymwotrbt9CTvMY",
   "name": "#0340 – Sunday, August 6, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230806-340",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 39161329,
+    "size": 40712954,
     "type": "image/jpeg",
     "width": 5865,
     "height": 3910,
-    "sha256": "288b000b817c2a72d0f56e5b3eaf37ba04cc18c5a33e26133e877832f0b85be9"
+    "sha256": "ebed8f349b8ebac2a0f400f2adc1f9178195831bd5a1d6a80abc09b0a3c575b2"
   }
 }
