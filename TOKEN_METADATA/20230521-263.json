@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Sunday, May 21, 2023.",
-  "image": "ar://yr06SjImR8dFw7fr07tGsFbPH2PWW0cPVim8dCSlWmg",
-  "image_url": "ar://yr06SjImR8dFw7fr07tGsFbPH2PWW0cPVim8dCSlWmg",
+  "image": "ar://h744TP6GZG0hN6pvINSzHzbrIv8ooSoEuAvXkxacxYI",
+  "image_url": "ar://h744TP6GZG0hN6pvINSzHzbrIv8ooSoEuAvXkxacxYI",
   "name": "#0263 – Sunday, May 21, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230521-263",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 45260776,
+    "size": 47423028,
     "type": "image/jpeg",
     "width": 4160,
     "height": 6240,
-    "sha256": "edef1760bb14191e86a7e3d6781db374baacd7a0bdeb0ea1aa2a5a0bb1f49cfa"
+    "sha256": "aa29db2be9a3a5e9d9213a72c009b1a337c74f0c65c29b1032b4d37b8142d650"
   }
 }
