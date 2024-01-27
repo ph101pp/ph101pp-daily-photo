@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Wednesday, October 18, 2023.",
-  "image": "ar://fmyPZjd7HZhPKGCEmxb-IxxZDKg55jAqoSXA4K0qoco",
-  "image_url": "ar://fmyPZjd7HZhPKGCEmxb-IxxZDKg55jAqoSXA4K0qoco",
+  "image": "ar://aPY0kBeqfqbWnWQ2GqpaTZ4zkxHwOb2DbchSekVMxyw",
+  "image_url": "ar://aPY0kBeqfqbWnWQ2GqpaTZ4zkxHwOb2DbchSekVMxyw",
   "name": "#0413 – Wednesday, October 18, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20231018-413",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 40934156,
+    "size": 40674293,
     "type": "image/jpeg",
     "width": 5939,
     "height": 3959,
-    "sha256": "81a5120003c1df50278b412eb398cca41cadf68630ef684dfd10b6b1c7863b66"
+    "sha256": "64773c1bf6807fff0455030cbfaced23fede96ba9e6228c86c47f3091a0ffcc6"
   }
 }
