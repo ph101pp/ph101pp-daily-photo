@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Sunday, July 9, 2023.",
-  "image": "ar://USAlw4Wnqjv1PNm8GSU0iDYSdXU7b9ot6jWwkYfPvGc",
-  "image_url": "ar://USAlw4Wnqjv1PNm8GSU0iDYSdXU7b9ot6jWwkYfPvGc",
+  "image": "ar://yQpcfI8USB320_68_4B2Xa_SiCu-ciwb8upeKIawcho",
+  "image_url": "ar://yQpcfI8USB320_68_4B2Xa_SiCu-ciwb8upeKIawcho",
   "name": "#0312 – Sunday, July 9, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230709-312",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 38980300,
+    "size": 40898988,
     "type": "image/jpeg",
     "width": 3913,
     "height": 5870,
-    "sha256": "82aad8de8e3e63e4a996b6c097d900863d089deaff86bb6e3a146fac90c0e4ca"
+    "sha256": "162b2572328ad2ed5c62d296ebf6712e17fc72603ea2e944ac03c2aff23268a2"
   }
 }
