@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Monday, October 2, 2023.",
-  "image": "ar://nlnYk3pLQoqeT0yof3_FImQPpbi5_dutR9lg0hGSgxM",
-  "image_url": "ar://nlnYk3pLQoqeT0yof3_FImQPpbi5_dutR9lg0hGSgxM",
+  "image": "ar://Iz4pZ0obRKKW17maW0VdljpbJZzrYB-i7NNsVmAsW_I",
+  "image_url": "ar://Iz4pZ0obRKKW17maW0VdljpbJZzrYB-i7NNsVmAsW_I",
   "name": "#0397 – Monday, October 2, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20231002-397",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 28585623,
+    "size": 26652410,
     "type": "image/jpeg",
     "width": 5717,
     "height": 3811,
-    "sha256": "999d5947b0413e38ee5d85921e9fb8bb55426992bdec7c0bf8789e9b37bec321"
+    "sha256": "b8cfeca0f996c55082f095c75f4f6c00f7252e6741f270fe3eda18fb4e905dfc"
   }
 }
