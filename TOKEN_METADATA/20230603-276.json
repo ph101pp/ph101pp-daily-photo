@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Saturday, June 3, 2023.",
-  "image": "ar://gG-NVeHli0FZsS6nAUqx7EB7kGBB7lm8dq7yDW7xyic",
-  "image_url": "ar://gG-NVeHli0FZsS6nAUqx7EB7kGBB7lm8dq7yDW7xyic",
+  "image": "ar://dyWPDLKa9ovpDFf49JQXXcVa3R_rYsehlnSmydmg_Pc",
+  "image_url": "ar://dyWPDLKa9ovpDFf49JQXXcVa3R_rYsehlnSmydmg_Pc",
   "name": "#0276 – Saturday, June 3, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230603-276",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 50093527,
+    "size": 48170847,
     "type": "image/jpeg",
     "width": 6240,
     "height": 4160,
-    "sha256": "dc901a2287b29a1b8ea8dec5f0558218dea71293de3521383837eaae64740af4"
+    "sha256": "3b61304f4d74d3b6da74a00c519f8b03e963c8c610fe2db98b16dd9766969870"
   }
 }
