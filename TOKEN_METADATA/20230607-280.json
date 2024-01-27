@@ -1,26 +1,26 @@
 {
   "description": "This moment was captured on Wednesday, June 7, 2023.",
-  "image": "ar://ZmYqc2kBYXJG3VBZrv9qWlikrpj6iaVzi3aONdq0gbQ",
-  "image_url": "ar://ZmYqc2kBYXJG3VBZrv9qWlikrpj6iaVzi3aONdq0gbQ",
+  "image": "ar://W2ZcbInqfw9bMjU67UUiHP5EVmVFCT2aCCAwlpH1AyI",
+  "image_url": "ar://W2ZcbInqfw9bMjU67UUiHP5EVmVFCT2aCCAwlpH1AyI",
   "name": "#0280 – Wednesday, June 7, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230607-280",
   "attributes": [
     {
       "trait_type": "Place",
-      "value": ""
+      "value": "Manhattan, New York City"
     },
     {
       "trait_type": "Country",
-      "value": ""
+      "value": "USA"
     },
     {
       "trait_type": "Camera",
-      "value": ""
+      "value": "FUJIFILM X100V"
     },
     {
       "trait_type": "Settings",
-      "value": ""
+      "value": "23mm 1/125s ƒ/8 ISO2500"
     },
     {
       "trait_type": "Type",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 0,
-    "type": "string",
-    "width": 0,
-    "height": 0,
-    "sha256": ""
+    "size": 40711950,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 6240,
+    "sha256": "8dc2b42490a1f6814f4283078ed490adf8f7be085d83312ca9ce0f8b03804f2d"
   }
 }
