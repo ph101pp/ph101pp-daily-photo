@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Thursday, August 24, 2023.",
-  "image": "ar://bh2JOAhqJn2YL7YhKXGC78hp_DywKsMXNxIbWZjGsUo",
-  "image_url": "ar://bh2JOAhqJn2YL7YhKXGC78hp_DywKsMXNxIbWZjGsUo",
+  "image": "ar://2Xs3SO0eesSLPwg2SYTe4vzdT62Izx4R766zNuUlrRI",
+  "image_url": "ar://2Xs3SO0eesSLPwg2SYTe4vzdT62Izx4R766zNuUlrRI",
   "name": "#0358 – Thursday, August 24, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230824-358",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 44513697,
+    "size": 47338052,
     "type": "image/jpeg",
     "width": 3762,
     "height": 5643,
-    "sha256": "13cc6c2bb44ef297d2c170beefd1d77285241d23fa792a31cb1f7bda9d68335d"
+    "sha256": "4a1d31c0e62f39db08f606a4402332e15b81099413064e24726ca28e0e23e31d"
   }
 }
