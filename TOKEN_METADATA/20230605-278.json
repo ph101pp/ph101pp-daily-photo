@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Monday, June 5, 2023.",
-  "image": "ar://b6UA9PlF_qf64VACoyQOqnFeR7r0ngzI4Gya1iWxvjs",
-  "image_url": "ar://b6UA9PlF_qf64VACoyQOqnFeR7r0ngzI4Gya1iWxvjs",
+  "image": "ar://u45ZBt9WQ1PStJOmbmJS823YrH4n_iHu-DFqvtwnd7Y",
+  "image_url": "ar://u45ZBt9WQ1PStJOmbmJS823YrH4n_iHu-DFqvtwnd7Y",
   "name": "#0278 – Monday, June 5, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230605-278",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 42950058,
+    "size": 42951201,
     "type": "image/jpeg",
     "width": 6240,
     "height": 4160,
-    "sha256": "0f3fb2039a37efae0ea47ca8954d130f609974a7aa51b6047bc85f89bb1011ac"
+    "sha256": "25009d0d7a2c5084724590c4a1f0f3ac4d074be37638ac038b1eff1aef41e934"
   }
 }
