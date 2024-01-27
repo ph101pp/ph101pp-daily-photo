@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Tuesday, July 11, 2023.",
-  "image": "ar://VjnDaVcii_Q1t38-UZvub-qavJcIqY34OQuiiSVs-8E",
-  "image_url": "ar://VjnDaVcii_Q1t38-UZvub-qavJcIqY34OQuiiSVs-8E",
+  "image": "ar://MAFy5SR5RCX0-jtejcDRZRl2uOJq7Lry7humwAATYI8",
+  "image_url": "ar://MAFy5SR5RCX0-jtejcDRZRl2uOJq7Lry7humwAATYI8",
   "name": "#0314 – Tuesday, July 11, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230711-314",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 41297533,
+    "size": 42415450,
     "type": "image/jpeg",
     "width": 6031,
     "height": 4021,
-    "sha256": "c18ba8f043749eed4599db85e10bbf96cc006010951930ffbc45268a89d55792"
+    "sha256": "898d2d83613f8dacef7c64c842c133bd7eb4d59ca321faa366e54852daa65de3"
   }
 }
