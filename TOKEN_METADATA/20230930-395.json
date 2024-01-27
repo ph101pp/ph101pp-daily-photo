@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Saturday, September 30, 2023.",
-  "image": "ar://57M2aexh6Gf4P9d-t85FzqNCkA94BQ1JkWGyl775AHk",
-  "image_url": "ar://57M2aexh6Gf4P9d-t85FzqNCkA94BQ1JkWGyl775AHk",
+  "image": "ar://XVsmBrpQZeLv__xTuidoRlt4lv8HWIQN0TWTTgQYSuo",
+  "image_url": "ar://XVsmBrpQZeLv__xTuidoRlt4lv8HWIQN0TWTTgQYSuo",
   "name": "#0395 – Saturday, September 30, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230930-395",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 46714626,
+    "size": 48127453,
     "type": "image/jpeg",
     "width": 3557,
     "height": 5335,
-    "sha256": "a8fccd37ddbecae69df31a261d85cdb061a25fa3a9b26f4ee6546b9d06d72dd8"
+    "sha256": "453765c286fdf9dda0c113c0f9a81e5da56b23bb4ea6d243e53a279bd8ed31bd"
   }
 }
