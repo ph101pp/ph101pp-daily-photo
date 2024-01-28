@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, December 30, 2023.",
+  "image": "ar://GIRtJDGK5rAJKppQOjsuHN9Jnm7IJn3J76l4CtPT8J4",
+  "image_url": "ar://GIRtJDGK5rAJKppQOjsuHN9Jnm7IJn3J76l4CtPT8J4",
+  "name": "#0486 – Saturday, December 30, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231230-486",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Oberburg"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2 ISO2000"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 486
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1703934000
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 30
+    }
+  ],
+  "image_details": {
+    "size": 58388219,
+    "type": "image/jpeg",
+    "width": 3889,
+    "height": 5834,
+    "sha256": "7dc8b66c9e0cbe5362591858c0605a198ae6e9c8cbb3e8dfe178cda364b35294"
+  }
+}
