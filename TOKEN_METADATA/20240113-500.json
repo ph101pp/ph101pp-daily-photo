@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, January 13, 2024.",
+  "image": "ar://SzMX9Wfe7IoK27YKKBHVgUaRYXDKSx6LxSZVUXjG_t0",
+  "image_url": "ar://SzMX9Wfe7IoK27YKKBHVgUaRYXDKSx6LxSZVUXjG_t0",
+  "name": "#0500 – Saturday, January 13, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240113-500",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Swiss International Air Lines"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/4000s ƒ/10 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 500
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1705143600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 13
+    }
+  ],
+  "image_details": {
+    "size": 44013240,
+    "type": "image/jpeg",
+    "width": 5627,
+    "height": 3751,
+    "sha256": "b62c5bacc71813129ce6ee53ad60a5e76a978c499b0c126583ddfcf3a0cd07d7"
+  }
+}
