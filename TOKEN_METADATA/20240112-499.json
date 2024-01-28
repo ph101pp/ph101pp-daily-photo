@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, January 12, 2024.",
+  "image": "ar://pxt41oWPPP4SEBXBaiPBQutvuzq6gqfp0jwV-1CEuW8",
+  "image_url": "ar://pxt41oWPPP4SEBXBaiPBQutvuzq6gqfp0jwV-1CEuW8",
+  "name": "#0499 – Friday, January 12, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240112-499",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Basel"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/500s ƒ/2.5 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 499
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1705057200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 12
+    }
+  ],
+  "image_details": {
+    "size": 34591967,
+    "type": "image/jpeg",
+    "width": 3675,
+    "height": 5512,
+    "sha256": "dc7aa77fc681483b33564949a3e84e54a5016ac774b0c30827fb546598eb8e6c"
+  }
+}
