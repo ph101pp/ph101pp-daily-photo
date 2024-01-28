@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, December 31, 2023.",
+  "image": "ar://Wnzeoh55oGHK82gQiOrQdDbe-rgVk7rd1i9pVL6S81s",
+  "image_url": "ar://Wnzeoh55oGHK82gQiOrQdDbe-rgVk7rd1i9pVL6S81s",
+  "name": "#0487 – Sunday, December 31, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231231-487",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Schlieren"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/125s ƒ/2.2 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 487
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1704020400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 31
+    }
+  ],
+  "image_details": {
+    "size": 51232614,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 6240,
+    "sha256": "868b3a39e2b3daedc08f4eb7b6706e9492a68716b812ce1d00c0a4037737a09b"
+  }
+}
