@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Tuesday, January 2, 2024.",
-  "image": "ar://oDglMPQ0Bglv4Z52ZUwb6y2V29XpJJXJnAwI5cwFcLQ",
-  "image_url": "ar://oDglMPQ0Bglv4Z52ZUwb6y2V29XpJJXJnAwI5cwFcLQ",
+  "image": "ar://FLhBN5oJZomLfZrDyOTAlt3_NCofCCtx1XzY4kiGiaI",
+  "image_url": "ar://FLhBN5oJZomLfZrDyOTAlt3_NCofCCtx1XzY4kiGiaI",
   "name": "#0489 – Tuesday, January 2, 2024",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20240102-489",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 38456916,
+    "size": 41378792,
     "type": "image/jpeg",
     "width": 6240,
     "height": 4160,
-    "sha256": "36ebe9a0021a9a4fed095caeb92a036217ed620b86187e8cff8fc63826b80bba"
+    "sha256": "fb962284e8d6c6616c04ab91672009d271619fb48f65fc7274ba6f1055d140a3"
   }
 }
