@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Wednesday, January 3, 2024.",
+  "image": "ar://Ofq4_m-z1zU53wMu7uGl69LKGM0dQFwex9jiRfxt1iE",
+  "image_url": "ar://Ofq4_m-z1zU53wMu7uGl69LKGM0dQFwex9jiRfxt1iE",
+  "name": "#0490 – Wednesday, January 3, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240103-490",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Oberburg"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/6.4 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 490
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1704279600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Wednesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 3
+    }
+  ],
+  "image_details": {
+    "size": 36450381,
+    "type": "image/jpeg",
+    "width": 5641,
+    "height": 3761,
+    "sha256": "6fe848cb54c3f64a8809e514491a68e829d7abfb2b0b57e1297f591be0e2380b"
+  }
+}
