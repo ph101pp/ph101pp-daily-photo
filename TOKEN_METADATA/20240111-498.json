@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Thursday, January 11, 2024.",
-  "image": "ar://p0v1iVOcWzkr2D4ZmZKVNCWbKmQKXqY9IsTVBiO8mEU",
-  "image_url": "ar://p0v1iVOcWzkr2D4ZmZKVNCWbKmQKXqY9IsTVBiO8mEU",
+  "image": "ar://4lcPdmHLy4RWJjw2bSN-FlrUFIm_wtqy1BA1rJ41mwo",
+  "image_url": "ar://4lcPdmHLy4RWJjw2bSN-FlrUFIm_wtqy1BA1rJ41mwo",
   "name": "#0498 – Thursday, January 11, 2024",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20240111-498",
@@ -20,7 +20,7 @@
     },
     {
       "trait_type": "Settings",
-      "value": "23mm 1/60s ƒ/2 ISO3200"
+      "value": "23mm 1/1000s ƒ/4.5 ISO640"
     },
     {
       "trait_type": "Type",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 37968666,
+    "size": 50148027,
     "type": "image/jpeg",
-    "width": 3975,
-    "height": 5963,
-    "sha256": "2f3e8bea5285743e61659704cf77fba5bb2e2ab6dfc2f7b0f74053da44c339f3"
+    "width": 4160,
+    "height": 6240,
+    "sha256": "14aa610b1cf312f059c51108d8484942ed0e099844ae45367234c8afe68ba950"
   }
 }
