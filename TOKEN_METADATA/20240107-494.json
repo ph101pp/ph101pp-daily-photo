@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, January 7, 2024.",
+  "image": "ar://MNiFE-mLSSwrzpCimso02inoDIoSv6Ev53GOR59Nu94",
+  "image_url": "ar://MNiFE-mLSSwrzpCimso02inoDIoSv6Ev53GOR59Nu94",
+  "name": "#0494 – Sunday, January 7, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240107-494",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lignières"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/9 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 494
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1704625200
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 7
+    }
+  ],
+  "image_details": {
+    "size": 45034203,
+    "type": "image/jpeg",
+    "width": 3980,
+    "height": 5970,
+    "sha256": "ddfb77937743b5b50e345a9c49251772ba44c9e1a7bb78a0adc87a7b79c38726"
+  }
+}
