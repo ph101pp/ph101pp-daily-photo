@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Monday, November 13, 2023.",
-  "image": "ar://VIRpkbWawIeMctaAFqZnPh3qwRvfLNOAOguh9uUIvl4",
-  "image_url": "ar://VIRpkbWawIeMctaAFqZnPh3qwRvfLNOAOguh9uUIvl4",
+  "image": "ar://tjoWsXjlNBPZXrHBw8N53Y0nV_RzaTxk2AIy-538rZI",
+  "image_url": "ar://tjoWsXjlNBPZXrHBw8N53Y0nV_RzaTxk2AIy-538rZI",
   "name": "#0439 – Monday, November 13, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20231113-439",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 29967041,
+    "size": 28394616,
     "type": "image/jpeg",
     "width": 3536,
     "height": 5304,
-    "sha256": "5cbdbe62bc88654f76a82d61cdffce2ce6e6bfe6a13673c3f7761b0a7095c78d"
+    "sha256": "f8cb7f1c83134d093db9ce7eb6ac78ea1eb654061eb88da174a5f64fdfc9b3df"
   }
 }
