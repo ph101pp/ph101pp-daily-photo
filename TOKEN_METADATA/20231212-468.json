@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Tuesday, December 12, 2023.",
-  "image": "ar://quKwQnIEILGt3hfTUw-RhPcW0dkthAQK048qvEEQTjI",
-  "image_url": "ar://quKwQnIEILGt3hfTUw-RhPcW0dkthAQK048qvEEQTjI",
+  "image": "ar://LRz6ygWwEALPB2W-FMMPHDCMHOSbKHsTezwI6ysYw5M",
+  "image_url": "ar://LRz6ygWwEALPB2W-FMMPHDCMHOSbKHsTezwI6ysYw5M",
   "name": "#0468 – Tuesday, December 12, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20231212-468",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 28902979,
+    "size": 31954102,
     "type": "image/jpeg",
     "width": 5635,
     "height": 3757,
-    "sha256": "e639542b0a2aec3d2c4e42e2b9d95fe75b3be65f1943278245a839447091ccb4"
+    "sha256": "5da6ddd7735e152f32329264cd563e9c86c62d172b4463f4f96b45f6df3a5deb"
   }
 }
