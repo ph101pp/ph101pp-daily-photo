@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Tuesday, January 16, 2024.",
+  "image": "ar://mFupruYWc5to-tQ8cRg6pFMewnWnejD4qJ0TkNUbsUc",
+  "image_url": "ar://mFupruYWc5to-tQ8cRg6pFMewnWnejD4qJ0TkNUbsUc",
+  "name": "#0503 – Tuesday, January 16, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240116-503",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Shibuya, Tokyo"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Japan"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/7.1 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 503
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1705402800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Tuesday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 16
+    }
+  ],
+  "image_details": {
+    "size": 47784793,
+    "type": "image/jpeg",
+    "width": 6136,
+    "height": 4091,
+    "sha256": "2c926ef151535201776587632c5a55bdb2880e323f6f2429120d0cdc22f0257e"
+  }
+}
