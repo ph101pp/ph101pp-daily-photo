@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Monday, January 1, 2024.",
+  "image": "ar://KXHpWnyIBmGFGh4wM1gqCLeWaanva1fRs2K-ZUIYxBQ",
+  "image_url": "ar://KXHpWnyIBmGFGh4wM1gqCLeWaanva1fRs2K-ZUIYxBQ",
+  "name": "#0488 – Monday, January 1, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240101-488",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Schlieren"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/60s ƒ/2 ISO12800"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 488
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1704106800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Monday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 1
+    }
+  ],
+  "image_details": {
+    "size": 54880087,
+    "type": "image/jpeg",
+    "width": 6082,
+    "height": 4055,
+    "sha256": "f22c76b5646571b1bf31181adc66c6f123b9d89b48ea3f793408f5ce0728b9f2"
+  }
+}
