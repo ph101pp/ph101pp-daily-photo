@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Saturday, January 6, 2024.",
+  "image": "ar://iqDCGasz3skHfkmzvAAK1ghIgRVALSFsF3ip3GpKEPw",
+  "image_url": "ar://iqDCGasz3skHfkmzvAAK1ghIgRVALSFsF3ip3GpKEPw",
+  "name": "#0493 – Saturday, January 6, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240106-493",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Lignières"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/2000s ƒ/8 ISO640"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 493
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1704538800
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Saturday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 6
+    }
+  ],
+  "image_details": {
+    "size": 42157712,
+    "type": "image/jpeg",
+    "width": 5665,
+    "height": 3777,
+    "sha256": "c2dc65e4dae232900c07790af4a2cf60a46deb6483ea9b5446dedcdc0d2598a7"
+  }
+}
