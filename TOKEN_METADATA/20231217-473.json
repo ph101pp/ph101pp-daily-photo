@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Sunday, December 17, 2023.",
-  "image": "ar://PcgdE_VkKYWacpdTVShLvIhwSujAhzFROK1aOZr4jO4",
-  "image_url": "ar://PcgdE_VkKYWacpdTVShLvIhwSujAhzFROK1aOZr4jO4",
+  "image": "ar://PslCCnlv4KK5nF_h6vUaGOfTc1Cnk9UwkeKpLJMVDqY",
+  "image_url": "ar://PslCCnlv4KK5nF_h6vUaGOfTc1Cnk9UwkeKpLJMVDqY",
   "name": "#0473 – Sunday, December 17, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20231217-473",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 46228169,
+    "size": 50395160,
     "type": "image/jpeg",
     "width": 6104,
     "height": 4069,
-    "sha256": "a7b7dfaaeb6d809a8f13e59bc87de6b62a4f7441cd44fc491959d03dcd4dd0cb"
+    "sha256": "bc31e1eae783ca9520249b3c158e710c601b5cd3cb0c91e36ab6b9093464404a"
   }
 }
