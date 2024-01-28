@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Friday, December 29, 2023.",
+  "image": "ar://gzBmdsbKXFazlVJ4OKYl6r9uOhnt5WJqAlRp5DOw5B0",
+  "image_url": "ar://gzBmdsbKXFazlVJ4OKYl6r9uOhnt5WJqAlRp5DOw5B0",
+  "name": "#0485 – Friday, December 29, 2023",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20231229-485",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Martigny"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Switzerland"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2 ISO2500"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 485
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1703847600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Friday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 12
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2023
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 29
+    }
+  ],
+  "image_details": {
+    "size": 42401661,
+    "type": "image/jpeg",
+    "width": 6127,
+    "height": 4085,
+    "sha256": "579081449371e25555dd352cfd6f4b02a6f55ec98f2931e857dcf8b64d9a4db7"
+  }
+}
