@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Thursday, January 25, 2024.",
+  "image": "ar://Y_d4t0YwmllovOCZYUG_09h3akUbTCr8J6yDxI4CSVk",
+  "image_url": "ar://Y_d4t0YwmllovOCZYUG_09h3akUbTCr8J6yDxI4CSVk",
+  "name": "#0512 – Thursday, January 25, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240125-512",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Shinjuku, Tokyo"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Japan"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/1000s ƒ/4.5 ISO320"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 512
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1706180400
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Thursday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 25
+    }
+  ],
+  "image_details": {
+    "size": 44936607,
+    "type": "image/jpeg",
+    "width": 4160,
+    "height": 6240,
+    "sha256": "cdddcce3d954d79e640dc0c9c5b1d78b90990638f25d41aa39014e69b6a82dc2"
+  }
+}
