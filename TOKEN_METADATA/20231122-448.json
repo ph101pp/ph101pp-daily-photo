@@ -1,7 +1,7 @@
 {
   "description": "This moment was captured on Wednesday, November 22, 2023.",
-  "image": "ar://0zutxYUo7WY_W66xO1boEagkVVQmCOnEvZ0V2qYBI50",
-  "image_url": "ar://0zutxYUo7WY_W66xO1boEagkVVQmCOnEvZ0V2qYBI50",
+  "image": "ar://nrkX1-9XHOtHFJgGvLBs8WCEG7nzAAbaBBJUO33qlz0",
+  "image_url": "ar://nrkX1-9XHOtHFJgGvLBs8WCEG7nzAAbaBBJUO33qlz0",
   "name": "#0448 – Wednesday, November 22, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20231122-448",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 46969456,
+    "size": 48360111,
     "type": "image/jpeg",
     "width": 3692,
     "height": 5538,
-    "sha256": "59865241807278d805ff990f6e11b696a0feb265bcf1a540d96b06ab45540057"
+    "sha256": "767af61f2b2b4d4c0276d88d2367bb19b4aa3dde86e32da9ebe0c77eee8ac60c"
   }
 }
