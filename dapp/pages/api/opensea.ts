@@ -5,6 +5,7 @@ import { Chain, OpenSeaSDK } from "opensea-js";
 
 const PRIVATE_KEY = process.env.ETHEREUM_TREASURY_PRIVATE_KEY!;
 const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY!;
+const OPENSEA_LIST_PRICE_ETH = process.env.OPENSEA_LIST_PRICE_ETH!;
 const NEXT_PUBLIC_MAINNET_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_MAINNET_CONTRACT_ADDRESS!;
 
 export default async function handler(
@@ -37,7 +38,7 @@ export default async function handler(
         tokenAddress: NEXT_PUBLIC_MAINNET_CONTRACT_ADDRESS,
       },
       accountAddress: walletWithProvider.address,
-      startAmount: 0.01,
+      startAmount: parseFloat(OPENSEA_LIST_PRICE_ETH),
       expirationTime: Math.round(Date.now() / 1000 + 60 * 60 * 24 * 182),
     });
     return res.json(JSON.parse(JSON.stringify(listing, (key, value) =>
