@@ -68,7 +68,7 @@ const UploadAndPublish = () => {
       });
       imageTx = imageResult.id;
     }
-    else if(image.type ==="existing") {
+    else if (image.type === "existing") {
       console.log("existing");
       imageTx = image.existingArHash;
 
@@ -149,21 +149,26 @@ const UploadAndPublish = () => {
         {
           result: commitResult,
           data: commitData,
-          message: "> Manifest Committed > Refresh Opensea Metadata"
+          message: "> Manifest Committed > List on Opensea"
         }
       ]
     });
 
-    const url = getOSURL(parseInt(tokenIndex));
-    const osResult = await fetch(url);
+    const osResult = await fetch("/api/opensea", {
+      method: "POST",
+      body: JSON.stringify({
+        tokenId: tokenIndex
+      })
+    });
+
+
 
     setProgress({
       numberOfSteps,
       steps: [
         {
           result: osResult,
-          url,
-          message: "> Opensea Metadata Refreshed > Done!"
+          message: "> Listed on Opensea > Done!"
         }
       ]
     });
