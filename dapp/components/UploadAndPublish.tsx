@@ -19,9 +19,9 @@ if (!process.env.NEXT_PUBLIC_GOERLI_CONTRACT_ADDRESS) {
 }
 
 const contract = process.env.NEXT_PUBLIC_GOERLI_CONTRACT_ADDRESS;
-const baseURI = "https://testnets-api.opensea.io";
-// const baseURI = "https://api.opensea.io";
-const getOSURL = (i: number) => `${baseURI}/api/v1/asset/${contract}/${i}?force_update=true`;
+// const baseURI = "https://testnets-api.opensea.io";
+const baseURI = "https://opensea.io/assets/ethereum";
+const getOSURL = (i: number) => `${baseURI}/${contract}/${i}`;
 
 let numberOfSteps = 6;
 
@@ -161,12 +161,11 @@ const UploadAndPublish = () => {
       })
     });
 
-
-
     setProgress({
       numberOfSteps,
       steps: [
         {
+          openseaUrl: getOSURL(parseInt(tokenIndex)),
           result: await osResult.json(),
           message: "> Listed on Opensea > Done!"
         }
