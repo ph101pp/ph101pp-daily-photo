@@ -1,0 +1,73 @@
+{
+  "description": "This moment was captured on Sunday, January 28, 2024.",
+  "image": "ar://8A0arn5OBqJApr3HR0lFYCg-U6tWa7ITA0827kRey08",
+  "image_url": "ar://8A0arn5OBqJApr3HR0lFYCg-U6tWa7ITA0827kRey08",
+  "name": "#0515 – Sunday, January 28, 2024",
+  "created_by": "Philipp Adrian (ph101pp.eth)",
+  "external_url": "https://daily.ph101pp.xyz/20240128-515",
+  "attributes": [
+    {
+      "trait_type": "Place",
+      "value": "Shibuya, Tokyo"
+    },
+    {
+      "trait_type": "Country",
+      "value": "Japan"
+    },
+    {
+      "trait_type": "Camera",
+      "value": "FUJIFILM X100V"
+    },
+    {
+      "trait_type": "Settings",
+      "value": "23mm 1/250s ƒ/2 ISO400"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Captured"
+    },
+    {
+      "trait_type": "Project",
+      "value": "None"
+    },
+    {
+      "trait_type": "Artist",
+      "value": "Ph101pp"
+    },
+    {
+      "trait_type": "Number",
+      "value": 515
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Date",
+      "value": 1706439600
+    },
+    {
+      "trait_type": "Weekday",
+      "value": "Sunday"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Month",
+      "value": 1
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Year",
+      "value": 2024
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Day",
+      "value": 28
+    }
+  ],
+  "image_details": {
+    "size": 34796239,
+    "type": "image/jpeg",
+    "width": 5922,
+    "height": 3948,
+    "sha256": "3d074f06c40ea8e0467c647bc6240de29ac5c2a0486d75cb29444552a6b138f6"
+  }
+}
