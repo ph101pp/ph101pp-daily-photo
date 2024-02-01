@@ -167,7 +167,7 @@ const UploadAndPublish = () => {
       numberOfSteps,
       steps: [
         {
-          result: osResult,
+          result: await osResult.json(),
           message: "> Listed on Opensea > Done!"
         }
       ]

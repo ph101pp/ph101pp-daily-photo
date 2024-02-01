@@ -15,8 +15,7 @@ export default async function handler(
     return res.status(405).json({ message: 'Only POST requests allowed' })
   }
   const params = JSON.parse(req.body);
-
-  const tokenId = params.token;
+  const tokenId = params.tokenId;
 
   if (typeof tokenId !== "string") {
     return res.status(404).json({ message: 'Not Found' })
@@ -31,16 +30,24 @@ export default async function handler(
     chain: Chain.Mainnet,
     apiKey: OPENSEA_API_KEY,
   });
-
-  const listing = await openseaSDK.createListing({
-    asset: {
-      tokenId,
-      tokenAddress: NEXT_PUBLIC_MAINNET_CONTRACT_ADDRESS,
-    },
-    accountAddress: walletWithProvider.address,
-    startAmount: 0.01,
-    expirationTime: Math.round(Date.now() / 1000 + 60 * 60 * 24),
-  });
-
-  return res.json(listing);
+  try {
+    const listing = await openseaSDK.createListing({
+      asset: {
+        tokenId,
+        tokenAddress: NEXT_PUBLIC_MAINNET_CONTRACT_ADDRESS,
+      },
+      accountAddress: walletWithProvider.address,
+      startAmount: 0.01,
+      expirationTime: Math.round(Date.now() / 1000 + 60 * 60 * 24),
+    });
+    return res.json(JSON.parse(JSON.stringify(listing, (key, value) =>
+      typeof value === 'bigint'
+        ? value.toString()
+        : value // return everything else unchanged
+    )));
+  }
+  catch (e) {
+    console.log(e)
+    return res.end("not ok")
+  }
 }
