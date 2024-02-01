@@ -38,7 +38,7 @@ export default async function handler(
       },
       accountAddress: walletWithProvider.address,
       startAmount: 0.01,
-      expirationTime: Math.round(Date.now() / 1000 + 60 * 60 * 24 * 365),
+      expirationTime: Math.round(Date.now() / 1000 + 60 * 60 * 24 * 182),
     });
     return res.json(JSON.parse(JSON.stringify(listing, (key, value) =>
       typeof value === 'bigint'
