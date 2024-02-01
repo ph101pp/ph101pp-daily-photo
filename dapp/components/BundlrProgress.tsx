@@ -49,7 +49,7 @@ const BundlrProgress = () => {
 
         <Box>
           {status.steps.map(({ message, ...stats }, i, steps) => (
-            <Accordion>
+            <Accordion key={message}>
               <AccordionSummary>
                 <Box style={{ display: "flex", flex:"1", justifyContent:"space-between" }}>
                   <Box>
