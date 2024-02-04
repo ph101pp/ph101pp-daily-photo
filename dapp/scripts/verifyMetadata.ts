@@ -11,8 +11,7 @@ const arweave = Arweave.init({
 execute();
 async function execute() {
 
-
-  const verify = process.cwd() + "/../verify.txt";
+  const verify = process.cwd() + "/../VERIFY_METADATA.txt";
   const dirname = process.cwd() + "/../TOKEN_METADATA";
   const tokens = fs.readdirSync(dirname);
 
@@ -26,23 +25,12 @@ async function execute() {
     const metadata = fs.readFileSync(dirname + "/" + token).toString("utf-8");
     const data = JSON.parse(metadata.replace(/\n/g, ""));
 
-    // console.log(data.image, data.image_details)
-
     const image = await arweave.transactions.getData(data.image.replace("ar://", ""), { decode: true }) as Uint8Array
     const hash = await sha256("data:image/jpeg;base64," + Buffer.from(image).toString("base64"));
 
-
-    // console.log(image.byteLength, hash);
-    fs.appendFileSync(verify, `${token}, ${data.image_details.size === image.byteLength}, ${hash === data.image_details.sha256}
-    `);
+    fs.appendFileSync(verify, `${token},${data.image_details.size === image.byteLength},${hash === data.image_details.sha256}\n`);
   }
 }
-// const data = arweave.transactions.getData("wgyaNi-o60ee2KPmRWwqRxGZ0He6jgM0LaK7YeHsMCw", {decode:true}).then(async (d) => {
-
-//   // @ts-ignore
-//   console.log(d.byteLength, await sha256("data:image/jpeg;base64,"+Buffer.from(d).toString("base64")));
-
-// })
 
 async function sha256(text: string): Promise<string> {
   const textAsBuffer = new TextEncoder().encode(text);
@@ -50,20 +38,4 @@ async function sha256(text: string): Promise<string> {
   const hashBuffer = await webcrypto.subtle.digest('SHA-256', textAsBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-
-function readFiles(dirname: string) {
-  const files = fs.readdirSync(dirname);
-  console.log(files)
-  //   filenames.forEach(function(filename) {
-  //     fs.readFile(dirname + filename, 'utf-8', async function(err, content) {
-  //       if (err) {
-  //         onError(err);
-  //         return;
-  //       }
-  //       onFileContent(filename, content);
-  //     });
-  //   });
-  // });
 }
