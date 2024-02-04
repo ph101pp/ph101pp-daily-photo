@@ -53,7 +53,7 @@ const defaultTokenMetadataInputAtom = selector<TokenMetadataInputType | null>({
     const [tokenDate, tokenIndex] = tokenId.split("-");
     const formattedDate = formatDate(tokenDate);
     const imageDimensions = await getImageDimensions(image.dataURL);
-    const sha = await sha256(image.dataURL);
+    const sha = await sha256(image.dataURL.replace(/^data\:([^\;]+)\;base64,/gmi, ''));
     const autoCamera = `${image.exif.Make} ${image.exif.Model}`
     const exposureTime = parseFloat(image.exif.ExposureTime);
     const shutterSpeed = exposureTime >= 1 ? `${exposureTime}` : `1/${getShutterspeed(exposureTime)}`;
