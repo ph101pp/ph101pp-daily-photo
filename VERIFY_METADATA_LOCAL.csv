@@ -289,7 +289,7 @@ token,imageSizeMatch,imageHashMatch
 20230615-288.json,true,true
 20230616-289.json,true,true
 20230617-290.json,true,true
-20230618-291.json,false,false
+20230618-291.json,true,true
 20230619-292.json,true,true
 20230620-293.json,true,true
 20230621-294.json,true,true
@@ -515,6 +515,3 @@ token,imageSizeMatch,imageHashMatch
 20240127-514.json,true,true
 20240128-515.json,true,true
 CLAIM-0.json,true,true
-20230618-291.json,false,false
-20230618-291.json,false,false
-20230618-291.json,true,true

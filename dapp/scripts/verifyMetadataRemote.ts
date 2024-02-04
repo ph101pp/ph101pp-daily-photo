@@ -11,13 +11,15 @@ const arweave = Arweave.init({
 execute();
 async function execute() {
 
-  const verify = process.cwd() + "/../VERIFY_METADATA.txt";
+  const verify = process.cwd() + "/../VERIFY_METADATA_REMOTE.csv";
   const dirname = process.cwd() + "/../TOKEN_METADATA";
   const tokens = fs.readdirSync(dirname);
 
+  fs.writeFileSync(verify, "token,imageSizeMatch,imageHashMatch\n")
+
   console.log(tokens.length);
 
-  for (let i = 291; i < 292; i++) {
+  for (let i = 0; i < 10; i++) {
     const token = tokens[i];
     if (token === ".DS_Store") {
       continue
@@ -28,7 +30,9 @@ async function execute() {
     const image = await arweave.transactions.getData(data.image.replace("ar://", ""), { decode: true }) as Uint8Array
     const hash = await sha256("data:image/jpeg;base64," + Buffer.from(image).toString("base64"));
 
-    fs.appendFileSync(verify, `${token},${data.image_details.size === image.byteLength},${hash === data.image_details.sha256}\n`);
+    const result = `${token},${data.image_details.size === image.byteLength},${hash === data.image_details.sha256}\n`;
+    console.log(result)
+    fs.appendFileSync(verify, result);
   }
 }
 
