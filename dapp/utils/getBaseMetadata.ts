@@ -45,7 +45,7 @@ export default function getBaseMetadata(tokenDate: string, tokenIndex: string): 
     "attributes": [
       {
         "trait_type": "Artist",
-        "value": "Ph101pp"
+        "value": "Philipp Adrian"
       },
       {
         "trait_type": "Number",

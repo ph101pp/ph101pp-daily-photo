@@ -8,7 +8,7 @@
   "attributes": [
     {
       "trait_type": "Place",
-      "value": "Queens, New York City"
+      "value": "Queens, New York"
     },
     {
       "trait_type": "Country",
@@ -32,7 +32,7 @@
     },
     {
       "trait_type": "Artist",
-      "value": "Ph101pp"
+      "value": "Philipp Adrian"
     },
     {
       "trait_type": "Number",

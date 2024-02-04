@@ -10,7 +10,7 @@ export default function getClaimMetadata({
 }): MetadataType {
   return ({
     "name": "Claim - One Daily Photo",
-    "created_by": "Philipp Adrian (Ph101pp)",
+    "created_by": "Philipp Adrian (ph101pp.eth)",
     "external_url": "https://daily.ph101pp.xyz/claim",
     "description": `This claim is redeemable for one photo from the Ph101pp Daily collection.
 
@@ -18,7 +18,7 @@ export default function getClaimMetadata({
     "attributes": [
       {
         "trait_type": "Artist",
-        "value": "Ph101pp"
+        "value": "Philipp Adrian"
       },
       {
         "trait_type": "Type",
