@@ -1,14 +1,14 @@
 {
   "description": "This moment was captured on Sunday, June 18, 2023.",
-  "image": "ar://w4D1s75OlTN6N3UqXpxupkv0icYlSTIbaZpS4dY2UYA",
-  "image_url": "ar://w4D1s75OlTN6N3UqXpxupkv0icYlSTIbaZpS4dY2UYA",
+  "image": "ar://j8H-wYC363qyQ34on1pqgYe0Sd8iQW0Q3FGluAeYGBY",
+  "image_url": "ar://j8H-wYC363qyQ34on1pqgYe0Sd8iQW0Q3FGluAeYGBY",
   "name": "#0291 – Sunday, June 18, 2023",
   "created_by": "Philipp Adrian (ph101pp.eth)",
   "external_url": "https://daily.ph101pp.xyz/20230618-291",
   "attributes": [
     {
       "trait_type": "Place",
-      "value": "Brooklyn, New York City"
+      "value": "Brooklyn, New York"
     },
     {
       "trait_type": "Country",
@@ -64,10 +64,10 @@
     }
   ],
   "image_details": {
-    "size": 18593621,
+    "size": 19570039,
     "type": "image/jpeg",
     "width": 4075,
     "height": 2717,
-    "sha256": "951ba521dcb54ad63eaa5998aaf7e8209c684ca54076be179ed0ed887415970b"
+    "sha256": "ea088e323ac48d6098de9618ca7f46e81900dc26460699e8a33c7dd26b4868e6"
   }
 }
