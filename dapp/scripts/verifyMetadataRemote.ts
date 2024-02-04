@@ -28,7 +28,7 @@ async function execute() {
     const data = JSON.parse(metadata.replace(/\n/g, ""));
 
     const image = await arweave.transactions.getData(data.image.replace("ar://", ""), { decode: true }) as Uint8Array
-    const hash = await sha256("data:image/jpeg;base64," + Buffer.from(image).toString("base64"));
+    const hash = await sha256(Buffer.from(image).toString("base64"));
 
     const result = `${token},${data.image_details.size === image.byteLength},${hash === data.image_details.sha256}\n`;
     console.log(result)

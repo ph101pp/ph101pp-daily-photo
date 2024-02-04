@@ -30,7 +30,7 @@ async function execute() {
     const data = JSON.parse(metadata.replace(/\n/g, ""));
 
     const image = fs.readFileSync(imageDirname + "/" + token.replace("json", "jpg"));
-    const hash = await sha256("data:image/jpeg;base64," + image.toString("base64"));
+    const hash = await sha256(image.toString("base64"));
 
     const result = `${token},${data.image_details.size === image.byteLength},${hash === data.image_details.sha256}\n`;
     console.log(result);
